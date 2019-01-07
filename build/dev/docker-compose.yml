@@ -1,0 +1,19 @@
+version: "2"
+services:
+  finished-games:
+    build:
+      args:
+        uid: ${UID}
+        gid: ${GID}
+      context: ../..
+      dockerfile: build/dev/Dockerfile
+    environment:
+      DJANGO_SETTINGS_MODULE: finishedgames.settings.dev
+    image: finished-games:dev
+    volumes:
+      - ../..:/code
+      - ../..:/opt/finished-games
+      - ~/.bash_history.finished-games:/home/finished-games/.bash_history
+    command: "bash -c 'exec python manage.py runserver 0.0.0.0:5000'"
+    ports:
+        - "0.0.0.0:5000:5000"

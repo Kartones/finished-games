@@ -1,0 +1,38 @@
+{% extends "base_with_menu.html" %}
+
+{% block title %}{{ viewed_user.get_username.capitalize }} Wishlisted games list - {{ block.super }}{% endblock %}
+
+{% block content %}
+
+    <h2>{{ viewed_user.get_username.capitalize }} Wishlisted games list</h2>
+
+    <table class="nes-table is-bordered">
+        <thead>
+            <tr>
+                <th>Game</th>
+                <th>Platform</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in wishlisted_games %}
+                <tr>
+                    <td>
+                        <a href="{% url 'game_details' item.game.id %}">{{ item.game.name }}</a>
+                    </td>
+                    <td class="is-centered">
+                        {{ item.platform.shortname }}
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <section class="nes-container">
+        <div>
+            <p>
+                <strong>{{ wishlisted_games_count }}</strong> games.</a>
+            </p>
+        </div>
+    </section>
+
+{% endblock %}

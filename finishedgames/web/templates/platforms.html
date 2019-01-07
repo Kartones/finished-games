@@ -1,0 +1,35 @@
+{% extends "base_with_menu.html" %}
+
+{% block title %}All platforms - {{ block.super }}{% endblock %}
+
+{% block content %}
+
+    <h2>All platforms</h2>
+
+    <table class="nes-table is-bordered">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for platform in platforms %}
+                <tr>
+                    <td>{{ platform.name }}</td>
+                    <td><a class="nes-btn is-primary" href="{% url "games_by_platform" platform.id %}">Games</a></td>
+                    <td><a class="nes-btn is-primary" href="{% url "platform_details" platform.id %}">Details</a></td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <section class="nes-container">
+        <div>
+            <p>
+                <strong>{{ platforms_count }}</strong> platforms.</a>
+            </p>
+        </div>
+    </section>
+
+{% endblock %}

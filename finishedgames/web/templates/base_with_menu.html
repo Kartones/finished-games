@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block menu %}
+    <section class="nes-container menu">
+        <div>
+            <a class="nes-btn" href="{% url 'games' %}">Games</a>
+            <a class="nes-btn" href="{% url 'platforms' %}">Platforms</a>
+            <a class="nes-btn" href="{% url 'users' %}">Users</a>
+            {% if user.is_authenticated %}
+                <a class="nes-btn is-right" href="{% url 'logout' %}">Logout</a>
+                <a class="nes-btn is-right" href="{% url 'user_profile' user.get_username %}">Profile</a>
+            {% else %}
+                <a class="nes-btn is-success is-right" href="{% url 'login' %}">Login</a>
+            {% endif %}
+        </div>
+    </section>
+{% endblock %}

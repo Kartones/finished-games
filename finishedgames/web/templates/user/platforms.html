@@ -1,0 +1,35 @@
+{% extends "base_with_menu.html" %}
+
+{% block title %}Platforms Catalog of {{ viewed_user.get_username.capitalize }} - {{ block.super }}{% endblock %}
+
+{% block content %}
+
+    <h2>Platforms Catalog of {{ viewed_user.get_username.capitalize }}</h2>
+
+    <table class="nes-table is-bordered">
+        <thead>
+            <tr>
+                <th>Platform</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for platform in user_platforms %}
+                <tr>
+                    <td>
+                        <a href="{% url "user_games_by_platform" viewed_user.get_username platform.id %}">{{ platform.name }}</a>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <section class="nes-container with-title">
+        <h3 class="title">Stats</h3>
+        <div>
+            <p>
+                <strong>{{ user_platforms_count }}</strong> platforms owned</a>
+            </p>
+        </div>
+    </section>
+
+    {% endblock %}

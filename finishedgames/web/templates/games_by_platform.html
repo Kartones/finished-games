@@ -1,0 +1,26 @@
+{% extends "base_with_menu.html" %}
+
+{% block title %}{{ platform.name }} games - {{ block.super }}{% endblock %}
+
+{% block content %}
+
+    <h2>{{ platform.name }} games</h2>
+
+    <table class="nes-table is-bordered">
+        <thead>
+            <tr>
+                <th>Name</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for game in games %}
+                <tr>
+                    <td><a href="{% url "game_details" game.id %}">{{ game.name }}</a></td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <p><strong>{{ games_count }}</strong> games for <strong>{{ platform.name }}</strong>.</p>
+
+{% endblock %}

@@ -1,0 +1,74 @@
+body {
+    padding: 0 1.5rem;
+    margin: 1.5rem;
+}
+
+footer {
+    font-size: 12px;
+    text-align: center;
+}
+
+h1 a, h1 a:hover {
+    text-decoration: none;
+    color: black;
+}
+
+section {
+    margin-bottom: 0.5rem;
+}
+
+hr {
+    border-color: #adafbc;
+    border-style: solid;
+    border-width: 2px;
+    margin-bottom: 1rem;
+}
+
+.margin-top {
+    margin-top: 1rem;
+}
+
+.nes-btn.is-right {
+    float: right;
+    margin-left: 20px;
+}
+
+section.menu {
+    padding: 0.5rem 1rem;
+    margin-bottom: 1rem;
+}
+
+a.nes-btn {
+    text-decoration: none;
+    color: black;
+}
+
+.nes-table.is-bordered {
+    margin-top: 1rem;
+    margin-bottom: 2rem;
+}
+
+h3.nes-title span {
+    vertical-align: super;
+}
+
+.nes-icon, .snes-jp-logo {
+    vertical-align: middle;
+}
+
+.nes-table th.is-centered, .nes-table td.is-centered {
+    text-align: center;
+}
+
+.nes-field.is-inline .nes-input, .nes-field.is-inline .nes-textarea {
+    flex-grow: 4;
+}
+
+.nes-field.inline-checkbox > label {
+    margin-left: 2rem;
+    text-align: left;
+}
+
+.nes-input {
+    margin-bottom: 12px;
+}

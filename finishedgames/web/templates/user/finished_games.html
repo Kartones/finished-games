@@ -1,0 +1,42 @@
+{% extends "base_with_menu.html" %}
+
+{% block title %}{{ viewed_user.get_username.capitalize }} Finished games list - {{ block.super }}{% endblock %}
+
+{% block content %}
+
+    <h2><i class="nes-icon trophy" title="Finished"></i> {{ viewed_user.get_username.capitalize }} Finished games list</h2>
+
+    <table class="nes-table is-bordered">
+        <thead>
+            <tr>
+                <th>Game</th>
+                <th>Platform</th>
+                <th>Year</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in finished_games %}
+                <tr>
+                    <td>
+                        <a href="{% url 'game_details' item.game.id %}">{{ item.game.name }}</a>{% if item.currently_playing %} <i class="snes-jp-logo" title="Currently playing"></i>{% endif %}
+                    </td>
+                    <td class="is-centered">
+                        {{ item.platform.shortname }}
+                    </td>
+                    <td class="is-centered">
+                        {{ item.year_finished }}
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <section class="nes-container">
+        <div>
+            <p>
+                <strong>{{ finished_games_count }}</strong> games.</a>
+            </p>
+        </div>
+    </section>
+
+{% endblock %}

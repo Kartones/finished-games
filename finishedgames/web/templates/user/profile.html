@@ -1,0 +1,23 @@
+{% extends "base_with_menu.html" %}
+
+{% block title %}Your Profile - {{ block.super }}{% endblock %}
+
+{% block content %}
+
+    <h2>Hi {{ user.get_username.capitalize }},this is your profile</h2>
+
+    <section class="nes-container">
+        <div>
+            <p>
+                <a class="nes-btn" href="{% url 'user_public_profile' user.get_username %}">Your public profile</a>
+            </p>
+            <p>
+                <a class="nes-btn" href="{% url 'user_catalog' user.get_username %}">Your catalog</a>
+            </p>
+            <p>
+                <a class="nes-btn" href="{% url 'user_add_game' user.get_username %}">Add game to your catalog</a>
+            </p>
+        </div>
+    </section>
+
+{% endblock %}

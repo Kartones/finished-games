@@ -1,0 +1,39 @@
+{% extends "base_with_menu.html" %}
+
+{% block title %}Videogames Catalog of {{ viewed_user.get_username.capitalize }} - {{ block.super }}{% endblock %}
+
+{% block content %}
+
+    <h2>Videogames Catalog of {{ viewed_user.get_username.capitalize }}</h2>
+
+    <table class="nes-table is-bordered">
+        <thead>
+            <tr>
+                <th>Game</th>
+                <th>Platform</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in user_games %}
+                <tr>
+                    <td>
+                        <a href="{% url 'game_details' item.game.id %}">{{ item.game.name }}</a>{% if item.currently_playing %} <i class="snes-jp-logo" title="Currently playing"></i>{% endif %}{% if item.year_finished %} <i class="nes-icon trophy" title="Finished"></i>{% endif %}
+                    </td>
+                    <td class="is-centered">
+                        {{ item.platform.shortname }}
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <section class="nes-container with-title">
+        <h3 class="title">Stats</h3>
+        <div>
+            <p>
+                <strong>{{ user_games_count }}</strong> games owned</a>
+            </p>
+        </div>
+    </section>
+
+{% endblock %}

@@ -1,0 +1,7 @@
+pytest
+flake8
+mypy
+django-debug-toolbar
+pytest-django
+coverage
+pytest-cov

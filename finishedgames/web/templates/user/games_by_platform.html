@@ -1,0 +1,45 @@
+{% extends "base_with_menu.html" %}
+
+{% block title %}{{ platform.name }} games owned by {{ viewed_user.get_username.capitalize }} - {{ block.super }}{% endblock %}
+
+{% block content %}
+
+    <h2>{{ platform.name }} games owned by {{ viewed_user.get_username.capitalize }}</h2>
+
+    <table class="nes-table is-bordered">
+        <thead>
+            <tr>
+                <th>Name</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in user_games %}
+                <tr>
+                    <td>
+                        <a href="{% url "game_details" item.game.id %}">{{ item.game.name }}</a>{% if item.currently_playing %} <i class="snes-jp-logo" title="Currently playing"></i>{% endif %}{% if item.year_finished %} <i class="nes-icon trophy" title="Finished"></i>{% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <section class="nes-container with-title">
+        <h3 class="title">Stats</h3>
+        <div>
+            <p>
+                <strong>{{ games_count }}</strong> games.
+            </p>
+            <p>
+                <strong>{{ currently_playing_games_count }}</strong> currently playing games.
+            </p>
+            <p>
+                <strong>{{ finished_games_count }}</strong> finished games.
+                <br/>
+                <progress class="nes-progress {{ progress_class }}" value="{{ finished_games_progress }}"
+                    max="100"
+                    title="Finished {{ finished_games_progress }}% of the catalog ({{ finished_games_count }}/{{ games_count }})"></progress>
+            </p>
+        </div>
+    </section>
+
+{% endblock %}

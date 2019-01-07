@@ -1,0 +1,8 @@
+
+.submit-row {
+    text-align: left;
+}
+
+.submit-row input.default {
+    float: none;
+}

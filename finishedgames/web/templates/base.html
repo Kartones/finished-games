@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load static %}
+    <link rel="shortcut icon" type="image/x-icon" href="{% static 'favicon.ico' %}" />
+    <link href="https://fonts.googleapis.com/css?family=Press+Start+2P" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/nes.min.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}" />
+    <title>{% block title %}Finished Games{% endblock %}</title>
+</head>
+
+<body>
+    <header>
+        <h1><a href="{% url 'index' %}">Finished Games</a></h1>
+        <p>Track your playing history</p>
+        {% block menu %}{% endblock %}
+    </header>
+
+    <div id="content">
+        <section class="nes-container">
+            <div>
+                {% block content %}{% endblock %}
+
+                {% if request.path != '/' %}
+                    <hr/>
+                    <a class="nes-btn" href="javascript:history.back();">Go Back</a>
+                {% endif %}
+            </div>
+        </section>
+    </div>
+
+    <footer>
+        Made with <i class="nes-icon heart is-small" title="love"></i> by <a href="https://kartones.net" target="_blank">Kartones</a>
+    </footer>
+</body>
+</html>

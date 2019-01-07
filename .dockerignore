@@ -1,0 +1,10 @@
+.git
+.gitignore
+.flake8
+.pytest_cache
+LICENSE
+Makefile
+README.md
+mypy.ini
+pytest.ini
+*/doc/*
