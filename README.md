@@ -43,9 +43,11 @@ Not all functionality is yet implemented, expect missing basic features until re
 
 There is a roadmap but for now internal, I do plan to make the site fully usable without needing to rely on django-admin, I'll eventually add an autocomplete textfield for selecting the game and/or platform, and other basic features, all before considering MVP 1.1 done.
 
+The Docker Python image is already compatible with variable type hints (>= 3.6), but as many OS still come with as much as 3.5, like Ubuntu, keeping variable type annotations as comments for now so they run with Python 3.5.
+
 ## Setup
 
-This project requires `Python >= 3.6`, `Docker` and `Docker Compose`. Other requirements are specified in the corresponding `requirements.txt` and `requirements-dev.txt` files but are installed inside the containers.
+This project requires `Python >= 3.5`, `Docker` and `Docker Compose`. Other requirements are specified in the corresponding `requirements.txt` and `requirements-dev.txt` files but are installed inside the containers.
 
 Requirements are not version-pinned on purpose, if a build fails due to some new version breaking change it will be triaged and solved accordingly.
 
