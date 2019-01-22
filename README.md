@@ -35,9 +35,13 @@ Form to add an existing game to the user's catalog:
 
 You can see a live demo of the project at [https://finishedgames.kartones.net](https://finishedgames.kartones.net) (user accounts restricted to only friends, not for public use, sorry!).
 
-**Note**: Not all functionality is yet implemented, expect missing basic features until reaching MVP 1.1.
-
 This project uses the awesome [NES.CSS Framework from nostalgic-css](https://github.com/nostalgic-css/NES.css).
+
+### Notes
+
+Not all functionality is yet implemented, expect missing basic features until reaching MVP 1.1.
+
+There is a roadmap but for now internal, I do plan to make the site fully usable without needing to rely on django-admin, I'll eventually add an autocomplete textfield for selecting the game and/or platform, and other basic features, all before considering MVP 1.1 done.
 
 ## Setup
 
