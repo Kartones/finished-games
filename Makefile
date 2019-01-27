@@ -1,4 +1,4 @@
-.PHONY: default deps base build stop shell test coverage run
+.PHONY: default deps base build stop shell test coverage run statics
 
 export SERVICE_NAME := finished-games
 
@@ -55,3 +55,6 @@ coverage: build
 	set -o pipefail; \
 	$(COMPOSE_CMD) pytest --cov-report html:../cov_html --cov=. --cov-config .coveragerc; \
 	xdg-open cov_html/index.html
+
+statics: build
+	$(COMPOSE_CMD) python3 manage.py collectstatic ${collectargs}

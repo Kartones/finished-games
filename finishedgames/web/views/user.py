@@ -7,6 +7,7 @@ from typing import Dict  # NOQA: F401
 
 from core.forms import UserGameForm
 from core.models import (Game, Platform, UserGame, WishlistedUserGame)
+from web import constants
 
 
 def _progress_bar_class(progress: int) -> str:
@@ -22,8 +23,8 @@ def _progress_bar_class(progress: int) -> str:
 
 
 def users(request: HttpRequest) -> HttpResponse:
-    # For security reasons, no superadmins/staff can have normal site profiles
-    users = get_user_model().objects.filter(is_active=True, is_superuser=False, is_staff=False)
+    # For security reasons, no superadmins should have normal site profiles
+    users = get_user_model().objects.filter(is_active=True, is_superuser=False)
     context = {
         "users": users,
     }
@@ -98,15 +99,23 @@ def catalog(request: HttpRequest, username: str) -> HttpResponse:
 def games(request: HttpRequest, username: str) -> HttpResponse:
     viewed_user = get_object_or_404(get_user_model(), username=username)
 
+    sort_by = request.GET.get("sort_by", constants.SORT_BY_GAME_NAME)
+    try:
+        order_by = constants.SORT_FIELDS_MAPPING[sort_by]
+    except KeyError:
+        order_by = constants.SORT_FIELDS_MAPPING[constants.SORT_BY_GAME_NAME]
+
     user_games = UserGame.objects \
                          .filter(user=viewed_user) \
-                         .order_by("game__name") \
+                         .order_by(*order_by) \
                          .select_related("game", "platform")
 
     context = {
         "viewed_user": viewed_user,
         "user_games": user_games,
-        "user_games_count": len(user_games)
+        "user_games_count": len(user_games),
+        "constants": constants,
+        "sort_by": sort_by,
     }
 
     return render(request, "user/games.html", context)
@@ -124,7 +133,7 @@ def platforms(request: HttpRequest, username: str) -> HttpResponse:
     context = {
         "viewed_user": viewed_user,
         "user_platforms": user_platforms,
-        "user_platforms_count": len(user_platforms)
+        "user_platforms_count": len(user_platforms),
     }
 
     return render(request, "user/platforms.html", context)
@@ -133,15 +142,23 @@ def platforms(request: HttpRequest, username: str) -> HttpResponse:
 def currently_playing_games(request: HttpRequest, username: str) -> HttpResponse:
     viewed_user = get_object_or_404(get_user_model(), username=username)
 
+    sort_by = request.GET.get("sort_by", constants.SORT_BY_GAME_NAME)
+    try:
+        order_by = constants.SORT_FIELDS_MAPPING[sort_by]
+    except KeyError:
+        order_by = constants.SORT_FIELDS_MAPPING[constants.SORT_BY_GAME_NAME]
+
     currently_playing_games = UserGame.objects \
                                       .filter(user=viewed_user, currently_playing=True) \
-                                      .order_by("game__name") \
+                                      .order_by(*order_by) \
                                       .select_related("game", "platform")
 
     context = {
         "viewed_user": viewed_user,
         "currently_playing_games": currently_playing_games,
-        "currently_playing_games_count": len(currently_playing_games)
+        "currently_playing_games_count": len(currently_playing_games),
+        "constants": constants,
+        "sort_by": sort_by,
     }
 
     return render(request, "user/currently_playing_games.html", context)
@@ -150,15 +167,23 @@ def currently_playing_games(request: HttpRequest, username: str) -> HttpResponse
 def finished_games(request: HttpRequest, username: str) -> HttpResponse:
     viewed_user = get_object_or_404(get_user_model(), username=username)
 
+    sort_by = request.GET.get("sort_by", constants.SORT_BY_GAME_NAME)
+    try:
+        order_by = constants.SORT_FIELDS_MAPPING[sort_by]
+    except KeyError:
+        order_by = constants.SORT_FIELDS_MAPPING[constants.SORT_BY_GAME_NAME]
+
     finished_games = UserGame.objects.filter(user=viewed_user) \
                                      .exclude(year_finished__isnull=True) \
-                                     .order_by("-year_finished", "game__name") \
+                                     .order_by(*order_by) \
                                      .select_related("game", "platform")
 
     context = {
         "viewed_user": viewed_user,
         "finished_games": finished_games,
-        "finished_games_count": len(finished_games)
+        "finished_games_count": len(finished_games),
+        "constants": constants,
+        "sort_by": sort_by,
     }
 
     return render(request, "user/finished_games.html", context)
@@ -167,15 +192,23 @@ def finished_games(request: HttpRequest, username: str) -> HttpResponse:
 def wishlisted_games(request: HttpRequest, username: str) -> HttpResponse:
     viewed_user = get_object_or_404(get_user_model(), username=username)
 
+    sort_by = request.GET.get("sort_by", constants.SORT_BY_GAME_NAME)
+    try:
+        order_by = constants.SORT_FIELDS_MAPPING[sort_by]
+    except KeyError:
+        order_by = constants.SORT_FIELDS_MAPPING[constants.SORT_BY_GAME_NAME]
+
     wishlisted_games = WishlistedUserGame.objects \
                                          .filter(user=viewed_user) \
-                                         .order_by("game__name") \
+                                         .order_by(*order_by) \
                                          .select_related("game", "platform")
 
     context = {
         "viewed_user": viewed_user,
         "wishlisted_games": wishlisted_games,
-        "wishlisted_games_count": len(wishlisted_games)
+        "wishlisted_games_count": len(wishlisted_games),
+        "constants": constants,
+        "sort_by": sort_by,
     }
 
     return render(request, "user/wishlisted_games.html", context)

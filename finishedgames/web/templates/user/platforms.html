@@ -1,10 +1,10 @@
 {% extends "base_with_menu.html" %}
 
-{% block title %}Platforms Catalog of {{ viewed_user.get_username.capitalize }} - {{ block.super }}{% endblock %}
+{% block title %}Platforms {{ viewed_user.get_username.capitalize }} has played in - {{ block.super }}{% endblock %}
 
 {% block content %}
 
-    <h2>Platforms Catalog of {{ viewed_user.get_username.capitalize }}</h2>
+    <h2>Platforms {{ viewed_user.get_username.capitalize }} has played in</h2>
 
     <table class="nes-table is-bordered">
         <thead>

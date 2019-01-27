@@ -65,7 +65,7 @@ python manage.py createsuperuser
 
 To setup the production settings, my recommendation (and the .gitignored file) is to create a `finishedgames/finishedgames/settings/prod.py` file and there setup your secrets (secret key, database credentials, allowed_hosts, etc.).
 
-Also remember that you need to [setup the statics](https://docs.djangoproject.com/en/2.1/howto/static-files/) for production (and run `python manage.py collectstatic`) when going live, for development it works out of the box.
+Also remember that you need to [setup the statics](https://docs.djangoproject.com/en/2.1/howto/static-files/) for production when going live, for development it works out of the box. To prepare the statics, run `make statics`.
 
 ## Running
 

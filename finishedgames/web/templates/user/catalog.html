@@ -13,7 +13,7 @@
                 <a href="{% url 'user_games' viewed_user.get_username %}"><strong>{{ user_games_count }}</strong> games owned</a>
             </p>
             <p>
-                <a href="{% url 'user_platforms' viewed_user.get_username %}"><strong>{{ user_platforms_count }}</strong> platforms owned</a>
+                <a href="{% url 'user_platforms' viewed_user.get_username %}"><strong>{{ user_platforms_count }}</strong> platforms played in</a>
             </p>
             <p>
                 <a href="{% url 'user_currently_playing_games' viewed_user.get_username %}"><strong>{{ currently_playing_games_count }}</strong> currently playing games</a>
@@ -80,7 +80,7 @@
             </table>
 
             <p>
-                <a class="nes-btn is-primary" href="{% url 'user_platforms' viewed_user.get_username %}">All owned platforms</a>
+                <a class="nes-btn is-primary" href="{% url 'user_platforms' viewed_user.get_username %}">All platforms played in</a>
             </p>
         </div>
     </section>

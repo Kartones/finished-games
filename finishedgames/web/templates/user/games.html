@@ -9,8 +9,17 @@
     <table class="nes-table is-bordered">
         <thead>
             <tr>
-                <th>Game</th>
-                <th>Platform</th>
+                {% if sort_by == constants.SORT_BY_GAME_NAME %}
+                    <th>Game <a href="{{ request.path }}?sort_by={{ constants.SORT_BY_GAME_NAME_DESC }}">&#8593;</a></th>
+                {% else %}
+                    <th>Game <a href="{{ request.path }}?sort_by={{ constants.SORT_BY_GAME_NAME }}">&#8595;</a></th>
+                {% endif %}
+
+                {% if sort_by == constants.SORT_BY_PLATFORM %}
+                    <th>Platform <a href="{{ request.path }}?sort_by={{ constants.SORT_BY_PLATFORM_DESC }}">️️️️&#8593;</a></th>
+                {% else %}
+                    <th>Platform <a href="{{ request.path }}?sort_by={{ constants.SORT_BY_PLATFORM }}">&#8595;</a></th>
+                {% endif %}
             </tr>
         </thead>
         <tbody>

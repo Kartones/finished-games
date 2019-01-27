@@ -4,35 +4,44 @@
 
 {% block content %}
 
-    <h2>{{ viewed_user.get_username.capitalize }} Wishlisted games list</h2>
+<h2>{{ viewed_user.get_username.capitalize }} Wishlisted games list</h2>
 
-    <table class="nes-table is-bordered">
-        <thead>
-            <tr>
-                <th>Game</th>
-                <th>Platform</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for item in wishlisted_games %}
-                <tr>
-                    <td>
-                        <a href="{% url 'game_details' item.game.id %}">{{ item.game.name }}</a>
-                    </td>
-                    <td class="is-centered">
-                        {{ item.platform.shortname }}
-                    </td>
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+<table class="nes-table is-bordered">
+    <thead>
+        <tr>
+            {% if sort_by == constants.SORT_BY_GAME_NAME %}
+                <th>Game <a href="{{ request.path }}?sort_by={{ constants.SORT_BY_GAME_NAME_DESC }}">&#8593;</a></th>
+            {% else %}
+                <th>Game <a href="{{ request.path }}?sort_by={{ constants.SORT_BY_GAME_NAME }}">&#8595;</a></th>
+            {% endif %}
 
-    <section class="nes-container">
-        <div>
-            <p>
-                <strong>{{ wishlisted_games_count }}</strong> games.</a>
-            </p>
-        </div>
-    </section>
+            {% if sort_by == constants.SORT_BY_PLATFORM %}
+                <th>Platform <a href="{{ request.path }}?sort_by={{ constants.SORT_BY_PLATFORM_DESC }}">️️️️&#8593;</a></th>
+            {% else %}
+                <th>Platform <a href="{{ request.path }}?sort_by={{ constants.SORT_BY_PLATFORM }}">&#8595;</a></th>
+            {% endif %}
+        </tr>
+    </thead>
+    <tbody>
+        {% for item in wishlisted_games %}
+        <tr>
+            <td>
+                <a href="{% url 'game_details' item.game.id %}">{{ item.game.name }}</a>
+            </td>
+            <td class="is-centered">
+                {{ item.platform.shortname }}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<section class="nes-container">
+    <div>
+        <p>
+            <strong>{{ wishlisted_games_count }}</strong> games.</a>
+        </p>
+    </div>
+</section>
 
 {% endblock %}
