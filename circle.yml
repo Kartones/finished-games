@@ -1,0 +1,31 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: circleci/python:3.6
+    steps:
+      - checkout
+
+      - restore_cache:
+          keys:
+          - v1-dependencies-{{ checksum "requirements.txt" }}
+          # fallback to using the latest cache if no exact match is found
+          - v1-dependencies-
+      - run: sudo pip install -r requirements.txt
+      - save_cache:
+          paths:
+            - ./cache
+          key: v1-dependencies-{{ checksum "requirements.txt" }}
+
+      - restore_cache:
+          keys:
+          - v1-dependencies-dev-{{ checksum "requirements-dev.txt" }}
+          # fallback to using the latest cache if no exact match is found
+          - v1-dependencies-dev-
+      - run: sudo pip install -r requirements-dev.txt
+      - save_cache:
+          paths:
+            - ./cache
+          key: v1-dependencies-dev-{{ checksum "requirements-dev.txt" }}
+
+      - run: pytest
