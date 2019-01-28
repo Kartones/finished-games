@@ -28,4 +28,4 @@ jobs:
             - ./cache
           key: v1-dependencies-dev-{{ checksum "requirements-dev.txt" }}
 
-      - run: pytest
+      - run: BUILD_ENV=dev pytest
