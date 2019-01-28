@@ -132,13 +132,11 @@ Also remember that you need to [setup the statics](https://docs.djangoproject.co
 
 ## Roadmap
 
-See [Projects page](https://github.com/Kartones/finished-games/projects?query=is%3Aopen+sort%3Aname-asc) for individual task details.
-
 Note that the second MVP means a radical departure from the current one, so a release tag will be created before embarking in the second phase (it can be useful as a "django starter kit").
 
-**Warning**: Until reaching MVP 1 "ready" state, all code, UI and DB schemas are subject to change. Then upon starting MVP 2 until its "ready" state again, expect heavy changes and no guaranteed backwards compatibility.
+**Warning**: Until reaching MVP 1.1 "ready" state, all code, UI and DB schemas are subject to change. Then upon starting MVP 2 until its "ready" state again, expect heavy changes and no guaranteed backwards compatibility.
 
-### MVP 1
+### ☑️  MVP 1
 
 Django only version, either without javascript or minimal one just to be able to use the site. Main goal is to have the system working and usable by users. Data ingestion either manually (through Django-admin) or via scripts (and probably Django commands).
 

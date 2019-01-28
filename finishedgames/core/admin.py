@@ -39,8 +39,8 @@ class UserDataInline(admin.StackedInline):
 
 class UserGameAdmin(FGModelAdmin):
     form = UserGameForm
-    list_display = ("game", "user", "platform", "currently_playing", "year_finished")
-    list_filter = ["user__username", "platform", "currently_playing", "year_finished"]
+    list_display = ("game", "user", "platform", "currently_playing", "year_finished", "no_longer_owned")
+    list_filter = ["user__username", "platform", "currently_playing", "year_finished", "no_longer_owned"]
     search_fields = ["game__name"]
 
     def get_ordering(self, request: HttpRequest) -> List[str]:
