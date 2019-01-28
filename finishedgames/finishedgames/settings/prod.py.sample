@@ -1,0 +1,29 @@
+import os
+
+from .base import *  # NOQA: F401, F403
+
+# Your production secret goes here
+SECRET_KEY = None
+# Although is better to fetch it from an environment variable:
+# SECRET_KEY = os.environ.get("SECRET_KEY")
+
+DEBUG = False
+
+ALLOWED_HOSTS = [
+    "0.0.0.0",
+    # Your production allowed hosts go here
+]
+
+DATABASES = {
+    # Your production database config goes here
+}
+
+# Static files production url
+# STATIC_URL = "https://finishedgames.kartones.net/statics/"
+
+# Directory from which you’d serve statics in production
+STATIC_ROOT = "/code/finishedgames/statics/"
+
+# HTTPS only for additional security (disable if you don't have https)
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = True

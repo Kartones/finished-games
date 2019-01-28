@@ -63,10 +63,6 @@ make shell
 python manage.py createsuperuser
 ```
 
-To setup the production settings, my recommendation (and the .gitignored file) is to create a `finishedgames/finishedgames/settings/prod.py` file and there setup your secrets (secret key, database credentials, allowed_hosts, etc.).
-
-Also remember that you need to [setup the statics](https://docs.djangoproject.com/en/2.1/howto/static-files/) for production when going live, for development it works out of the box. To prepare the statics, run `make statics`.
-
 ## Running
 
 To launch the website in development, just run:
@@ -125,6 +121,14 @@ To see the SQL query of an ORM query, use the `.query` property on `QuerySet` ob
 ```
 print(latest_finished_games.query)
 ```
+
+## Deployment
+
+
+To setup the production settings, copy `finishedgames/finishedgames/settings/prod.py.sample` to `finishedgames/finishedgames/settings/prod.py` and setup your secrets (secret key, database credentials, etc.). You should **never** remove the `prod.py` file from `.gitignored` list as you could commit your production credentials.
+
+Also remember that you need to [setup the statics](https://docs.djangoproject.com/en/2.1/howto/static-files/) for production when going live, for development it works out of the box. To prepare the statics, run `make statics`.
+
 
 ## Roadmap
 
