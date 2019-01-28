@@ -28,6 +28,10 @@ jobs:
             - ./cache
           key: v1-dependencies-dev-{{ checksum "requirements-dev.txt" }}
 
-      - run: |
-          cd finishedgames
-          BUILD_ENV=dev pytest
+      - run:
+          command: make test
+          shell: /bin/bash
+          working_directory: ~/finishedgames
+          environment:
+            BUILD_ENV: dev
+            DJANGO_SETTINGS_MODULE: finishedgames.settings.dev
