@@ -31,7 +31,7 @@ jobs:
       - run:
           command: pytest
           shell: /bin/bash
-          working_directory: ~/finishedgames
+          working_directory: ~/project/finishedgames
           environment:
             BUILD_ENV: dev
             DJANGO_SETTINGS_MODULE: finishedgames.settings.dev
