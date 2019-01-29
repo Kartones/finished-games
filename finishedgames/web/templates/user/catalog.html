@@ -10,7 +10,7 @@
         <h3 class="title">Stats</h3>
         <div>
             <p>
-                <a href="{% url 'user_games' viewed_user.get_username %}"><strong>{{ user_games_count }}</strong> games owned</a>
+                <a href="{% url 'user_games' viewed_user.get_username %}"><strong>{{ user_games_count }}</strong> games</a>
             </p>
             <p>
                 <a href="{% url 'user_platforms' viewed_user.get_username %}"><strong>{{ user_platforms_count }}</strong> platforms played in</a>
@@ -45,7 +45,7 @@
                     {% for item in latest_user_games %}
                         <tr>
                             <td>
-                                <a href="{% url 'game_details' item.game.id %}">{{ item.game.name }}</a>{% if item.currently_playing %} <i class="snes-jp-logo" title="Currently playing"></i>{% endif %}{% if item.year_finished %} <i class="nes-icon trophy" title="Finished"></i>{% endif %}
+                                <a href="{% url 'game_details' item.game.id %}">{{ item.game.name }}</a>{% if item.year_finished %} <i class="nes-icon trophy" title="Finished"></i>{% endif %}{% if item.currently_playing %} <i class="snes-jp-logo" title="Currently playing"></i>{% endif %}{% if item.no_longer_owned %} <i class="snes-jp-logo is-disabled" title="No longer owned"></i>{% endif %}
                             </td>
                             <td class="is-centered">
                                 {{ item.platform.shortname }}
@@ -56,7 +56,7 @@
             </table>
 
             <p>
-                <a class="nes-btn is-primary" href="{% url 'user_games' viewed_user.get_username %}">All owned games</a>
+                <a class="nes-btn is-primary" href="{% url 'user_games' viewed_user.get_username %}">All user games</a>
             </p>
         </div>
     </section>
