@@ -33,8 +33,8 @@
         <tr>
             <td>
                 <a href="{% url 'game_details' item.game.id %}">{{ item.game.name }}</a>{% if item.currently_playing %}
-                <i class="snes-jp-logo" title="Currently playing"></i>{% endif %}{% if item.no_longer_owned %}
-                <i class="snes-jp-logo is-disabled" title="No longer owned"></i>{% endif %}
+                <i class="nes-pixel-art snes-jp-logo" title="Currently playing"></i>{% endif %}{% if item.no_longer_owned %}
+                <i class="nes-pixel-art snes-jp-logo is-disabled" title="No longer owned"></i>{% endif %}
             </td>
             <td class="is-centered">
                 {{ item.platform.shortname }}

@@ -37,7 +37,7 @@ Form to add an existing game to the user's catalog:
 
 You can see a live demo of the project at [https://finishedgames.kartones.net](https://finishedgames.kartones.net) (user accounts restricted to only friends, not for public use, sorry!).
 
-This project uses the awesome [NES.CSS Framework from nostalgic-css](https://github.com/nostalgic-css/NES.css).
+This project uses [a customized fork](https://github.com/kartones-forks/NES.css) of the awesome [NES.CSS Framework from nostalgic-css](https://github.com/nostalgic-css/NES.css).
 
 ### Notes
 

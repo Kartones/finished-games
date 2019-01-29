@@ -1,4 +1,4 @@
-from typing import List
+from typing import (Any, cast, List)
 
 from django.contrib import admin
 # TODO: Use when adding data fields for the user, like an avatar (or fully remove)
@@ -46,6 +46,11 @@ class UserGameAdmin(FGModelAdmin):
     def get_ordering(self, request: HttpRequest) -> List[str]:
         return [Lower("user__username"), "-id"]
 
+    def get_form(self, request: HttpRequest, obj: Any = None, **kwargs: Any) -> UserGameForm:
+        form = super(UserGameAdmin, self).get_form(request, obj, **kwargs)
+        form.base_fields['user'].initial = request.user
+        return cast(UserGameForm, form)
+
 
 class PlatformAdmin(FGModelAdmin):
     form = PlatformForm
@@ -77,6 +82,11 @@ class WishlistedUserGameAdmin(FGModelAdmin):
 
     def get_ordering(self, request: HttpRequest) -> List[str]:
         return [Lower("user__username"), "-id"]
+
+    def get_form(self, request: HttpRequest, obj: Any = None, **kwargs: Any) -> WishlistedUserGameForm:
+        form = super(WishlistedUserGameAdmin, self).get_form(request, obj, **kwargs)
+        form.base_fields['user'].initial = request.user
+        return cast(WishlistedUserGameForm, form)
 
 
 # TODO: Use when adding data fields for the user, like an avatar (or fully remove)
