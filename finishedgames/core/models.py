@@ -58,6 +58,10 @@ class BaseUserGame(models.Model):
         abstract = True
         unique_together = (("user", "game", "platform"),)
 
+    @property
+    def generic_id(self) -> str:
+        return "{}:{}".format(self.game.id, self.platform.id)
+
 
 class UserGame(BaseUserGame):
     currently_playing = models.BooleanField("Currently playing", default=False, db_index=True)

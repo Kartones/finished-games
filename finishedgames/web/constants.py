@@ -14,3 +14,5 @@ SORT_FIELDS_MAPPING = {
     SORT_BY_YEAR: ["year_finished", "game__name"],
     SORT_BY_YEAR_DESC: ["-year_finished", "game__name"],
 }
+
+FORM_ACTION_DELETE = "DELETE"

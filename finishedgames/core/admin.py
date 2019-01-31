@@ -54,7 +54,7 @@ class UserGameAdmin(FGModelAdmin):
 
 class PlatformAdmin(FGModelAdmin):
     form = PlatformForm
-    list_display = ("name", "publish_date")
+    list_display = ("name", "shortname", "publish_date")
 
     def get_ordering(self, request: HttpRequest) -> List[str]:
         return [Lower("name")]

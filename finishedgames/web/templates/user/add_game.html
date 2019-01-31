@@ -27,12 +27,7 @@
         <section class="form nes-container">
             <p>
                 {% csrf_token %}
-                <div class="nes-field is-inline">
-                    <label for="user">User</label>
-                    <input type="text" id="user" class="nes-input" value="{{ user.get_username }}"
-                        readonly required />
-                    <input type="hidden" name="user" value="{{ user.id }}" />
-                </div>
+                <input type="hidden" name="user" value="{{ user.id }}" />
                 <div class="nes-field is-inline">
                     <label for="game">Game</label>
                     <select id="game" name="game" class="nes-input" required>

@@ -2,12 +2,15 @@ from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import get_user_model
 from django.http import (Http404, HttpResponse, HttpRequest)
-from django.shortcuts import (get_object_or_404, render)
-from typing import Dict  # NOQA: F401
+from django.shortcuts import (get_object_or_404, redirect, render)
+from django.utils.decorators import method_decorator
+from django.views import View
+from typing import (Any, Callable, Dict)  # NOQA: F401
 
-from core.forms import UserGameForm
+from core.forms import (UserGameForm, WishlistedUserGameForm)
 from core.models import (Game, Platform, UserGame, WishlistedUserGame)
 from web import constants
+from web.decorators import (authenticated_user_wishlisted_games, viewed_user)
 
 
 def _progress_bar_class(progress: int) -> str:
@@ -189,31 +192,6 @@ def finished_games(request: HttpRequest, username: str) -> HttpResponse:
     return render(request, "user/finished_games.html", context)
 
 
-def wishlisted_games(request: HttpRequest, username: str) -> HttpResponse:
-    viewed_user = get_object_or_404(get_user_model(), username=username)
-
-    sort_by = request.GET.get("sort_by", constants.SORT_BY_GAME_NAME)
-    try:
-        order_by = constants.SORT_FIELDS_MAPPING[sort_by]
-    except KeyError:
-        order_by = constants.SORT_FIELDS_MAPPING[constants.SORT_BY_GAME_NAME]
-
-    wishlisted_games = WishlistedUserGame.objects \
-                                         .filter(user=viewed_user) \
-                                         .order_by(*order_by) \
-                                         .select_related("game", "platform")
-
-    context = {
-        "viewed_user": viewed_user,
-        "wishlisted_games": wishlisted_games,
-        "wishlisted_games_count": len(wishlisted_games),
-        "constants": constants,
-        "sort_by": sort_by,
-    }
-
-    return render(request, "user/wishlisted_games.html", context)
-
-
 def user_games_by_platform(request: HttpRequest, username: str, platform_id: int) -> HttpResponse:
     viewed_user = get_object_or_404(get_user_model(), username=username)
 
@@ -264,7 +242,7 @@ def add_game(request: HttpRequest, username: str) -> HttpResponse:
     error_message = ""
 
     if request.method == "POST":
-        form = UserGameForm(request.POST, request.FILES)
+        form = UserGameForm(request.POST)
         if form.is_valid() and int(request.POST["user"]) == request.user.id:
             user_game = form.save()
             success_message = "Game '{}' for '{}' added".format(user_game.game.name, user_game.platform.shortname)
@@ -287,3 +265,56 @@ def add_game(request: HttpRequest, username: str) -> HttpResponse:
     }
 
     return render(request, "user/add_game.html", context)
+
+
+class GameWishlistView(View):
+
+    @method_decorator(viewed_user)
+    @method_decorator(authenticated_user_wishlisted_games)
+    def get(self, request: HttpRequest, username: str, *args: Any, **kwargs: Any) -> HttpResponse:
+        viewed_user = kwargs["viewed_user"]
+
+        sort_by = request.GET.get("sort_by", constants.SORT_BY_GAME_NAME)
+        try:
+            order_by = constants.SORT_FIELDS_MAPPING[sort_by]
+        except KeyError:
+            order_by = constants.SORT_FIELDS_MAPPING[constants.SORT_BY_GAME_NAME]
+
+        wishlisted_games = WishlistedUserGame.objects \
+                                             .filter(user=viewed_user) \
+                                             .order_by(*order_by) \
+                                             .select_related("game", "platform")
+
+        context = {
+            "viewed_user": viewed_user,
+            "wishlisted_games": wishlisted_games,
+            "wishlisted_games_count": len(wishlisted_games),
+            "constants": constants,
+            "sort_by": sort_by,
+            "auth_user_wishlisted_games": kwargs["authenticated_user_wishlisted_games"],
+        }
+
+        return render(request, "user/wishlisted_games.html", context)
+
+    def post(self, request: HttpRequest, username: str, *args: Any, **kwargs: Any) -> HttpResponse:
+        if username != request.user.get_username() or request.method != "POST":
+            raise Http404("Invalid URL")
+
+        if request.POST.get("action") == constants.FORM_ACTION_DELETE:
+            # TODO: Error handling
+            WishlistedUserGame.objects \
+                              .filter(
+                                user=request.user,
+                                game_id=request.POST["game"],
+                                platform_id=request.POST["platform"]
+                              ).delete()
+        else:
+            form = WishlistedUserGameForm(request.POST)
+            # TODO: Error handling
+            if form.is_valid() and int(request.POST["user"]) == request.user.id:
+                form.save()
+
+        # TODO: ensure relative url
+        redirect_location = request.POST.get("next", "user_wishlisted_games")
+        redirect_username = request.POST.get("viewed_username", username)
+        return redirect(redirect_location, username=redirect_username)

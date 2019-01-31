@@ -28,7 +28,7 @@ urlpatterns = [
         name="user_currently_playing_games"
     ),
     path("users/<slug:username>/games/finished/", user.finished_games, name="user_finished_games"),
-    path("users/<slug:username>/games/wishlisted/", user.wishlisted_games, name="user_wishlisted_games"),
+    path("users/<slug:username>/games/wishlisted/", user.GameWishlistView.as_view(), name="user_wishlisted_games"),
     path(
         "users/<slug:username>/platforms/<int:platform_id>/games/",
         user.user_games_by_platform,
