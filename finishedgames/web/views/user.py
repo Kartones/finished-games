@@ -99,31 +99,6 @@ def catalog(request: HttpRequest, username: str) -> HttpResponse:
     return render(request, "user/catalog.html", context)
 
 
-def games(request: HttpRequest, username: str) -> HttpResponse:
-    viewed_user = get_object_or_404(get_user_model(), username=username)
-
-    sort_by = request.GET.get("sort_by", constants.SORT_BY_GAME_NAME)
-    try:
-        order_by = constants.SORT_FIELDS_MAPPING[sort_by]
-    except KeyError:
-        order_by = constants.SORT_FIELDS_MAPPING[constants.SORT_BY_GAME_NAME]
-
-    user_games = UserGame.objects \
-                         .filter(user=viewed_user) \
-                         .order_by(*order_by) \
-                         .select_related("game", "platform")
-
-    context = {
-        "viewed_user": viewed_user,
-        "user_games": user_games,
-        "user_games_count": len(user_games),
-        "constants": constants,
-        "sort_by": sort_by,
-    }
-
-    return render(request, "user/games.html", context)
-
-
 def platforms(request: HttpRequest, username: str) -> HttpResponse:
     viewed_user = get_object_or_404(get_user_model(), username=username)
 
@@ -140,56 +115,6 @@ def platforms(request: HttpRequest, username: str) -> HttpResponse:
     }
 
     return render(request, "user/platforms.html", context)
-
-
-def currently_playing_games(request: HttpRequest, username: str) -> HttpResponse:
-    viewed_user = get_object_or_404(get_user_model(), username=username)
-
-    sort_by = request.GET.get("sort_by", constants.SORT_BY_GAME_NAME)
-    try:
-        order_by = constants.SORT_FIELDS_MAPPING[sort_by]
-    except KeyError:
-        order_by = constants.SORT_FIELDS_MAPPING[constants.SORT_BY_GAME_NAME]
-
-    currently_playing_games = UserGame.objects \
-                                      .filter(user=viewed_user, currently_playing=True) \
-                                      .order_by(*order_by) \
-                                      .select_related("game", "platform")
-
-    context = {
-        "viewed_user": viewed_user,
-        "currently_playing_games": currently_playing_games,
-        "currently_playing_games_count": len(currently_playing_games),
-        "constants": constants,
-        "sort_by": sort_by,
-    }
-
-    return render(request, "user/currently_playing_games.html", context)
-
-
-def finished_games(request: HttpRequest, username: str) -> HttpResponse:
-    viewed_user = get_object_or_404(get_user_model(), username=username)
-
-    sort_by = request.GET.get("sort_by", constants.SORT_BY_GAME_NAME)
-    try:
-        order_by = constants.SORT_FIELDS_MAPPING[sort_by]
-    except KeyError:
-        order_by = constants.SORT_FIELDS_MAPPING[constants.SORT_BY_GAME_NAME]
-
-    finished_games = UserGame.objects.filter(user=viewed_user) \
-                                     .exclude(year_finished__isnull=True) \
-                                     .order_by(*order_by) \
-                                     .select_related("game", "platform")
-
-    context = {
-        "viewed_user": viewed_user,
-        "finished_games": finished_games,
-        "finished_games_count": len(finished_games),
-        "constants": constants,
-        "sort_by": sort_by,
-    }
-
-    return render(request, "user/finished_games.html", context)
 
 
 def user_games_by_platform(request: HttpRequest, username: str, platform_id: int) -> HttpResponse:
@@ -267,12 +192,153 @@ def add_game(request: HttpRequest, username: str) -> HttpResponse:
     return render(request, "user/add_game.html", context)
 
 
-class GameWishlistView(View):
+class GamesView(View):
 
     @method_decorator(viewed_user)
     @method_decorator(authenticated_user_wishlisted_games)
     def get(self, request: HttpRequest, username: str, *args: Any, **kwargs: Any) -> HttpResponse:
         viewed_user = kwargs["viewed_user"]
+        if not viewed_user:
+            raise Http404("Invalid URL")
+
+        sort_by = request.GET.get("sort_by", constants.SORT_BY_GAME_NAME)
+        try:
+            order_by = constants.SORT_FIELDS_MAPPING[sort_by]
+        except KeyError:
+            order_by = constants.SORT_FIELDS_MAPPING[constants.SORT_BY_GAME_NAME]
+
+        user_games = UserGame.objects \
+                             .filter(user=viewed_user) \
+                             .order_by(*order_by) \
+                             .select_related("game", "platform")
+
+        context = {
+            "viewed_user": viewed_user,
+            "user_games": user_games,
+            "user_games_count": len(user_games),
+            "constants": constants,
+            "sort_by": sort_by,
+            "authenticated_user_wishlisted_games": kwargs["authenticated_user_wishlisted_games"],
+            "next_url": request.path,
+        }
+
+        return render(request, "user/games.html", context)
+
+
+class GamesByPlatformView(View):
+
+    @method_decorator(viewed_user)
+    @method_decorator(authenticated_user_wishlisted_games)
+    def get(self, request: HttpRequest, username: str, platform_id: int, *args: Any, **kwargs: Any) -> HttpResponse:
+        viewed_user = kwargs["viewed_user"]
+        if not viewed_user:
+            raise Http404("Invalid URL")
+
+        platform = get_object_or_404(Platform, pk=platform_id)
+        user_games = UserGame.objects \
+                             .filter(user=viewed_user, platform=platform) \
+                             .order_by("game__name") \
+                             .select_related("game")
+        games_count = len(user_games)
+
+        currently_playing_games_count = user_games.filter(currently_playing=True).count()
+        finished_games_count = user_games.exclude(year_finished__isnull=True).count()
+        if games_count > 0:
+            finished_games_progress = int(finished_games_count * 100 / games_count)
+        else:
+            finished_games_progress = 0
+
+        context = {
+            "viewed_user": viewed_user,
+            "platform": platform,
+            "user_games": user_games,
+            "games_count": games_count,
+            "currently_playing_games_count": currently_playing_games_count,
+            "finished_games_count": finished_games_count,
+            "finished_games_progress": finished_games_progress,
+            "progress_class": _progress_bar_class(finished_games_progress),
+            "constants": constants,
+            "authenticated_user_wishlisted_games": kwargs["authenticated_user_wishlisted_games"],
+            "next_url": request.path,
+        }
+
+        return render(request, "user/games_by_platform.html", context)
+
+
+class GamesFinishedView(View):
+
+    @method_decorator(viewed_user)
+    @method_decorator(authenticated_user_wishlisted_games)
+    def get(self, request: HttpRequest, username: str, *args: Any, **kwargs: Any) -> HttpResponse:
+        viewed_user = kwargs["viewed_user"]
+        if not viewed_user:
+            raise Http404("Invalid URL")
+
+        sort_by = request.GET.get("sort_by", constants.SORT_BY_GAME_NAME)
+        try:
+            order_by = constants.SORT_FIELDS_MAPPING[sort_by]
+        except KeyError:
+            order_by = constants.SORT_FIELDS_MAPPING[constants.SORT_BY_GAME_NAME]
+
+        finished_games = UserGame.objects.filter(user=viewed_user) \
+                                         .exclude(year_finished__isnull=True) \
+                                         .order_by(*order_by) \
+                                         .select_related("game", "platform")
+
+        context = {
+            "viewed_user": viewed_user,
+            "finished_games": finished_games,
+            "finished_games_count": len(finished_games),
+            "constants": constants,
+            "sort_by": sort_by,
+            "authenticated_user_wishlisted_games": kwargs["authenticated_user_wishlisted_games"],
+            "next_url": request.path,
+        }
+
+        return render(request, "user/finished_games.html", context)
+
+
+class GamesCurrentlyPlayingView(View):
+
+    @method_decorator(viewed_user)
+    @method_decorator(authenticated_user_wishlisted_games)
+    def get(self, request: HttpRequest, username: str, *args: Any, **kwargs: Any) -> HttpResponse:
+        viewed_user = kwargs["viewed_user"]
+        if not viewed_user:
+            raise Http404("Invalid URL")
+
+        sort_by = request.GET.get("sort_by", constants.SORT_BY_GAME_NAME)
+        try:
+            order_by = constants.SORT_FIELDS_MAPPING[sort_by]
+        except KeyError:
+            order_by = constants.SORT_FIELDS_MAPPING[constants.SORT_BY_GAME_NAME]
+
+        currently_playing_games = UserGame.objects \
+                                          .filter(user=viewed_user, currently_playing=True) \
+                                          .order_by(*order_by) \
+                                          .select_related("game", "platform")
+
+        context = {
+            "viewed_user": viewed_user,
+            "currently_playing_games": currently_playing_games,
+            "currently_playing_games_count": len(currently_playing_games),
+            "constants": constants,
+            "sort_by": sort_by,
+            "authenticated_user_wishlisted_games": kwargs["authenticated_user_wishlisted_games"],
+            "next_url": request.path,
+        }
+
+        return render(request, "user/currently_playing_games.html", context)
+
+
+class GamesWishlistedView(View):
+
+    @method_decorator(viewed_user)
+    @method_decorator(authenticated_user_wishlisted_games)
+    def get(self, request: HttpRequest, username: str, *args: Any, **kwargs: Any) -> HttpResponse:
+        viewed_user = kwargs["viewed_user"]
+        if not viewed_user:
+            raise Http404("Invalid URL")
 
         sort_by = request.GET.get("sort_by", constants.SORT_BY_GAME_NAME)
         try:
@@ -291,7 +357,8 @@ class GameWishlistView(View):
             "wishlisted_games_count": len(wishlisted_games),
             "constants": constants,
             "sort_by": sort_by,
-            "auth_user_wishlisted_games": kwargs["authenticated_user_wishlisted_games"],
+            "authenticated_user_wishlisted_games": kwargs["authenticated_user_wishlisted_games"],
+            "next_url": request.path,
         }
 
         return render(request, "user/wishlisted_games.html", context)

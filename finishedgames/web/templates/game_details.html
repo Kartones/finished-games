@@ -1,5 +1,7 @@
 {% extends "base_with_menu.html" %}
 
+{% load web_extras %}
+
 {% block title %}{{ game.name }} - {{ block.super }}{% endblock %}
 
 {% block content %}
@@ -7,16 +9,33 @@
     <h2>Game: {{ game.name }}</h2>
 
     {% if game.dlc_or_expansion %}
-        <p><strong>DLC/Expansion of</strong>: <a href="{% url "game_details" game.parent_game.id %}">{{ game.parent_game.name }}</a></p>
+        <p><strong>DLC/Expansion of</strong>: <a href="{% url 'game_details' game.parent_game.id %}">{{ game.parent_game.name }}</a></p>
     {% endif %}
 
     <p><strong>Year first published</strong>: {{ game.publish_date }}</p>
 
-    <p><strong>Platforms</strong>:</p>
-    <ul class="nes-list is-disc">
-        {% for platform in game.platforms.all %}
-            <li><a href="{% url "platform_details" platform.id %}">{{ platform.name }}</a>
-        {% endfor %}
-    </ul>
+    <p><strong>Available on</strong>:</p>
+    <table class="nes-table is-bordered">
+        <thead>
+            <tr>
+                <th>Platform Name</th>
+                {% if user.is_authenticated %}
+                    <th>Actions</th>
+                {% endif %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for platform in game.platforms.all %}
+                <tr>
+                    <td>
+                        <a href="{% url 'platform_details' platform.id %}">{{ platform.name }}</a>
+                    </td>
+                    {% if user.is_authenticated %}
+                        {% render_actions user viewed_user game.id platform.id next_url authenticated_user_wishlisted_games constants %}
+                    {% endif %}
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 
 {% endblock %}

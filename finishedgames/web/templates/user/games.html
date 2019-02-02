@@ -1,5 +1,7 @@
 {% extends "base_with_menu.html" %}
 
+{% load web_extras %}
+
 {% block title %}Videogames Catalog of {{ viewed_user.get_username.capitalize }} - {{ block.super }}{% endblock %}
 
 {% block content %}
@@ -20,6 +22,10 @@
                 {% else %}
                     <th>Platform <a href="{{ request.path }}?sort_by={{ constants.SORT_BY_PLATFORM }}">&#8595;</a></th>
                 {% endif %}
+
+                {% if user.is_authenticated %}
+                    <th>Actions</th>
+                {% endif %}
             </tr>
         </thead>
         <tbody>
@@ -32,6 +38,9 @@
                     <td class="is-centered">
                         {{ item.platform.shortname }}
                     </td>
+                    {% if user.is_authenticated %}
+                        {% render_actions user viewed_user item.game.id item.platform.id next_url authenticated_user_wishlisted_games constants %}
+                    {% endif %}
                 </tr>
             {% endfor %}
         </tbody>

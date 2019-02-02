@@ -1,16 +1,28 @@
+from typing import Any
+
 from django.http import (HttpResponse, HttpRequest)
 from django.shortcuts import (get_object_or_404, render)
+from django.utils.decorators import method_decorator
+from django.views import View
 
 from core.models import (Game, Platform)
+from web import constants
+from web.decorators import authenticated_user_wishlisted_games
 
 
-def game_details(request: HttpRequest, game_id: int) -> HttpResponse:
-    game = get_object_or_404(Game.objects.select_related("parent_game"), pk=game_id)
+class GameDetailsView(View):
 
-    context = {
-        "game": game,
-    }
-    return render(request, "game_details.html", context)
+    @method_decorator(authenticated_user_wishlisted_games)
+    def get(self, request: HttpRequest, game_id: int, *args: Any, **kwargs: Any) -> HttpResponse:
+        game = get_object_or_404(Game.objects.select_related("parent_game"), pk=game_id)
+
+        context = {
+            "game": game,
+            "constants": constants,
+            "authenticated_user_wishlisted_games": kwargs["authenticated_user_wishlisted_games"],
+            "next_url": request.path,
+        }
+        return render(request, "game_details.html", context)
 
 
 def games_by_platform(request: HttpRequest, platform_id: int) -> HttpResponse:

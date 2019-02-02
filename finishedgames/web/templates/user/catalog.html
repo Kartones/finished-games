@@ -34,26 +34,13 @@
     <section class="nes-container with-title">
         <h3 class="title">Latest videogames added</h3>
         <div>
-            <table class="nes-table is-bordered">
-                <thead>
-                    <tr>
-                        <th>Game</th>
-                        <th>Platform</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for item in latest_user_games %}
-                        <tr>
-                            <td>
-                                <a href="{% url 'game_details' item.game.id %}">{{ item.game.name }}</a>{% if item.year_finished %} <i class="nes-icon trophy" title="Finished"></i>{% endif %}{% if item.currently_playing %} <i class="nes-pixel-art snes-jp-logo" title="Currently playing"></i>{% endif %}{% if item.no_longer_owned %} <i class="nes-pixel-art snes-jp-logo is-disabled" title="No longer owned"></i>{% endif %}
-                            </td>
-                            <td class="is-centered">
-                                {{ item.platform.shortname }}
-                            </td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+            <ul class="nes-list is-disc margin-top">
+                {% for item in latest_user_games %}
+                <li>
+                    <a href="{% url 'game_details' item.game.id %}">{{ item.game.name }}</a> ({{ item.platform.shortname }}){% if item.year_finished %} <i class="nes-icon trophy" title="Finished"></i>{% endif %}{% if item.currently_playing %} <i class="nes-pixel-art snes-jp-logo" title="Currently playing"></i>{% endif %}{% if item.no_longer_owned %} <i class="nes-pixel-art snes-jp-logo is-disabled" title="No longer owned"></i>{% endif %}
+                </li>
+                {% endfor %}
+            </ul>
 
             <p>
                 <a class="nes-btn is-primary" href="{% url 'user_games' viewed_user.get_username %}">All user games</a>
@@ -64,20 +51,13 @@
     <section class="container with-title">
         <h3 class="title">Latest platforms added</h3>
         <div>
-            <table class="nes-table is-bordered">
-                <thead>
-                    <tr>
-                        <th>Platform</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for platform in latest_user_platforms %}
-                        <tr>
-                            <td><a href="{% url "user_games_by_platform" viewed_user.get_username platform.id %}">{{ platform.name }}</a></td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+            <ul class="nes-list is-disc margin-top">
+                {% for platform in latest_user_platforms %}
+                    <li>
+                        <a href="{% url "user_games_by_platform" viewed_user.get_username platform.id %}">{{ platform.name }}</a>
+                    </li>
+                {% endfor %}
+            </ul>
 
             <p>
                 <a class="nes-btn is-primary" href="{% url 'user_platforms' viewed_user.get_username %}">All platforms played in</a>

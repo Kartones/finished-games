@@ -1,10 +1,12 @@
 {% extends "base_with_menu.html" %}
 
-{% block title %}{{ viewed_user.get_username.capitalize }} Wishlisted games list - {{ block.super }}{% endblock %}
+{% load web_extras %}
+
+{% block title %}{{ viewed_user.get_username.capitalize }} wishlisted games list - {{ block.super }}{% endblock %}
 
 {% block content %}
 
-<h2><i class="nes-icon star" title="Wishlisted"></i> {{ viewed_user.get_username.capitalize }} Wishlisted games list</h2>
+<h2><i class="nes-icon star" title="Wishlisted"></i> {{ viewed_user.get_username.capitalize }} wishlisted games list</h2>
 
 <table class="nes-table is-bordered">
     <thead>
@@ -36,37 +38,7 @@
                 {{ item.platform.shortname }}
             </td>
             {% if user.is_authenticated %}
-                <td class="is-centered">
-                    {% if viewed_user == user %}
-                        <form action="{% url 'user_wishlisted_games' user.get_username %}" method="post">
-                            {% csrf_token %}
-                            <input type="hidden" name="action" value="{{ constants.FORM_ACTION_DELETE }}" />
-                            <input type="hidden" name="game" value="{{ item.game.id }}" />
-                            <input type="hidden" name="platform" value="{{ item.platform.id }}" />
-                            <button class="nes-btn is-error" type="submit" title="Remove from wishlist"><i class="nes-icon star is-empty" title="Remove from wishlist"></i></button>
-                        </form>
-                    {% else %}
-                        {% if item.generic_id in auth_user_wishlisted_games %}
-                            <form action="{% url 'user_wishlisted_games' user.get_username %}" method="post">
-                                {% csrf_token %}
-                                <input type="hidden" name="action" value="{{ constants.FORM_ACTION_DELETE }}" />
-                                <input type="hidden" name="viewed_username" value="{{ viewed_user.get_username }}" />
-                                <input type="hidden" name="game" value="{{ item.game.id }}" />
-                                <input type="hidden" name="platform" value="{{ item.platform.id }}" />
-                                <button class="nes-btn is-error" type="submit" title="Remove from your wishlist"><i class="nes-icon star is-empty" title="Remove from your wishlist"></i></button>
-                            </form>
-                        {% else %}
-                            <form action="{% url 'user_wishlisted_games' user.get_username %}" method="post">
-                                {% csrf_token %}
-                                <input type="hidden" name="viewed_username" value="{{ viewed_user.get_username }}" />
-                                <input type="hidden" name="user" value="{{ user.id }}" />
-                                <input type="hidden" name="game" value="{{ item.game.id }}" />
-                                <input type="hidden" name="platform" value="{{ item.platform.id }}" />
-                                <button class="nes-btn is-warning" type="submit" title="Add to your wishlist"><i class="nes-icon star" title="Add to your wishlist"></i></button>
-                            </form>
-                        {% endif %}
-                    {% endif %}
-                </td>
+                {% render_actions user viewed_user item.game.id item.platform.id next_url authenticated_user_wishlisted_games constants %}
             {% endif %}
         </tr>
         {% endfor %}

@@ -4,6 +4,8 @@ from django.conf import settings
 from django.core.validators import (MaxValueValidator, MinValueValidator)
 from django.db import models
 
+from core.helpers import generic_id as generic_id_helper
+
 
 class Platform(models.Model):
     name = models.CharField("Name", max_length=100, unique=True, db_index=True)
@@ -60,7 +62,7 @@ class BaseUserGame(models.Model):
 
     @property
     def generic_id(self) -> str:
-        return "{}:{}".format(self.game.id, self.platform.id)
+        return generic_id_helper(self.game.id, self.platform.id)
 
 
 class UserGame(BaseUserGame):

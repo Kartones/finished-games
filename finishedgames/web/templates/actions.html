@@ -1,0 +1,22 @@
+{# context required: user, viewed_user, game_id, platform_id, next, authenticated_user_wishlisted_games, constants #}
+
+<td class="is-centered">
+    <form action="{% url 'user_wishlisted_games' user.get_username %}" method="post">
+            {% csrf_token %}
+            {% if item_generic_id in authenticated_user_wishlisted_games %}
+                <input type="hidden" name="action" value="{{ constants.FORM_ACTION_DELETE }}" />
+            {% endif %}
+            <input type="hidden" name="user" value="{{ user.id }}" />
+            <input type="hidden" name="game" value="{{ game_id }}" />
+            <input type="hidden" name="platform" value="{{ platform_id }}" />
+            {% if viewed_user and viewed_user != user %}
+                <input type="hidden" name="viewed_username" value="{{ viewed_user.get_username }}" />
+            {% endif %}
+            <input type="hidden" name="next" value="{{ next_url }}" />
+            {% if item_generic_id in authenticated_user_wishlisted_games %}
+                <button class="nes-btn is-error" type="submit" title="Remove from your wishlist"><i class="nes-icon star is-empty" title="Remove from your wishlist"></i></button>
+            {% else %}
+                <button class="nes-btn is-warning" type="submit" title="Add to your wishlist"><i class="nes-icon star" title="Add to your wishlist"></i></button>
+            {% endif %}
+        </form>
+</td>

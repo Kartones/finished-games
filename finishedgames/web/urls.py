@@ -10,7 +10,7 @@ urlpatterns = [
     path('accounts/logout/', auth_views.LogoutView.as_view(next_page="index"), name="logout"),
 
     path("games/", game.games, name="games"),
-    path("games/<int:game_id>/", game.game_details, name="game_details"),
+    path("games/<int:game_id>/", game.GameDetailsView.as_view(), name="game_details"),
 
     path("platforms/", platform.platforms, name="platforms"),
     path("platforms/<int:platform_id>/", platform.platform_details, name="platform_details"),
@@ -20,18 +20,18 @@ urlpatterns = [
     path("users/<slug:username>/", user.public_profile, name="user_public_profile"),
     path("users/<slug:username>/profile/", user.profile, name="user_profile"),
     path("users/<slug:username>/catalog/", user.catalog, name="user_catalog"),
-    path("users/<slug:username>/games/", user.games, name="user_games"),
+    path("users/<slug:username>/games/", user.GamesView.as_view(), name="user_games"),
     path("users/<slug:username>/platforms/", user.platforms, name="user_platforms"),
     path(
         "users/<slug:username>/games/currently-playing/",
-        user.currently_playing_games,
+        user.GamesCurrentlyPlayingView.as_view(),
         name="user_currently_playing_games"
     ),
-    path("users/<slug:username>/games/finished/", user.finished_games, name="user_finished_games"),
-    path("users/<slug:username>/games/wishlisted/", user.GameWishlistView.as_view(), name="user_wishlisted_games"),
+    path("users/<slug:username>/games/finished/", user.GamesFinishedView.as_view(), name="user_finished_games"),
+    path("users/<slug:username>/games/wishlisted/", user.GamesWishlistedView.as_view(), name="user_wishlisted_games"),
     path(
         "users/<slug:username>/platforms/<int:platform_id>/games/",
-        user.user_games_by_platform,
+        user.GamesByPlatformView.as_view(),
         name="user_games_by_platform"
     ),
     path("users/<slug:username>/games/new/", user.add_game, name="user_add_game"),
