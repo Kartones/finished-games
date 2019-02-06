@@ -1,13 +1,14 @@
-from typing import (Any, cast, List)
+from typing import (Any, List)
 
 from django.contrib import admin
 # TODO: Use when adding data fields for the user, like an avatar (or fully remove)
 # from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 # from django.contrib.auth.models import User
 from django.db.models.functions import Lower
+from django.forms import ModelForm
 from django.http import HttpRequest
 
-from core.forms import (GameForm, PlatformForm, UserGameForm, WishlistedUserGameForm)
+from core.forms import (GameForm, PlatformForm)
 from core.models import (Game, Platform, UserGame, WishlistedUserGame)
 
 
@@ -38,7 +39,6 @@ class UserDataInline(admin.StackedInline):
 
 
 class UserGameAdmin(FGModelAdmin):
-    form = UserGameForm
     list_display = ("game", "user", "platform", "currently_playing", "year_finished", "no_longer_owned")
     list_filter = ["user__username", "platform", "currently_playing", "year_finished", "no_longer_owned"]
     search_fields = ["game__name"]
@@ -46,10 +46,10 @@ class UserGameAdmin(FGModelAdmin):
     def get_ordering(self, request: HttpRequest) -> List[str]:
         return [Lower("user__username"), "-id"]
 
-    def get_form(self, request: HttpRequest, obj: Any = None, **kwargs: Any) -> UserGameForm:
+    def get_form(self, request: HttpRequest, obj: Any = None, **kwargs: Any) -> ModelForm:
         form = super(UserGameAdmin, self).get_form(request, obj, **kwargs)
         form.base_fields['user'].initial = request.user
-        return cast(UserGameForm, form)
+        return form
 
 
 class PlatformAdmin(FGModelAdmin):
@@ -75,7 +75,6 @@ class GameAdmin(FGModelAdmin):
 
 
 class WishlistedUserGameAdmin(FGModelAdmin):
-    form = WishlistedUserGameForm
     list_display = ("game", "user", "platform")
     list_filter = ["user__username", "platform"]
     search_fields = ["game__name"]
@@ -83,10 +82,10 @@ class WishlistedUserGameAdmin(FGModelAdmin):
     def get_ordering(self, request: HttpRequest) -> List[str]:
         return [Lower("user__username"), "-id"]
 
-    def get_form(self, request: HttpRequest, obj: Any = None, **kwargs: Any) -> WishlistedUserGameForm:
+    def get_form(self, request: HttpRequest, obj: Any = None, **kwargs: Any) -> ModelForm:
         form = super(WishlistedUserGameAdmin, self).get_form(request, obj, **kwargs)
         form.base_fields['user'].initial = request.user
-        return cast(WishlistedUserGameForm, form)
+        return form
 
 
 # TODO: Use when adding data fields for the user, like an avatar (or fully remove)

@@ -34,5 +34,10 @@ urlpatterns = [
         user.GamesByPlatformView.as_view(),
         name="user_games_by_platform"
     ),
+    path(
+        "users/<slug:username>/games/no-longer-owned/",
+        user.NoLongerOwnedGamesView.as_view(),
+        name="user_no_longer_owned_games"
+    ),
     path("users/<slug:username>/games/new/", user.add_game, name="user_add_game"),
 ]

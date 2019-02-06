@@ -72,3 +72,11 @@ h3.nes-title span {
 .nes-input {
     margin-bottom: 12px;
 }
+
+td.actions {
+    display: flex;
+}
+
+td.actions form {
+    margin-right: 6px;
+}

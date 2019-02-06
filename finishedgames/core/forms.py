@@ -3,7 +3,7 @@ from typing import (Any, cast, Dict)
 
 from django.forms import (ModelForm, ValidationError)
 
-from core.models import (Game, Platform, UserGame, WishlistedUserGame)
+from core.models import (Game, Platform)
 
 
 # TODO: Use when adding data fields for the user, like an avatar (or fully remove)
@@ -13,30 +13,6 @@ class UserDataForm(ModelForm):
         model = UserData
         fields = "__all__"
 """
-
-
-class UserGameForm(ModelForm):
-    class Meta:
-        model = UserGame
-        fields = "__all__"
-
-    def __init__(self, *args: Any, **kwargs: Any) -> None:
-        super().__init__(*args, **kwargs)
-
-    def clean(self) -> Dict:
-        super().clean()
-
-        game_platforms = self.cleaned_data["game"].platforms.all()
-        if self.cleaned_data["platform"] not in game_platforms:
-            raise ValidationError({
-                "platform": "'{}'  not available in platform '{}'. Available platforms: '{}'".format(
-                    self.cleaned_data["game"].name,
-                    self.cleaned_data["platform"].name,
-                    "','".join([platform.name for platform in game_platforms])
-                    )
-                })
-
-        return cast(Dict, self.cleaned_data)
 
 
 class PlatformForm(ModelForm):
@@ -118,27 +94,6 @@ class GameForm(ModelForm):
                 raise ValidationError({
                     "platforms": "Game DLC must be available on subset or all of parent game platforms: '{}'".format(
                         "','".join([platform.name for platform in self.cleaned_data["parent_game"].platforms.all()])
-                    )
-                })
-
-        return cast(Dict, self.cleaned_data)
-
-
-class WishlistedUserGameForm(ModelForm):
-    class Meta:
-        model = WishlistedUserGame
-        fields = "__all__"
-
-    def clean(self) -> Dict:
-        super().clean()
-
-        game_platforms = self.cleaned_data["game"].platforms.all()
-        if self.cleaned_data["platform"] not in game_platforms:
-            raise ValidationError({
-                "platform": "'{}'  not available in platform '{}'. Available platforms: '{}'".format(
-                    self.cleaned_data["game"].name,
-                    self.cleaned_data["platform"].name,
-                    "','".join([platform.name for platform in game_platforms])
                     )
                 })
 

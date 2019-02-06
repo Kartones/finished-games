@@ -1,4 +1,4 @@
-from typing import (Dict, List, Optional)
+from typing import (Dict, Optional)
 
 from django import template
 from django.conf import settings
@@ -20,7 +20,7 @@ def render_actions(
     game_id: int,
     platform_id: int,
     next_url: str,
-    authenticated_user_wishlisted_games: List[str],
+    authenticated_user_catalog: Dict,
     constants: Dict
 ) -> Dict:
     return {
@@ -30,6 +30,6 @@ def render_actions(
         "platform_id": platform_id,
         "item_generic_id": generic_id(game_id, platform_id),
         "next_url": next_url,
-        "authenticated_user_wishlisted_games": authenticated_user_wishlisted_games,
+        "authenticated_user_catalog": authenticated_user_catalog,
         "constants": constants,
     }

@@ -20,11 +20,6 @@
         <section class="nes-container">
             <div>
                 {% block content %}{% endblock %}
-
-                {% if request.path != '/' %}
-                    <hr/>
-                    <a class="nes-btn" href="javascript:history.back();">Go Back</a>
-                {% endif %}
             </div>
         </section>
     </div>

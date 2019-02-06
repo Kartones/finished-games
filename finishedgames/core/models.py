@@ -1,6 +1,7 @@
 from typing import cast
 
 from django.conf import settings
+from django.core.exceptions import ValidationError
 from django.core.validators import (MaxValueValidator, MinValueValidator)
 from django.db import models
 
@@ -79,8 +80,30 @@ class UserGame(BaseUserGame):
     def __str__(self) -> str:
         return "{}: {} ({})".format(self.user.get_username(), self.game.name, self.platform.shortname)
 
+    def clean(self) -> None:
+        game_platforms = self.game.platforms.all()
+        if self.platform not in game_platforms:
+            raise ValidationError({
+                "platform": "'{}'  not available in platform '{}'. Available platforms: '{}'".format(
+                    self.game.name,
+                    self.platform.name,
+                    "','".join([platform.name for platform in game_platforms])
+                    )
+                })
+
 
 class WishlistedUserGame(BaseUserGame):
 
     def __str__(self) -> str:
         return "{}: {} ({})".format(self.user.get_username(), self.game.name, self.platform.shortname)
+
+    def clean(self) -> None:
+        game_platforms = self.game.platforms.all()
+        if self.platform not in game_platforms:
+            raise ValidationError({
+                "platform": "'{}'  not available in platform '{}'. Available platforms: '{}'".format(
+                    self.game.name,
+                    self.platform.name,
+                    "','".join([platform.name for platform in game_platforms])
+                    )
+                })
