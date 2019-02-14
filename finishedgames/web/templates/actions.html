@@ -10,7 +10,7 @@
                 <input type="hidden" name="viewed_username" value="{{ viewed_user.get_username }}" />
             {% endif %}
             <input type="hidden" name="next" value="{{ next_url }}" />
-            <button class="nes-btn is-warning" type="submit" title="Remove from your wishlist"><i class="nes-icon heart is-empty" title="Remove from your wishlist"></i></button>
+            <button class="nes-btn is-error" type="submit" title="Remove from your wishlist"><i class="nes-icon heart is-empty" title="Remove from your wishlist"></i></button>
         </form>
     {% elif not item_generic_id in authenticated_user_catalog.games %}
         <form action="{% url 'user_wishlisted_games' user.get_username %}" method="post">
@@ -22,7 +22,7 @@
                 <input type="hidden" name="viewed_username" value="{{ viewed_user.get_username }}" />
             {% endif %}
             <input type="hidden" name="next" value="{{ next_url }}" />
-            <button class="nes-btn is-success" type="submit" title="Add to your wishlist"><i class="nes-icon heart" title="Add to your wishlist"></i></button>
+            <button class="nes-btn" type="submit" title="Add to your wishlist"><i class="nes-icon heart" title="Add to your wishlist"></i></button>
         </form>
     {% endif %}
     {% if item_generic_id in authenticated_user_catalog.games %}
@@ -37,7 +37,7 @@
                     <input type="hidden" name="viewed_username" value="{{ viewed_user.get_username }}" />
                 {% endif %}
                 <input type="hidden" name="next" value="{{ next_url }}" />
-                <button class="nes-btn" type="submit" title="Remove from currently playing"><i class="nes-pixel-art snes-jp-logo is-empty" title="Remove from currently playing"></i></button>
+                <button class="nes-btn is-primary" type="submit" title="Remove from currently playing"><i class="nes-pixel-art snes-jp-logo is-empty" title="Remove from currently playing"></i></button>
             </form>
         {% else %}
             <form action="{% url 'user_currently_playing_games' user.get_username %}" method="post">
@@ -49,7 +49,7 @@
                     <input type="hidden" name="viewed_username" value="{{ viewed_user.get_username }}" />
                 {% endif %}
                 <input type="hidden" name="next" value="{{ next_url }}" />
-                <button class="nes-btn is-primary" type="submit" title="Mark as currently playing"><i class="nes-pixel-art snes-jp-logo" title="Mark as currently playing"></i></button>
+                <button class="nes-btn" type="submit" title="Mark as currently playing"><i class="nes-pixel-art snes-jp-logo" title="Mark as currently playing"></i></button>
             </form>
         {% endif %}
         {% if item_generic_id in authenticated_user_catalog.finished %}
@@ -63,7 +63,7 @@
                     <input type="hidden" name="viewed_username" value="{{ viewed_user.get_username }}" />
                 {% endif %}
                 <input type="hidden" name="next" value="{{ next_url }}" />
-                <button class="nes-btn" type="submit" title="Remove from finished games"><i class="nes-icon trophy is-empty" title="Remove from finished games"></i></button>
+                <button class="nes-btn is-primary" type="submit" title="Remove from finished games"><i class="nes-icon trophy is-empty" title="Remove from finished games"></i></button>
             </form>
         {% else %}
             <form action="{% url 'user_finished_games' user.get_username %}" method="post">
@@ -75,7 +75,7 @@
                     <input type="hidden" name="viewed_username" value="{{ viewed_user.get_username }}" />
                 {% endif %}
                 <input type="hidden" name="next" value="{{ next_url }}" />
-                <button class="nes-btn is-primary" type="submit" title="Mark as finished game"><i class="nes-icon trophy" title="Mark as finished game"></i></button>
+                <button class="nes-btn" type="submit" title="Mark as finished game"><i class="nes-icon trophy" title="Mark as finished game"></i></button>
             </form>
         {% endif %}
         {% if not item_generic_id in authenticated_user_catalog.currently_playing %}
@@ -90,7 +90,7 @@
                         <input type="hidden" name="viewed_username" value="{{ viewed_user.get_username }}" />
                     {% endif %}
                     <input type="hidden" name="next" value="{{ next_url }}" />
-                    <button class="nes-btn" type="submit" title="Remove no longer owned mark"><i class="nes-pixel-art snes-jp-logo is-disabled" title="Remove no longer owned mark"></i></button>
+                    <button class="nes-btn is-primary" type="submit" title="Remove no longer owned mark"><i class="nes-pixel-art snes-jp-logo is-disabled" title="Remove no longer owned mark"></i></button>
                 </form>
             {% else %}
                 <form action="{% url 'user_no_longer_owned_games' user.get_username %}" method="post">
@@ -102,7 +102,7 @@
                         <input type="hidden" name="viewed_username" value="{{ viewed_user.get_username }}" />
                     {% endif %}
                     <input type="hidden" name="next" value="{{ next_url }}" />
-                    <button class="nes-btn is-primary" type="submit" title="Mark as no longer owned"><i class="nes-pixel-art snes-jp-logo is-disabled" title="Mark as no longer owned"></i></button>
+                    <button class="nes-btn" type="submit" title="Mark as no longer owned"><i class="nes-pixel-art snes-jp-logo is-disabled" title="Mark as no longer owned"></i></button>
                 </form>
             {% endif %}
         {% endif %}
@@ -116,7 +116,7 @@
                 <input type="hidden" name="viewed_username" value="{{ viewed_user.get_username }}" />
             {% endif %}
             <input type="hidden" name="next" value="{{ next_url }}" />
-            <button class="nes-btn is-warning" type="submit" title="Remove from your catalog"><i class="nes-icon star is-empty" title="Remove from your catalog"></i></button>
+            <button class="nes-btn is-error" type="submit" title="Remove from your catalog"><i class="nes-icon star is-empty" title="Remove from your catalog"></i></button>
         </form>
     {% else %}
         <form action="{% url 'user_games' user.get_username %}" method="post">
@@ -128,7 +128,7 @@
                 <input type="hidden" name="viewed_username" value="{{ viewed_user.get_username }}" />
             {% endif %}
             <input type="hidden" name="next" value="{{ next_url }}" />
-            <button class="nes-btn is-success" type="submit" title="Add to your catalog"><i class="nes-icon star" title="Add to your catalog"></i></button>
+            <button class="nes-btn" type="submit" title="Add to your catalog"><i class="nes-icon star" title="Add to your catalog"></i></button>
         </form>
     {% endif %}
 </td>

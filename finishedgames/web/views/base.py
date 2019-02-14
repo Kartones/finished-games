@@ -20,3 +20,7 @@ def index(request: HttpRequest) -> HttpResponse:
         "latest_added_platforms": latest_added_platforms,
     }
     return render(request, "index.html", context)
+
+
+def help(request: HttpRequest) -> HttpResponse:
+    return render(request, "help.html", {})

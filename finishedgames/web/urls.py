@@ -5,6 +5,7 @@ from web.views import (base, game, platform, user)
 
 urlpatterns = [
     path("", base.index, name="index"),
+    path("help/", base.help, name="help"),
 
     path('accounts/login/', auth_views.LoginView.as_view(), name="login"),
     path('accounts/logout/', auth_views.LogoutView.as_view(next_page="index"), name="logout"),
