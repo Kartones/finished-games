@@ -6,7 +6,7 @@ from django.db.models.query import QuerySet
 from django.http import HttpRequest
 from django.utils.translation import ugettext_lazy as _
 
-from catalogsources.models import FetchedPlatform
+from catalogsources.models import (FetchedGame, FetchedPlatform)
 from core.admin import FGModelAdmin
 
 
@@ -22,15 +22,13 @@ class HiddenByDefaultFilter(admin.SimpleListFilter):
             ("True", _("True")),
         )
 
+    # Replace default filter choices by ours
     def choices(self, changelist: ChangeList) -> Generator:
-        # Replace default filter values by ours
         for lookup, title in self.lookup_choices:
             yield {
-                'selected': self.value() == lookup,
-                'query_string': changelist.get_query_string({
-                    self.parameter_name: lookup,
-                }, []),
-                'display': title,
+                "selected": self.value() == lookup,
+                "query_string": changelist.get_query_string({self.parameter_name: lookup}, []),
+                "display": title,
             }
 
     def queryset(self, request: HttpRequest, queryset: QuerySet) -> QuerySet:
@@ -38,6 +36,17 @@ class HiddenByDefaultFilter(admin.SimpleListFilter):
             return queryset.filter(hidden=False)
         elif self.value() == "True":
             return queryset.filter(hidden=True)
+
+
+class FetchedGameAdmin(FGModelAdmin):
+    list_display = [
+        "name", "dlc_or_expansion", "parent_game", "publish_date", "source_id", "last_modified_date", "last_fetch_date",
+        "hidden"
+    ]
+    list_filter = ["dlc_or_expansion", "platforms", "source_id", HiddenByDefaultFilter]
+    search_fields = ["name"]
+    readonly_fields = ["last_modified_date", "last_fetch_date", "change_hash"]
+    ordering = ["-last_modified_date", "source_id", "name"]
 
 
 class FetchedPlatformAdmin(FGModelAdmin):
@@ -48,4 +57,5 @@ class FetchedPlatformAdmin(FGModelAdmin):
     ordering = ["-last_modified_date", "source_id", "name"]
 
 
+admin.site.register(FetchedGame, FetchedGameAdmin)
 admin.site.register(FetchedPlatform, FetchedPlatformAdmin)

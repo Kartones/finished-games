@@ -23,7 +23,7 @@ class FGModelAdmin(admin.ModelAdmin):
 """
 class UserDataAdmin(FGModelAdmin):
     form = UserDataForm
-    list_display = ("user",)
+    list_display = ["user"]
     list_filter = ["user"]
     search_fields = ["user__username", "user__email"]
 
@@ -39,7 +39,7 @@ class UserDataInline(admin.StackedInline):
 
 
 class UserGameAdmin(FGModelAdmin):
-    list_display = ("game", "user", "platform", "currently_playing", "year_finished", "no_longer_owned")
+    list_display = ["game", "user", "platform", "currently_playing", "year_finished", "no_longer_owned"]
     list_filter = ["user__username", "platform", "currently_playing", "year_finished", "no_longer_owned"]
     search_fields = ["game__name"]
 
@@ -54,7 +54,7 @@ class UserGameAdmin(FGModelAdmin):
 
 class PlatformAdmin(FGModelAdmin):
     form = PlatformForm
-    list_display = ("name", "shortname", "publish_date")
+    list_display = ["name", "shortname", "publish_date"]
 
     def get_ordering(self, request: HttpRequest) -> List[str]:
         return [Lower("name")]
@@ -66,7 +66,7 @@ class GameAdmin(FGModelAdmin):
         ("Basic Info", {"fields": ["name", "platforms", "publish_date"]}),
         ("DLCs & Expansions", {"fields": ["dlc_or_expansion", "parent_game"]}),
     ]
-    list_display = ("name", "dlc_or_expansion", "parent_game")
+    list_display = ["name", "dlc_or_expansion", "parent_game"]
     list_filter = ["dlc_or_expansion"]
     search_fields = ["name"]
 
@@ -91,7 +91,7 @@ class WishlistedUserGameAdmin(FGModelAdmin):
 # TODO: Use when adding data fields for the user, like an avatar (or fully remove)
 """
 class UserAdmin(BaseUserAdmin):
-    inlines = (UserDataInline,)
+    inlines = [UserDataInline]
 """
 
 
