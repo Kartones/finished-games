@@ -16,6 +16,7 @@ class FetchedPlatform(BasePlatform):
     source_id = models.CharField("Source identifier", max_length=50, db_index=True)
     source_url = models.CharField("Resource source URI", max_length=255)
     change_hash = models.CharField("Marker to detect data changes after a fetch", max_length=32)
+    hidden = models.BooleanField("Item hidden", default=False, db_index=True)
 
     def save(self, *args: Any, **kwargs: Any) -> None:
         if not self.shortname:
