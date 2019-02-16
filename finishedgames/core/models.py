@@ -8,7 +8,19 @@ from django.db import models
 from core.helpers import generic_id as generic_id_helper
 
 
-class Platform(models.Model):
+class BasePlatform(models.Model):
+    name = models.CharField("Name", max_length=100, unique=True, db_index=True)
+    shortname = models.CharField("Shortname", max_length=40, unique=True, default=None)
+    publish_date = models.IntegerField(
+        "Year published",
+        validators=[MinValueValidator(1970), MaxValueValidator(3000)],
+    )
+
+    class Meta:
+        abstract = True
+
+
+class Platform(BasePlatform):
     name = models.CharField("Name", max_length=100, unique=True, db_index=True)
     shortname = models.CharField("Shortname", max_length=40, unique=True, default=None)
     publish_date = models.IntegerField(
