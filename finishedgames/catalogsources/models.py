@@ -13,7 +13,7 @@ class FetchedGame(BaseGame):
     last_modified_date = models.DateTimeField(
         "Last data modification", null=True, default=None, blank=True, db_index=True
     )
-    source_id = models.CharField("Source identifier", max_length=50, db_index=True)
+    source_game_id = models.CharField("Source game identifier", max_length=50, db_index=True)
     source_url = models.CharField("Resource source URI", max_length=255)
     change_hash = models.CharField("Marker to detect data changes after a fetch", max_length=32)
     hidden = models.BooleanField("Item hidden", default=False, db_index=True)
@@ -41,9 +41,9 @@ class FetchedGame(BaseGame):
         else:
             platforms = None
 
-        return "{name}-{publish_date}-{dlc}-{platforms}-{parent}-{source_id}-{source_url}".format(
+        return "{name}-{publish_date}-{dlc}-{platforms}-{parent}-{source_url}".format(
             name=self.name, publish_date=self.publish_date, dlc=self.dlc_or_expansion, platforms=platforms,
-            parent=self.parent_game, source_id=self.source_id, source_url=self.source_url
+            parent=self.parent_game, source_url=self.source_url
         )
 
     def __str__(self) -> str:
@@ -56,7 +56,7 @@ class FetchedPlatform(BasePlatform):
     last_modified_date = models.DateTimeField(
         "Last data modification", null=True, default=None, blank=True, db_index=True
     )
-    source_id = models.CharField("Source identifier", max_length=50, db_index=True)
+    source_platform_id = models.CharField("Source platform identifier", max_length=50, db_index=True)
     source_url = models.CharField("Resource source URI", max_length=255)
     change_hash = models.CharField("Marker to detect data changes after a fetch", max_length=32)
     hidden = models.BooleanField("Item hidden", default=False, db_index=True)
@@ -78,9 +78,8 @@ class FetchedPlatform(BasePlatform):
         super().save(*args, **kwargs)
 
     def _fields_for_hash(self) -> str:
-        return "{name}-{shortname}-{publish_date}-{source_id}-{source_url}".format(
-            name=self.name, shortname=self.shortname, publish_date=self.publish_date, source_id=self.source_id,
-            source_url=self.source_url
+        return "{name}-{shortname}-{publish_date}-{source_url}".format(
+            name=self.name, shortname=self.shortname, publish_date=self.publish_date, source_url=self.source_url
         )
 
     def __str__(self) -> str:

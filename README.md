@@ -76,9 +76,21 @@ Once loaded the site will be available from [http://0.0.0.0:5000/](http://0.0.0.
 
 Admin site is accessible from [http://0.0.0.0:5000/admin/](http://0.0.0.0:5000/admin/) .
 
+**NOTE:** Some Data creation and management is done from the Admin site.
 
-**NOTE:** Data creation and most management is done from the Admin site, currently the website only allows to associate existing data to existing users. Although some functionality will be added before, until  building the React version (MVP 2) full data management will only be available from the admin.
+## Fetching catalog from external sources
 
+You can manually add `Games` and `Platforms` to your catalog, but this can become a titanic task. The included `catalogsources` django app provides an extensible adapter-based system to fetch data from external sources that provide APIs. This repo includes connectors for [GiantBomb](https://www.giantbomb.com/api/) and [MobyGames](https://www.mobygames.com/info/api), but **you must always request your own API keys and setup them** (see `finishedgames/finishedgames/settings/prod.py.sample` for expected configuration format).
+
+Once you have added your key(s) to the settings, you can invoke fetching of platforms using a Django command:
+```
+# Command accepts one or more source_ids
+python3 manage.py fetch_platforms <source_id_1> [<source_id_2> ...]
+```
+
+No detailed instructions are provided on how to work with fetched items, but don't worry about your existing catalog, fetched data always goes to different tables and must be manually imported into the catalog to avoid overriding things by mistake.
+
+When using the Admin site to browse fetched items, there are custom convenience *Actions* available, like marking as hidden.
 
 ## Development
 
