@@ -8,7 +8,7 @@ Finished games is a small personal project whose purposes are:
 
 **1) To provide an easy to use videogames catalog tracking, both for your owned titles (and videogame platforms), which ones have you finished or are currently playing, and to keep a wishlist of interesting games you desire.** I'm going to use it frequently and wanted to build it my way.
 
-**2) To practice fully developing a website with Django 2.x.** On my daily work I don't get to touch all the pieces that the framework provides, plus I can learn how to setup `pytest` to run Django `TestCases`, add type hinting everywhere and other personal tastes.
+**2) To practice fully developing a website with Django 2.x.** On my daily work I don't get to touch all the pieces that the framework provides, plus I can learn how to setup `pytest` to run Django `TestCases`, add type hinting everywhere with `mypy` and other personal tastes, like `pytest` for testing (including running Django testcases).
 
 **3) To learn data fetching, scrapping, gathering, etc.**, so managing the database of game titles becomes as automated as possible.
 
@@ -51,7 +51,7 @@ The Docker Python image is already compatible with variable type hints (>= 3.6),
 
 This project requires `Python >= 3.5`, `Docker` and `Docker Compose`. Other requirements are specified in the corresponding `requirements.txt` and `requirements-dev.txt` files but are installed inside the containers.
 
-Requirements are not version-pinned on purpose, if a build fails due to some new version breaking change it will be triaged and solved accordingly.
+Most requirements are not version-pinned on purpose, if a build fails due to some new version breaking change it will be triaged and solved accordingly.
 
 To run pending migrations (both initial setup and after an update that brings new ones):
 ```
@@ -90,7 +90,7 @@ python3 manage.py fetch_platforms <source_id_1> [<source_id_2> ...]
 
 No detailed instructions are provided on how to work with fetched items, but don't worry about your existing catalog, fetched data always goes to different tables and must be manually imported into the catalog to avoid overriding things by mistake.
 
-When using the Admin site to browse fetched items, there are custom convenience *Actions* available, like marking as hidden.
+When using the Admin site to browse fetched items, there are custom convenience *Actions* available, like marking as hidden or importing to the main catalog.
 
 ## Development
 

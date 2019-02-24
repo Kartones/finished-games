@@ -5,7 +5,8 @@ from catalogsources.models import FetchedPlatform
 
 
 class BaseAdapter(ABC):
-    pass
+
+    FIELD_UNSUPPLIED = None
 
     @abstractmethod
     def __enter__(self) -> "BaseAdapter":
@@ -21,7 +22,7 @@ class BaseAdapter(ABC):
         pass
 
     @abstractmethod
-    def fetch_block(self) -> List[FetchedPlatform]:
+    def fetch_platforms_block(self) -> List[FetchedPlatform]:
         pass
 
     @abstractmethod

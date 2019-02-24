@@ -26,10 +26,10 @@ class Command(BaseCommand):
 
         with adapter_class() as adapter:
             while adapter.has_more_items():
-                self.stdout.write(" | ", ending="")
+                self.stdout.write(">")
 
                 time_start = time.perf_counter()
-                platforms = adapter.fetch_block()
+                platforms = adapter.fetch_platforms_block()
                 self._upsert_results(results=platforms)
                 time_end = time.perf_counter()
 
@@ -46,26 +46,37 @@ class Command(BaseCommand):
             self.stdout.write(self.style.SUCCESS("> Finished fetching from '{}'".format(source_id)))
 
     def _upsert_results(self, results: List[FetchedPlatform]) -> None:
+        errors = []
+
         for platform in results:
             self.stdout.write("{}:".format(platform.source_platform_id), ending="")
 
-            # TODO: Basic error handling (store error per item and keep going)
-            # self.stdout.write(self.style.ERROR("✗ "), ending="")
             try:
-                # existing_fetched_platform = FetchedPlatform.objects.get(
-                FetchedPlatform.objects.get(
+                existing_platform = FetchedPlatform.objects.get(
                     source_platform_id=platform.source_platform_id, source_id=platform.source_id
                 )
+                existing_platform.name = platform.name
+                existing_platform.source_platform_id = platform.source_platform_id
+                existing_platform.source_id = platform.source_id
+                existing_platform.source_url = platform.source_url
+                modified = existing_platform.modified
+                existing_platform.save()
+                if modified:
+                    self.stdout.write(self.style.WARNING("☑ "), ending="")
+                else:
+                    self.stdout.write(self.style.WARNING("☐ "), ending="")
             except FetchedPlatform.DoesNotExist:
                 platform.save()
                 self.stdout.write(self.style.SUCCESS("✓ "), ending="")
-            else:
-                # TODO: update existing_fetched_platform instead
-                self.stdout.write(self.style.WARNING("☑ "), ending="")
+            except Exception as error:
+                errors.append(str(error))
+                self.stdout.write(self.style.ERROR("✗ "), ending="")
+
+        # TODO: output errors
 
     def _wait_if_needed(self, time_start, time_end) -> None:
         time_elapsed = time_end - time_start
-        # Most apis allow 1 request per second
+        # Most apis allow 1 request per second, so default to 1 fetch request per second
         if time_elapsed < 1.0:
             time.sleep(1.0 - time_elapsed)
 

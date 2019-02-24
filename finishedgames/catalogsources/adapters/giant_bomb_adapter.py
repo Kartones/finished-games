@@ -47,7 +47,7 @@ class GiantBombAdapter(BaseAdapter):
     def source_id() -> str:
         return GiantBombAdapter.SOURCE_ID
 
-    def fetch_block(self) -> List[FetchedPlatform]:
+    def fetch_platforms_block(self) -> List[FetchedPlatform]:
         self.offset = self.next_offset
 
         # Limit is implicitly 100
@@ -74,7 +74,7 @@ class GiantBombAdapter(BaseAdapter):
 
         self.next_offset += self.last_request_data["number_of_page_results"]
         self.total_results = self.last_request_data["number_of_total_results"]
-        fetched_platforms = self._results_to_entities(self.last_request_data["results"])
+        fetched_platforms = self._results_to_platform_entities(self.last_request_data["results"])
 
         return fetched_platforms
 
@@ -101,12 +101,13 @@ class GiantBombAdapter(BaseAdapter):
         return self.error if self.error else ""
 
     @staticmethod
-    def _results_to_entities(results: Dict) -> List[FetchedPlatform]:
+    def _results_to_platform_entities(results: Dict) -> List[FetchedPlatform]:
         entities = []  # type: List[FetchedPlatform]
 
         for result in results:
             data = {
                 "name": result["name"],
+                "shortname": GiantBombAdapter.FIELD_UNSUPPLIED,  # Shortnames not fetched
                 "source_platform_id": result["id"],
                 "source_id": GiantBombAdapter.source_id(),
                 "source_url": result["site_detail_url"],
