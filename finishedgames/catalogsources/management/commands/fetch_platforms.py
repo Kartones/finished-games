@@ -26,7 +26,7 @@ class Command(BaseCommand):
 
         with adapter_class() as adapter:
             while adapter.has_more_items():
-                self.stdout.write(">")
+                self.stdout.write("\n>")
 
                 time_start = time.perf_counter()
                 platforms = adapter.fetch_platforms_block()
@@ -59,18 +59,18 @@ class Command(BaseCommand):
                 existing_platform.source_platform_id = platform.source_platform_id
                 existing_platform.source_id = platform.source_id
                 existing_platform.source_url = platform.source_url
-                modified = existing_platform.modified
+                last_modified_date = existing_platform.last_modified_date
                 existing_platform.save()
-                if modified:
-                    self.stdout.write(self.style.WARNING("☑ "), ending="")
+                if existing_platform.last_modified_date != last_modified_date:
+                    self.stdout.write(self.style.SUCCESS("☑  "), ending="")
                 else:
-                    self.stdout.write(self.style.WARNING("☐ "), ending="")
+                    self.stdout.write(self.style.WARNING("☐  "), ending="")
             except FetchedPlatform.DoesNotExist:
                 platform.save()
-                self.stdout.write(self.style.SUCCESS("✓ "), ending="")
+                self.stdout.write(self.style.SUCCESS("✓  "), ending="")
             except Exception as error:
                 errors.append(str(error))
-                self.stdout.write(self.style.ERROR("✗ "), ending="")
+                self.stdout.write(self.style.ERROR("✗  "), ending="")
 
         # TODO: output errors
 

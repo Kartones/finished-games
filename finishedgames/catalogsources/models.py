@@ -9,7 +9,6 @@ from core.models import (BaseGame, BasePlatform, Game, Platform)
 
 class FetchedGame(BaseGame):
     source_id = models.CharField("Source identifier", max_length=50, db_index=True)
-    last_fetch_date = models.DateTimeField("Last data fetch", null=True, default=None, blank=True)
     last_modified_date = models.DateTimeField(
         "Last data modification", null=True, default=None, blank=True, db_index=True
     )
@@ -22,18 +21,12 @@ class FetchedGame(BaseGame):
     parent_game = models.ForeignKey("FetchedGame", on_delete=models.CASCADE, null=True, default=None, blank=True)
 
     def save(self, *args: Any, **kwargs: Any) -> None:
-        self.last_fetch_date = timezone.now()
-
         new_changes_hash = self._get_changes_hash()
         if new_changes_hash != self.change_hash:
             self.change_hash = new_changes_hash
-            self.last_modified_date = self.last_fetch_date
+            self.last_modified_date = timezone.now()
 
         super().save(*args, **kwargs)
-
-    @property
-    def modified(self) -> bool:
-        return bool(self.last_modified_date == self.last_fetch_date)
 
     def _get_changes_hash(self) -> str:
         md5_hash = hashlib.md5()
@@ -47,10 +40,9 @@ class FetchedGame(BaseGame):
         else:
             platforms = None
 
-        return "{name}-{publish_date}-{dlc}-{platforms}-{parent}-{source_game_id}-{fg_game_id}-{source_url}".format(
+        return "{name}-{publish_date}-{dlc}-{platforms}-{parent}-{source_game_id}-{source_url}".format(
             name=self.name, publish_date=self.publish_date, dlc=self.dlc_or_expansion, platforms=platforms,
-            parent=self.parent_game, source_game_id=self.source_game_id, fg_game_id=self.fg_game_id,
-            source_url=self.source_url
+            parent=self.parent_game, source_game_id=self.source_game_id, source_url=self.source_url
         )
 
     def __str__(self) -> str:
@@ -59,7 +51,6 @@ class FetchedGame(BaseGame):
 
 class FetchedPlatform(BasePlatform):
     source_id = models.CharField("Source identifier", max_length=50, db_index=True)
-    last_fetch_date = models.DateTimeField("Last data fetch", null=True, default=None, blank=True)
     last_modified_date = models.DateTimeField(
         "Last data modification", null=True, default=None, blank=True, db_index=True
     )
@@ -74,18 +65,13 @@ class FetchedPlatform(BasePlatform):
     def save(self, *args: Any, **kwargs: Any) -> None:
         if not self.shortname:
             self.shortname = self.name
-        self.last_fetch_date = timezone.now()
 
         new_changes_hash = self._get_changes_hash()
         if new_changes_hash != self.change_hash:
             self.change_hash = new_changes_hash
-            self.last_modified_date = self.last_fetch_date
+            self.last_modified_date = timezone.now()
 
         super().save(*args, **kwargs)
-
-    @property
-    def modified(self) -> bool:
-        return bool(self.last_modified_date == self.last_fetch_date)
 
     def _get_changes_hash(self) -> str:
         md5_hash = hashlib.md5()
@@ -93,9 +79,9 @@ class FetchedPlatform(BasePlatform):
         return md5_hash.hexdigest()
 
     def _get_fields_for_hash(self) -> str:
-        return "{name}-{shortname}-{publish_date}-{source_platform_id}-{fg_platform_id}-{source_url}".format(
+        return "{name}-{shortname}-{publish_date}-{source_platform_id}-{source_url}".format(
             name=self.name, shortname=self.shortname, publish_date=self.publish_date,
-            source_platform_id=self.source_platform_id, fg_platform_id=self.fg_platform_id, source_url=self.source_url
+            source_platform_id=self.source_platform_id, source_url=self.source_url
         )
 
     def __str__(self) -> str:

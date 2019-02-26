@@ -6,8 +6,8 @@
 <link rel="stylesheet" type="text/css" href="/static/admin/css/forms.css">
 <link rel="stylesheet" type="text/css" media="all" href="/static/css/admin.css">
 <style type="text/css">
-    input.btn-copy {
-        background: #417690;
+    input.btn-operation {
+        background: #79aec8;
         margin-left: 9px;
         padding: 3px 6px;
     }
@@ -34,6 +34,12 @@
         padding-top: 10px;
         vertical-align: middle;
     }
+    #form-content {
+        display: flex;
+    }
+    #existing-platform {
+        border-left: 1px solid #eee;
+    }
 </style>
 {% endblock %}
 
@@ -42,6 +48,7 @@
 <div class="breadcrumbs">
     <a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
     &rsaquo; <a href="{% url 'admin:app_list' app_label=opts.app_label %}">{{ opts.app_config.verbose_name }}</a>
+    &rsaquo; <a href="{% url 'admin:catalogsources_fetchedplatform_changelist' %}">{{ model_class_name }}</a>
     &rsaquo; Import Platform
 </div>
 
@@ -52,105 +59,116 @@
 <div id="content-main">
 
     {% if fetched_platform %}
-        <fieldset class="module aligned">
-            <h3>Source Fetched Platform</h3>
-            <div class="form-row">
-                <div>
-                    <label for="fetched_name">Name:</label>
-                    <div class="with-copy-btn">
-                        <div class="readonly" id="fetched_name"><span>{{ fetched_platform.name }}</span></div>
-                        <input data-source="fetched_name" data-destination="name" onclick="copyField(this)" type="button" value="➤"     class="btn-copy" title="Copy value">
-                    </div>
-                </div>
-            </div>
-            <div class="form-row">
-                <div>
-                    <label>Shortname:</label>
-                    <div class="with-copy-btn">
-                        <div class="readonly" id="fetched_shortname"><span>{{ fetched_platform.shortname }}</span></div>
-                        <input data-source="fetched_shortname" data-destination="shortname" onclick="copyField(this)" type="button" value="➤" class="btn-copy" title="Copy value">
-                    </div>
-                </div>
-            </div>
-            <div class="form-row">
-                <div>
-                    <label for="fetched_publish_date">Year Published:</label>
-                    <div class="with-copy-btn">
-                        <div class="readonly" id="fetched_publish_date"><span>{{ fetched_platform.publish_date }}</span></div>
-                        <input data-source="fetched_publish_date" data-destination="publish_date" onclick="copyField(this)" type="button" value="➤" class="btn-copy" title="Copy value">
-                    </div>
-                </div>
-            </div>
-            <div class="form-row">
-                <div>
-                    <label>Source:</label>
-                    <div class="readonly">{{ fetched_platform.source_id }}</div>
-                </div>
-            </div>
-            <div class="form-row">
-                <div>
-                    <label>Source platform identifier:</label>
-                    <div class="readonly">{{ fetched_platform.source_platform_id }}</div>
-                </div>
-            </div>
-            <div class="form-row">
-                <div>
-                    <label>Source URI:</label>
-                    <div class="readonly"><a class="uri-field" href="{{ fetched_platform.source_url }}" target="_blank" id="fetched_source_url">{{ fetched_platform.source_url }}</a></div>
-                </div>
-            </div>
-            <div class="form-row">
-                <div>
-                    <label>Mapped to FG Platform:</label>
-                    <div class="readonly">
-                        {% if fetched_platform.fg_platform %}
-                            <a href="/admin/core/platform/{{ fetched_platform.fg_platform.id }}/change/">{{ fetched_platform.fg_platform.name }}</a>
-                        {% endif %}
-                    </div>
-                </div>
-            </div>
-            <div class="form-row">
-                <label for="fetched_hidden">Item hidden</label>
-                <input type="checkbox" name="hidden" id="fetched_hidden" {% if fetched_platform.hidden %}checked{% endif %} disabled="disabled" checked="checked">
-            </div>
-            <div class="form-row">
-                <div>
-                    <label>Last data modification:</label>
-                    <div class="readonly">{{ fetched_platform.last_modified_date }}</div>
-                </div>
-            </div>
-            <div class="form-row">
-                <div>
-                    <label>Last data fetch:</label>
-                    <div class="readonly">{{ fetched_platform.last_fetch_date }}</div>
-                </div>
-            </div>
-        </fieldset>
+        <form action="{% url 'admin:platform_import' %}" method="post">
+            <div id="form-content">
 
-        <form action="" method="post">
-            {% csrf_token %}
-            <div>
-                <fieldset class="module aligned">
-                    <h3>Destination Platform</h3>
-                    <div class="form-row">
-                        <div>
-                            <label class="required" for="name">Name:</label>
-                            <input type="text" name="name" value="" class="vTextField" maxlength="100" id="name" required>
+                <div id="imported-platform">
+                    <fieldset class="module aligned">
+                        <h3>Source Fetched Platform</h3>
+                        <div class="form-row">
+                            <div>
+                                <label for="fetched_name">Name:</label>
+                                <div class="with-copy-btn">
+                                    <div class="readonly" id="fetched_name"><span>{{ fetched_platform.name }}</span></div>
+                                    <input data-source="fetched_name" data-destination="name" onclick="copyField(this)" type="button" value="➤"     class="btn-operation" title="Copy value">
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                    <div class="form-row">
-                        <div>
-                            <label class="required" for="name">Shortname:</label>
-                            <input type="text" name="shortname" value="" class="vTextField" maxlength="100" id="shortname" required>
+                        <div class="form-row">
+                            <div>
+                                <label>Shortname:</label>
+                                <div class="with-copy-btn">
+                                    <div class="readonly" id="fetched_shortname"><span>{{ fetched_platform.shortname }}</span></div>
+                                    <input data-source="fetched_shortname" data-destination="shortname" onclick="copyField(this)" type="button" value="➤" class="btn-operation" title="Copy value">
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                    <div class="form-row">
-                        <div>
-                            <label class="required" for="publish_date">Year Published:</label>
-                            <input type="number" name="publish_date" value="" class="vIntegerField" id="publish_date" require>
+                        <div class="form-row">
+                            <div>
+                                <label for="fetched_publish_date">Year Published:</label>
+                                <div class="with-copy-btn">
+                                    <div class="readonly" id="fetched_publish_date"><span>{{ fetched_platform.publish_date }}</span></div>
+                                    <input data-source="fetched_publish_date" data-destination="publish_date" onclick="copyField(this)" type="button" value="➤" class="btn-operation" title="Copy value">
+                                </div>
+                            </div>
                         </div>
+                        <div class="form-row">
+                            <div>
+                                <label>Source:</label>
+                                <div class="readonly">{{ fetched_platform.source_id }}</div>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div>
+                                <label>Source platform identifier:</label>
+                                <div class="readonly">{{ fetched_platform.source_platform_id }}</div>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div>
+                                <label>Source URI:</label>
+                                <div class="readonly"><a class="uri-field" href="{{ fetched_platform.source_url }}" target="_blank" id="fetched_source_url">{{ fetched_platform.source_url }}</a></div>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div>
+                                <label>Mapped to Platform:</label>
+                                <div class="readonly">
+                                    {% if fetched_platform.fg_platform %}
+                                        <a href="/admin/core/platform/{{ fetched_platform.fg_platform.id }}/change/">{{ fetched_platform.fg_platform.name }}</a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <label for="fetched_hidden">Item hidden</label>
+                            <input type="checkbox" name="hidden" id="fetched_hidden" {% if fetched_platform.hidden %}checked{% endif %} disabled="disabled" checked="checked">
+                        </div>
+                        <div class="form-row">
+                            <div>
+                                <label>Last data modification:</label>
+                                <div class="readonly">{{ fetched_platform.last_modified_date }}</div>
+                            </div>
+                        </div>
+                    </fieldset>
+                </div>
+
+                <div id="existing-platform">
+                    {% csrf_token %}
+                    <input type="hidden" name="id" value="{% if fetched_platform.fg_platform %}{{ fetched_platform.fg_platform.id }}{% endif %}">
+                    <input type="hidden" name="fetched_platform_id" value="{{ fetched_platform.id }}">
+                    <div>
+                        <fieldset class="module aligned">
+                            <h3>Destination Platform</h3>
+                            <div class="form-row">
+                                <div>
+                                    <label class="required" for="name">Name:</label>
+                                    <input type="text" name="name" value="{% if fetched_platform.fg_platform %}{{ fetched_platform.fg_platform.name }}{% endif %}" class="vTextField" maxlength="100" id="name" required>
+                                    <input data-target="name" data-original="{% if fetched_platform.fg_platform %}{{ fetched_platform.fg_platform.name }}{% endif %}" onclick="revertField(this)" type="button" value="↺" class="btn-operation" title="Reset to original value">
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div>
+                                    <label class="required" for="name">Shortname:</label>
+                                    <input type="text" name="shortname" value="{% if fetched_platform.fg_platform %}{{ fetched_platform.fg_platform.shortname }}{% endif %}" class="vTextField" maxlength="100" id="shortname" required>
+                                    <input data-target="shortname" data-original="{% if fetched_platform.fg_platform %}{{ fetched_platform.fg_platform.shortname }}{% endif %}" onclick="revertField(this)" type="button" value="↺" class="btn-operation" title="Reset to original value">
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div>
+                                    <label class="required" for="publish_date">Year Published:</label>
+                                    <input type="number" name="publish_date" value="{% if fetched_platform.fg_platform %}{{ fetched_platform.fg_platform.publish_date }}{% endif %}" class="vIntegerField" id="publish_date" required>
+                                    <input data-target="publish_date" data-original="{% if fetched_platform.fg_platform %}{{ fetched_platform.fg_platform.publish_date }}{% endif %}" onclick="revertField(this)" type="button" value="↺" class="btn-operation" title="Reset to original value">
+                                </div>
+                            </div>
+                        </fieldset>
                     </div>
-                </fieldset>
+                </div>
+
+            </div>
+
+            <div class="submit-row">
+                <input type="submit" value="Save" class="default" name="_save">
             </div>
         </form>
 
@@ -159,7 +177,12 @@
                 var source_node = document.querySelector('#' + eventSource.dataset.source),
                     destination_node = document.querySelector('#' + eventSource.dataset.destination);
 
-                destination_node.value = source_node.innerHTML;
+                destination_node.value = source_node.firstElementChild.innerText;
+            }
+            function revertField(eventSource) {
+                var target_node = document.querySelector('#' + eventSource.dataset.target);
+
+                target_node.value = eventSource.dataset.original;
             }
         </script>
     {% endif %}
