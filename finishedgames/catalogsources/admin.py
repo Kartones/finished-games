@@ -90,7 +90,7 @@ class FetchedGameAdmin(FGModelAdmin):
 
 
 class FetchedPlatformAdmin(FGModelAdmin):
-    list_display = ["name", "shortname", "publish_date", "source_id", "last_modified_date", "hidden"]
+    list_display = ["name", "fg_platform", "publish_date", "last_modified_date", "source_id", "hidden"]
     list_filter = ["last_modified_date", HiddenByDefaultFilter, "source_id"]
     search_fields = ["name"]
     readonly_fields = ["last_modified_date", "change_hash"]

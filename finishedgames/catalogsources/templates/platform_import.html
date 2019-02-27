@@ -70,7 +70,7 @@
                                 <label for="fetched_name">Name:</label>
                                 <div class="with-copy-btn">
                                     <div class="readonly" id="fetched_name"><span>{{ fetched_platform.name }}</span></div>
-                                    <input data-source="fetched_name" data-destination="name" onclick="copyField(this)" type="button" value="➤"     class="btn-operation" title="Copy value">
+                                    <input data-source="fetched_name" data-destination="name" onclick="copyField(this)" type="button" value="➤" class="btn-operation" title="Copy value">
                                 </div>
                             </div>
                         </div>
@@ -139,7 +139,14 @@
                     <input type="hidden" name="fetched_platform_id" value="{{ fetched_platform.id }}">
                     <div>
                         <fieldset class="module aligned">
-                            <h3>Destination Platform</h3>
+                            <h3>
+                                Destination Platform
+                                {% if fetched_platform.fg_platform %}
+                                     - <span class="changelink">Modifying existing Platform</span>
+                                {% else %}
+                                     - <span class="addlink">Adding new Platform</span>
+                                {% endif %}
+                            </h3>
                             <div class="form-row">
                                 <div>
                                     <label class="required" for="name">Name:</label>
