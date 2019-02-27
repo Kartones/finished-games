@@ -16,4 +16,5 @@ pytest_cache/*
 *.db.sqlite3
 # prod config
 finishedgames/finishedgames/settings/prod.py
+finishedgames/finishedgames/settings/local.py
 finishedgames/statics/*

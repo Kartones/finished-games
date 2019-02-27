@@ -2,10 +2,11 @@
 <html lang="en">
 <head>
     {% load static %}
-    <link rel="shortcut icon" type="image/x-icon" href="{% static 'favicon.ico' %}" />
-    <link href="https://fonts.googleapis.com/css?family=Press+Start+2P" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'css/nes.min.css' %}" />
+    <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Press+Start+2P">
     <link rel="stylesheet" href="{% static 'css/styles.css' %}" />
+    <link rel="shortcut icon" type="image/x-icon" href="{% static 'favicon.ico' %}" />
     <title>{% block title %}Finished Games{% endblock %}</title>
 </head>
 

@@ -1,5 +1,7 @@
 import os
 
+from finishedgames import constants
+
 from .base import *  # NOQA: F401, F403
 
 # Your production secret goes here
@@ -27,3 +29,15 @@ STATIC_ROOT = "/code/finishedgames/statics/"
 # HTTPS only for additional security (disable if you don't have https)
 CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_SECURE = True
+
+# Custom Finished Games settings
+
+CATALOG_SOURCES_ADAPTERS = {
+    "<source_id>": {
+        constants.ADAPTER_API_KEY: "<api_key>",
+        constants.ADAPTER_REQUESTS_PER_HOUR: <amount_per_hour>
+    }
+}
+
+# Remember to setup a user agent
+CATALOG_SOURCES_ADAPTER_USER_AGENT = "<application-name>/<version> (<url>)"

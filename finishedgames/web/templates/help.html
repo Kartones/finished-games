@@ -1,9 +1,11 @@
 {% extends "base_with_menu.html" %}
 
+{% block title %}Help - {{ block.super }}{% endblock %}
+
 {% block content %}
 
     <section class="nes-container with-title">
-        <h2 class="title">Help</h2>
+        <h2 class="title">Legend</h2>
         <div>
             <table class="nes-table is-bordered">
                 <thead>
@@ -90,6 +92,23 @@
                     </tr>
                 </tbody>
             </table>
+        </div>
+    </section>
+    <section class="nes-container with-title">
+            <h2 class="title">Data Sources</h2>
+            <div>
+                <p>
+                    Some of the content of this page (Platforms and Games) comes from <a href="https://www.giantbomb.com/" target="_blank">GiantBomb.com</a>. Our sincere thanks for providing access to their catalog, as without it <strong>Finished Games</strong> would be incomplete <i class="nes-icon heart is-small" title="love"></i>
+                </p>
+            </div>
+        </section>
+    <section class="nes-container with-title">
+        <h2 class="title">Privacy</h2>
+        <div>
+            <p>
+                This website only stores a required session cookie for logged-in users. It uses no tracking cookies nor scripts and doesn't gathers any PII (Personally Identifiable Information).<br />
+                Registered users must have manually given consent to provide their email addresses as user registration is closed and accounts are only manually provided by the administrator(s).
+            </p>
         </div>
     </section>
 

@@ -8,7 +8,7 @@ from django.db import models
 from core.helpers import generic_id as generic_id_helper
 
 
-class Platform(models.Model):
+class BasePlatform(models.Model):
     name = models.CharField("Name", max_length=100, unique=True, db_index=True)
     shortname = models.CharField("Shortname", max_length=40, unique=True, default=None)
     publish_date = models.IntegerField(
@@ -16,11 +16,17 @@ class Platform(models.Model):
         validators=[MinValueValidator(1970), MaxValueValidator(3000)],
     )
 
+    class Meta:
+        abstract = True
+
+
+class Platform(BasePlatform):
+
     def __str__(self) -> str:
         return cast(str, self.name)
 
 
-class Game(models.Model):
+class BaseGame(models.Model):
     name = models.CharField("Name", max_length=200, unique=True, db_index=True)
     publish_date = models.IntegerField(
         "Year first published",
@@ -29,6 +35,12 @@ class Game(models.Model):
     dlc_or_expansion = models.BooleanField("DLC/Expansion", default=False)
     platforms = models.ManyToManyField(Platform)
     parent_game = models.ForeignKey("Game", on_delete=models.CASCADE, null=True, default=None, blank=True)
+
+    class Meta:
+        abstract = True
+
+
+class Game(BaseGame):
 
     def __str__(self) -> str:
         dlc_fragment = " [DLC/Expansion]" if self.dlc_or_expansion else ""

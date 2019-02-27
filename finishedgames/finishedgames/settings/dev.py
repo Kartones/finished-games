@@ -1,5 +1,11 @@
 from .base import *  # NOQA: F401, F403
 
+# To mess around with configuration without ever commiting it to the repository (but neither using prod settings)
+try:
+    from .local import *  # NOQA: F401, F403
+except Exception:
+    pass
+
 DEBUG = True
 
 # To disable it even in development

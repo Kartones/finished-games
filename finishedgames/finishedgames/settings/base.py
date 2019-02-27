@@ -3,7 +3,9 @@ For more information on this file, see https://docs.djangoproject.com/en/2.1/top
 For the full list of settings and their values, see https://docs.djangoproject.com/en/2.1/ref/settings/
 """
 
+from typing import Dict  # NOQA: F401
 import os
+
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -36,6 +38,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "core.apps.CoreConfig",
     "web.apps.WebConfig",
+    "catalogsources.apps.CatalogSourcesConfig",
 ]
 
 MIDDLEWARE = [
@@ -121,3 +124,9 @@ STATICFILES_DIRS = [
 
 LATEST_VIDEOGAMES_DISPLAY_COUNT = 10
 LATEST_PLATFORMS_DISPLAY_COUNT = 5
+
+# Setup adapters at prod settings
+CATALOG_SOURCES_ADAPTERS = {}  # type: Dict
+
+# Remember to setup a user agent at prod settings
+CATALOG_SOURCES_ADAPTER_USER_AGENT = None
