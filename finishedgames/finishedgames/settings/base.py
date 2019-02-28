@@ -30,7 +30,6 @@ ALLOWED_HOSTS = [
 # Application definition
 
 INSTALLED_APPS = [
-    "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
@@ -39,6 +38,8 @@ INSTALLED_APPS = [
     "core.apps.CoreConfig",
     "web.apps.WebConfig",
     "catalogsources.apps.CatalogSourcesConfig",
+    # After custom apps to allow for example overriding templates
+    "django.contrib.admin",
 ]
 
 MIDDLEWARE = [

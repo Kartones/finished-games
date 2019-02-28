@@ -20,13 +20,13 @@ class Command(BaseCommand):
 
     def _fetch_source(self, source_id: str) -> None:
         had_errors = False
-        self.stdout.write("> Started fetching from '{}'".format(source_id))
+        self.stdout.write("> Started fetching platforms from '{}'".format(source_id))
 
         adapter_class = self._source_class_from_id(source_id)
 
         with adapter_class() as adapter:
             while adapter.has_more_items():
-                self.stdout.write("\n>")
+                self.stdout.write("\n>fetch call...")
 
                 time_start = time.perf_counter()
                 platforms = adapter.fetch_platforms_block()
@@ -41,12 +41,13 @@ class Command(BaseCommand):
             self.stdout.write("")
 
         if had_errors:
-            self.stdout.write(self.style.WARNING("> Finished fetching with errors from '{}'".format(source_id)))
+            self.stdout.write(self.style.WARNING("> Finished fetching '{}' with errors".format(source_id)))
         else:
-            self.stdout.write(self.style.SUCCESS("> Finished fetching from '{}'".format(source_id)))
+            self.stdout.write(self.style.SUCCESS("> Finished fetching '{}'".format(source_id)))
 
     def _upsert_results(self, results: List[FetchedPlatform]) -> None:
         errors = []
+        count = 0
 
         for platform in results:
             self.stdout.write("{}:".format(platform.source_platform_id), ending="")
@@ -71,6 +72,10 @@ class Command(BaseCommand):
             except Exception as error:
                 errors.append(str(error))
                 self.stdout.write(self.style.ERROR("✗  "), ending="")
+
+            count += 1
+            if count % 10 == 0:
+                self.stdout.write("")
 
         # TODO: output errors
 

@@ -3,8 +3,8 @@
 
 {% block extrahead %}
 {{ block.super }}
-<link rel="stylesheet" type="text/css" href="/static/admin/css/forms.css">
-<link rel="stylesheet" type="text/css" media="all" href="/static/css/admin.css">
+<link rel="stylesheet" type="text/css" href="{% static 'admin/css/forms.css' %}">
+<link rel="stylesheet" type="text/css" media="all" href="{% static 'css/admin.css' %}">
 <style type="text/css">
     input.btn-operation {
         background: #79aec8;
@@ -122,7 +122,13 @@
                         </div>
                         <div class="form-row">
                             <label for="fetched_hidden">Item hidden</label>
-                            <input type="checkbox" name="hidden" id="fetched_hidden" {% if fetched_platform.hidden %}checked{% endif %} disabled="disabled" checked="checked">
+                            <div class="readonly">
+                                {% if fetched_platform.hidden %}
+                                    True
+                                {% else %}
+                                    False
+                                {% endif %}
+                            </div>
                         </div>
                         <div class="form-row">
                             <div>
