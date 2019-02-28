@@ -1,12 +1,14 @@
 from abc import (ABC, abstractmethod)
-from typing import (Any, List)
+from typing import (Any, List, Tuple)
 
-from catalogsources.models import FetchedPlatform
+from catalogsources.models import (FetchedGame, FetchedPlatform)
 
 
 class BaseAdapter(ABC):
 
     FIELD_UNSUPPLIED = None
+
+    UNKOWN_TOTAL_RESULTS_VALUE = -1
 
     @abstractmethod
     def __enter__(self) -> "BaseAdapter":
@@ -16,6 +18,10 @@ class BaseAdapter(ABC):
     def __exit__(self, *args: Any) -> None:
         pass
 
+    @abstractmethod
+    def reset(self) -> None:
+        pass
+
     @staticmethod
     @abstractmethod
     def source_id() -> str:
@@ -23,6 +29,10 @@ class BaseAdapter(ABC):
 
     @abstractmethod
     def fetch_platforms_block(self) -> List[FetchedPlatform]:
+        pass
+
+    @abstractmethod
+    def fetch_games_block(self, platform_id: int) -> List[Tuple[FetchedGame, List[FetchedPlatform]]]:
         pass
 
     @abstractmethod

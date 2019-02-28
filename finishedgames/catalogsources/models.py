@@ -17,7 +17,8 @@ class FetchedGame(BaseGame):
     change_hash = models.CharField("Marker to detect data changes after fetch", max_length=32)
     hidden = models.BooleanField("Item hidden", default=False, db_index=True)
     fg_game_id = models.ForeignKey(Game, on_delete=models.SET_NULL, null=True, default=None, blank=True)
-    # Override parent FK
+    # Override parent fields
+    platforms = models.ManyToManyField("FetchedPlatform")
     parent_game = models.ForeignKey("FetchedGame", on_delete=models.CASCADE, null=True, default=None, blank=True)
 
     def save(self, *args: Any, **kwargs: Any) -> None:
@@ -36,9 +37,9 @@ class FetchedGame(BaseGame):
     def _get_fields_for_hash(self) -> str:
         # Cannot use many to many relations until entity has an id
         if self.id:
-            platforms = self.platforms
+            platforms = ",".join([str(platform.id) for platform in self.platforms.all()])
         else:
-            platforms = None
+            platforms = ""
 
         return "{name}-{publish_date}-{dlc}-{platforms}-{parent}-{source_game_id}-{source_url}".format(
             name=self.name, publish_date=self.publish_date, dlc=self.dlc_or_expansion, platforms=platforms,
