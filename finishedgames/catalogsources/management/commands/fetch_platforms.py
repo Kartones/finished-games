@@ -25,12 +25,8 @@ class Command(BaseCommand):
 
         with adapter_class() as adapter:
             while adapter.has_more_items():
-                if adapter.total_results != adapter.UNKOWN_TOTAL_RESULTS_VALUE:
-                    self.stdout.write("\n>fetch call: {current}/{total}".format(
-                        current=adapter.offset+adapter.next_offset, total=adapter.total_results)
-                    )
-                else:
-                    self.stdout.write("\n>fetch call: {current}/-".format(current=adapter.offset))
+                total = adapter.total_results if adapter.total_results != adapter.UNKOWN_TOTAL_RESULTS_VALUE else "-"
+                self.stdout.write("\n>fetch call: {current}/{total}".format(current=adapter.next_offset, total=total))
 
                 time_start = time.perf_counter()
                 platforms = adapter.fetch_platforms_block()

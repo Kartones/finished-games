@@ -30,13 +30,12 @@ class Command(BaseCommand):
             for platform_id in platforms:
                 while adapter.has_more_items():
                     if adapter.total_results != adapter.UNKOWN_TOTAL_RESULTS_VALUE:
-                        self.stdout.write("\n>fetch call (platform_id {id}): {current}/{total}".format(
-                            id=platform_id, current=adapter.offset+adapter.next_offset, total=adapter.total_results)
-                        )
+                        total = adapter.total_results
                     else:
-                        self.stdout.write("\n>fetch call (platform_id {id}): {current}/-".format(
-                            id=platform_id, current=adapter.offset)
-                        )
+                        total = "-"
+                    self.stdout.write("\n>fetch call (platform_id {id}): {current}/{total}".format(
+                        id=platform_id, current=adapter.next_offset, total=total))
+
                     time_start = time.perf_counter()
                     games = adapter.fetch_games_block(platform_id=platform_id)
                     self._upsert_results(results=games)

@@ -26,6 +26,7 @@ class GiantBombAdapter(BaseAdapter):
         self.total_results = GiantBombAdapter.UNKOWN_TOTAL_RESULTS_VALUE
         self.error = None  # type: Optional[str]
         self.last_request_data = {}  # type: Dict
+        self.platforms_cache = {}  # type: Dict[int, Optional[FetchedPlatform]]
 
     def __enter__(self) -> "GiantBombAdapter":
         self.fetching = True
@@ -42,6 +43,7 @@ class GiantBombAdapter(BaseAdapter):
 
     def __exit__(self, *args: Any) -> None:
         self.fetching = False
+        self.platforms_cache = {}
 
     @staticmethod
     def source_id() -> str:
@@ -156,8 +158,17 @@ class GiantBombAdapter(BaseAdapter):
 
         return entities
 
-    @staticmethod
-    def _results_to_game_entities(results: Dict) -> List[Tuple[FetchedGame, List[FetchedPlatform]]]:
+    def _get_platform_cached(self, source_platform_id: int) -> Optional[FetchedPlatform]:
+        if source_platform_id not in self.platforms_cache:
+            try:
+                fetched_platform = FetchedPlatform.objects.get(source_platform_id=source_platform_id)
+            except FetchedPlatform.DoesNotExist:
+                fetched_platform = None
+            self.platforms_cache[source_platform_id] = fetched_platform
+
+        return self.platforms_cache[source_platform_id]
+
+    def _results_to_game_entities(self, results: Dict) -> List[Tuple[FetchedGame, List[FetchedPlatform]]]:
         entities = []  # type: List[Tuple[FetchedGame, List[FetchedPlatform]]]
 
         for result in results:
@@ -178,12 +189,9 @@ class GiantBombAdapter(BaseAdapter):
 
             platforms = []  # type: List[FetchedPlatform]
             for platform_result in result["platforms"]:
-                try:
-                    # TODO: Cache loaded platforms to not load each one more than once
-                    fetched_platform = FetchedPlatform.objects.get(source_platform_id=platform_result["id"])
+                fetched_platform = self._get_platform_cached(source_platform_id=platform_result["id"])
+                if fetched_platform:
                     platforms.append(fetched_platform)
-                except FetchedPlatform.DoesNotExist:
-                    pass
 
             entities.append((game, platforms,))
 
