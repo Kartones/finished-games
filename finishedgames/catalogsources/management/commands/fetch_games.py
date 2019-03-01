@@ -28,14 +28,14 @@ class Command(BaseCommand):
 
         self.default_publish_date = adapter_class.DEFAULT_PUBLISH_DATE
 
-        with adapter_class() as adapter:
+        with adapter_class(stdout=self.stdout, stdout_color_style=self.style) as adapter:
             for platform_id in platforms:
                 while adapter.has_more_items():
                     if adapter.total_results != adapter.UNKOWN_TOTAL_RESULTS_VALUE:
                         total = adapter.total_results
                     else:
                         total = "-"
-                    self.stdout.write("\n>fetch call (platform_id {id}): {current}/{total}".format(
+                    self.stdout.write("\n> Fetch call (platform_id {id}): {current}/{total}".format(
                         id=platform_id, current=adapter.next_offset, total=total))
 
                     time_start = time.perf_counter()

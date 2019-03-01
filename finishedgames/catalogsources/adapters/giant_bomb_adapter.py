@@ -1,10 +1,14 @@
 import json
+import time
 from typing import (Any, cast, Dict, List, Optional, Tuple)  # NOQA: F401
 
 from django.conf import settings
+from django.core.management.base import OutputWrapper
+from django.core.management.color import Style
 import requests
 
 from catalogsources.adapters.base_adapter import BaseAdapter
+from catalogsources.adapters.helpers import check_rate_limit
 from catalogsources.models import (FetchedGame, FetchedPlatform)
 from finishedgames import constants
 
@@ -16,10 +20,21 @@ class GiantBombAdapter(BaseAdapter):
 
     SOURCE_ID = "giantbomb"
 
-    def __init__(self) -> None:
-        super().__init__()
+    def __init__(self, stdout: OutputWrapper, stdout_color_style: Style) -> None:
+        super().__init__(stdout=stdout, stdout_color_style=stdout_color_style)
 
+        self.stdout = stdout
+        self.stdout_style = stdout_color_style
+
+        # This block is all related with rate limits
         self.api_key = settings.CATALOG_SOURCES_ADAPTERS[self.SOURCE_ID][constants.ADAPTER_API_KEY]
+        self.max_requests_per_time_window = \
+            settings.CATALOG_SOURCES_ADAPTERS[self.SOURCE_ID][constants.ADAPTER_REQUESTS_PER_HOUR]
+        self.wait_seconds_when_rate_limited = \
+            settings.CATALOG_SOURCES_ADAPTERS[self.SOURCE_ID][constants.ADAPTER_WAIT_SECONDS_WHEN_RATE_LIMITED]
+        self.time_window = 3600  # X requests allowed in Y seconds
+        self.token_bucket = self.max_requests_per_time_window  # start with bucket full of tokens
+        self.last_check_timestamp = 0.0
 
         self.offset = 0
         self.next_offset = 0
@@ -50,6 +65,8 @@ class GiantBombAdapter(BaseAdapter):
         return GiantBombAdapter.SOURCE_ID
 
     def fetch_platforms_block(self) -> List[FetchedPlatform]:
+        self._rate_limit_check_and_wait_if_needed()
+
         self.offset = self.next_offset
 
         # Limit is implicitly 100
@@ -81,6 +98,8 @@ class GiantBombAdapter(BaseAdapter):
         return fetched_platforms
 
     def fetch_games_block(self, platform_id: int) -> List[Tuple[FetchedGame, List[FetchedPlatform]]]:
+        self._rate_limit_check_and_wait_if_needed()
+
         self.offset = self.next_offset
 
         # Limit is implicitly 100
@@ -195,3 +214,18 @@ class GiantBombAdapter(BaseAdapter):
             entities.append((game, platforms,))
 
         return entities
+
+    def _rate_limit_check_and_wait_if_needed(self) -> None:
+        can_pass = False
+        while not can_pass:
+            self.token_bucket, self.last_check_timestamp, can_pass = check_rate_limit(
+                max_tokens=self.max_requests_per_time_window,
+                time_window=self.time_window,
+                token_bucket=self.token_bucket,
+                last_check_timestamp=self.last_check_timestamp
+            )
+            if not can_pass:
+                self.stdout.write(self.stdout_style.WARNING(
+                    "> Rate limit hit, waiting {} seconds".format(self.wait_seconds_when_rate_limited))
+                )
+                time.sleep(self.wait_seconds_when_rate_limited)
