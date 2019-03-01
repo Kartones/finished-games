@@ -23,6 +23,8 @@ class Command(BaseCommand):
 
         adapter_class = source_class_from_id(source_id)
 
+        self.default_publish_date = adapter_class.DEFAULT_PUBLISH_DATE
+
         with adapter_class() as adapter:
             while adapter.has_more_items():
                 total = adapter.total_results if adapter.total_results != adapter.UNKOWN_TOTAL_RESULTS_VALUE else "-"
@@ -60,7 +62,8 @@ class Command(BaseCommand):
                 existing_platform.source_platform_id = platform.source_platform_id
                 existing_platform.source_id = platform.source_id
                 existing_platform.source_url = platform.source_url
-                # TODO: publish_date ?
+                if platform.publish_date != self.default_publish_date:
+                    existing_platform.publish_date = platform.publish_date
                 last_modified_date = existing_platform.last_modified_date
                 existing_platform.save()
                 if existing_platform.last_modified_date != last_modified_date:

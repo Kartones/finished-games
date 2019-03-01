@@ -26,6 +26,8 @@ class Command(BaseCommand):
 
         adapter_class = source_class_from_id(source_id)
 
+        self.default_publish_date = adapter_class.DEFAULT_PUBLISH_DATE
+
         with adapter_class() as adapter:
             for platform_id in platforms:
                 while adapter.has_more_items():
@@ -69,7 +71,8 @@ class Command(BaseCommand):
                 existing_game.source_game_id = game.source_game_id
                 existing_game.source_id = game.source_id
                 existing_game.source_url = game.source_url
-                # TODO: publish_date ?
+                if game.publish_date != self.default_publish_date:
+                    existing_game.publish_date = game.publish_date
                 existing_game.platforms.set(platforms)
                 last_modified_date = existing_game.last_modified_date
                 existing_game.save()

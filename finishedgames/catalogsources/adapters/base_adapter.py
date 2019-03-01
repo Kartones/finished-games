@@ -10,6 +10,8 @@ class BaseAdapter(ABC):
 
     UNKOWN_TOTAL_RESULTS_VALUE = -1
 
+    DEFAULT_PUBLISH_DATE = 1970
+
     @abstractmethod
     def __enter__(self) -> "BaseAdapter":
         pass

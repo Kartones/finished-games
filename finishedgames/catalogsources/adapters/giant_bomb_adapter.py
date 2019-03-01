@@ -92,7 +92,6 @@ class GiantBombAdapter(BaseAdapter):
             "user-agent": settings.CATALOG_SOURCES_ADAPTER_USER_AGENT
         })
 
-        # TODO: generalize this? too similar to previous one
         if request.status_code == 200:
             try:
                 self.last_request_data = request.json()
@@ -153,7 +152,7 @@ class GiantBombAdapter(BaseAdapter):
                 data["publish_date"] = int(result["release_date"].split("-")[0])
             else:
                 # Some items don't have publish/release date
-                data["publish_date"] = 1970
+                data["publish_date"] = GiantBombAdapter.DEFAULT_PUBLISH_DATE
             entities.append(FetchedPlatform(**data))
 
         return entities
@@ -183,7 +182,7 @@ class GiantBombAdapter(BaseAdapter):
                 data["publish_date"] = int(result["original_release_date"].split("-")[0])
             else:
                 # Some items don't have publish/release date
-                data["publish_date"] = 1970
+                data["publish_date"] = GiantBombAdapter.DEFAULT_PUBLISH_DATE
 
             game = FetchedGame(**data)
 
