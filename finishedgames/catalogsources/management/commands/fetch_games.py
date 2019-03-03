@@ -30,7 +30,8 @@ class Command(BaseCommand):
 
         with adapter_class(stdout=self.stdout, stdout_color_style=self.style) as adapter:
             for platform_id in platforms:
-                while adapter.has_more_items():
+                # For now at least, if fails gathering a platform, try with next one
+                while adapter.has_more_items() and not had_errors:
                     if adapter.total_results != adapter.UNKOWN_TOTAL_RESULTS_VALUE:
                         total = adapter.total_results
                     else:
@@ -43,11 +44,11 @@ class Command(BaseCommand):
                     self._upsert_results(results=games)
                     time_end = time.perf_counter()
 
-                    if adapter.has_errored():
-                        had_errors = True
-                        self.stdout.write(self.style.ERROR("\nERROR: {}".format(adapter.error_info())))
+                    had_errors = adapter.has_errored()
                     wait_if_needed(time_start=time_start, time_end=time_end)
+
                 adapter.reset()
+                had_errors = False
 
             self.stdout.write("")
 

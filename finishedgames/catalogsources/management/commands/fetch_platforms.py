@@ -26,7 +26,7 @@ class Command(BaseCommand):
         self.default_publish_date = adapter_class.DEFAULT_PUBLISH_DATE
 
         with adapter_class(stdout=self.stdout, stdout_color_style=self.style) as adapter:
-            while adapter.has_more_items():
+            while adapter.has_more_items() and not had_errors:
                 total = adapter.total_results if adapter.total_results != adapter.UNKOWN_TOTAL_RESULTS_VALUE else "-"
                 self.stdout.write("\n> Fetch call: {current}/{total}".format(current=adapter.next_offset, total=total))
 
@@ -35,9 +35,7 @@ class Command(BaseCommand):
                 self._upsert_results(results=platforms)
                 time_end = time.perf_counter()
 
-                if adapter.has_errored():
-                    had_errors = True
-                    self.stdout.write(self.style.ERROR("\nERROR: {}".format(adapter.error_info())))
+                had_errors = adapter.has_errored()
                 wait_if_needed(time_start=time_start, time_end=time_end)
 
             self.stdout.write("")

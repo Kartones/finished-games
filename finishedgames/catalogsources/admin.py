@@ -1,9 +1,12 @@
-from typing import (cast, Generator, List, Tuple)
+from typing import (Any, cast, Generator, List, Optional, Tuple)
 
 from django.contrib import admin
 from django.contrib.admin.views.main import ChangeList
+from django.db.models.fields import Field
 from django.db.models.query import QuerySet
 from django.http import (HttpRequest, HttpResponseRedirect)
+from django.forms import ModelForm
+from django.forms.fields import Field as Form_Field
 from django.template.response import TemplateResponse
 from django.urls import (path, reverse)
 from django.utils.translation import ugettext_lazy as _
@@ -66,6 +69,22 @@ class FetchedGameAdmin(FGModelAdmin):
     readonly_fields = ["last_modified_date", "change_hash"]
     ordering = ["-last_modified_date", "source_id", "name"]
     actions = [hide_fetched_items, import_fetched_items]
+
+    def get_form(self, request: HttpRequest, obj: Optional[FetchedGame] = None, **kwargs: Any) -> ModelForm:
+        # just save obj reference for future processing in Inline
+        request._obj_ = obj
+        return super().get_form(request, obj, **kwargs)
+
+    # When rendering the platforms list of the fetched game, do some custom filtering
+    def formfield_for_manytomany(self, db_field: Field, request: HttpRequest, **kwargs: Any) -> Form_Field:
+        if db_field.name == "platforms":
+            # Hidden platforms out (un-hide first if want to use)
+            kwargs["queryset"] = FetchedPlatform.objects.filter(hidden=False)
+            # Only from same source
+            if request._obj_:
+                kwargs["queryset"] = kwargs["queryset"].filter(source_id=request._obj_.source_id)
+            kwargs["queryset"] = kwargs["queryset"].order_by("name")
+        return super().formfield_for_manytomany(db_field, request, **kwargs)
 
     def get_urls(self) -> List[str]:
         urls = super().get_urls()

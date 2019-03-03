@@ -39,7 +39,7 @@ class GiantBombAdapter(BaseAdapter):
         self.offset = 0
         self.next_offset = 0
         self.total_results = GiantBombAdapter.UNKOWN_TOTAL_RESULTS_VALUE
-        self.error = None  # type: Optional[str]
+        self.errored = False
         self.last_request_data = {}  # type: Dict
         self.platforms_cache = {}  # type: Dict[int, Optional[FetchedPlatform]]
 
@@ -53,7 +53,7 @@ class GiantBombAdapter(BaseAdapter):
         self.offset = 0
         self.next_offset = 0
         self.total_results = GiantBombAdapter.UNKOWN_TOTAL_RESULTS_VALUE
-        self.error = None  # type: Optional[str]
+        self.error = False
         self.last_request_data = {}  # type: Dict
 
     def __exit__(self, *args: Any) -> None:
@@ -81,14 +81,17 @@ class GiantBombAdapter(BaseAdapter):
             try:
                 self.last_request_data = request.json()
             except json.decoder.JSONDecodeError:
-                self.error = "Unable to decode content as JSON"
+                self.stdout.write(self.stdout_style.ERROR("Unable to decode content as JSON"))
+                self.errored = True
         else:
-            self.error = request.text
-        if self.error:
-            self.error = "{error}.\nInfo: S:{status_code} O:{offset} NO:{next_offset} T:{total_results}".format(
-                error=self.error, status_code=request.status_code, offset=self.offset, next_offset=self.next_offset,
-                total_results=self.total_results
-            )
+            self.errored = True
+            self.stdout.write(self.stdout_style.ERROR(
+                "{code}: {error}.\nInfo: S:{status_code} O:{offset} NO:{next_offset} T:{total_results}".format(
+                    code=request.status_code, error=request.text, status_code=request.status_code, offset=self.offset,
+                    next_offset=self.next_offset, total_results=self.total_results)
+            ))
+
+        if self.errored:
             return []
 
         self.next_offset += self.last_request_data["number_of_page_results"]
@@ -115,14 +118,17 @@ class GiantBombAdapter(BaseAdapter):
             try:
                 self.last_request_data = request.json()
             except json.decoder.JSONDecodeError:
-                self.error = "Unable to decode content as JSON"
+                self.stdout.write(self.stdout_style.ERROR("Unable to decode content as JSON"))
+                self.errored = True
         else:
-            self.error = request.text
-        if self.error:
-            self.error = "{error}.\nInfo: S:{status_code} O:{offset} NO:{next_offset} T:{total_results}".format(
-                error=self.error, status_code=request.status_code, offset=self.offset, next_offset=self.next_offset,
-                total_results=self.total_results
-            )
+            self.errored = True
+            self.stdout.write(self.stdout_style.ERROR(
+                "{code}: {error}.\nInfo: S:{status_code} O:{offset} NO:{next_offset} T:{total_results}".format(
+                    code=request.status_code, error=request.text, status_code=request.status_code, offset=self.offset,
+                    next_offset=self.next_offset, total_results=self.total_results)
+            ))
+
+        if self.errored:
             return []
 
         self.next_offset += self.last_request_data["number_of_page_results"]
@@ -137,7 +143,7 @@ class GiantBombAdapter(BaseAdapter):
         if not self.fetching:
             return False
         # In case of any error, stop
-        if self.error:
+        if self.errored:
             return False
         # First fetch call
         if self.total_results == GiantBombAdapter.UNKOWN_TOTAL_RESULTS_VALUE:
@@ -149,10 +155,7 @@ class GiantBombAdapter(BaseAdapter):
         return False
 
     def has_errored(self) -> bool:
-        return self.error is not None
-
-    def error_info(self) -> str:
-        return self.error if self.error else ""
+        return self.errored
 
     @staticmethod
     def _results_to_platform_entities(results: Dict) -> List[FetchedPlatform]:

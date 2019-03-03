@@ -51,7 +51,3 @@ class BaseAdapter(ABC):
     @abstractmethod
     def has_errored(self) -> bool:
         pass
-
-    @abstractmethod
-    def error_info(self) -> str:
-        pass
