@@ -25,8 +25,13 @@ class Command(BaseCommand):
         ))
 
         adapter_class = source_class_from_id(source_id)
-
         self.default_publish_date = adapter_class.DEFAULT_PUBLISH_DATE
+
+        if not self._source_has_plaforms(source_id):
+            self.stdout.write(self.style.ERROR(
+                "You must first fetch platforms from source '{}' as games needs to be linked to them".format(source_id)
+            ))
+            exit(1)
 
         with adapter_class(stdout=self.stdout, stdout_color_style=self.style) as adapter:
             for platform_id in platforms:
@@ -99,3 +104,7 @@ class Command(BaseCommand):
             self.stdout.write(self.style.ERROR("\nErrors:"))
             for error_item in errors:
                 self.stdout.write(self.style.ERROR(error_item))
+
+    @staticmethod
+    def _source_has_plaforms(source_id: str) -> bool:
+        return FetchedPlatform.objects.filter(source_id=source_id).count() > 0

@@ -179,16 +179,6 @@ class GiantBombAdapter(BaseAdapter):
 
         return entities
 
-    def _get_platform_cached(self, source_platform_id: int) -> Optional[FetchedPlatform]:
-        if source_platform_id not in self.platforms_cache:
-            try:
-                fetched_platform = FetchedPlatform.objects.get(source_platform_id=source_platform_id)
-            except FetchedPlatform.DoesNotExist:
-                fetched_platform = None
-            self.platforms_cache[source_platform_id] = fetched_platform
-
-        return self.platforms_cache[source_platform_id]
-
     def _results_to_game_entities(self, results: Dict) -> List[Tuple[FetchedGame, List[FetchedPlatform]]]:
         entities = []  # type: List[Tuple[FetchedGame, List[FetchedPlatform]]]
 
@@ -210,6 +200,7 @@ class GiantBombAdapter(BaseAdapter):
 
             platforms = []  # type: List[FetchedPlatform]
             for platform_result in result["platforms"]:
+                # NOTE: Only platforms not hidden will be linked
                 fetched_platform = self._get_platform_cached(source_platform_id=platform_result["id"])
                 if fetched_platform:
                     platforms.append(fetched_platform)
@@ -217,6 +208,18 @@ class GiantBombAdapter(BaseAdapter):
             entities.append((game, platforms,))
 
         return entities
+
+    def _get_platform_cached(self, source_platform_id: int) -> Optional[FetchedPlatform]:
+        if source_platform_id not in self.platforms_cache:
+            try:
+                fetched_platform = FetchedPlatform.objects.get(
+                    source_platform_id=source_platform_id, hidden=False
+                )
+            except FetchedPlatform.DoesNotExist:
+                fetched_platform = None
+            self.platforms_cache[source_platform_id] = fetched_platform
+
+        return self.platforms_cache[source_platform_id]
 
     def _rate_limit_check_and_wait_if_needed(self) -> None:
         can_pass = False

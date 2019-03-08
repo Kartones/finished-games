@@ -18,6 +18,8 @@ class FetchedGame(BaseGame):
     hidden = models.BooleanField("Item hidden", default=False, db_index=True)
     fg_game_id = models.ForeignKey(Game, on_delete=models.SET_NULL, null=True, default=None, blank=True)
     # Override parent fields
+    # Allow repeated names as for sure will be duplicates once using multiple sources
+    name = models.CharField("Name", max_length=200, unique=False, db_index=True)
     platforms = models.ManyToManyField("FetchedPlatform")
     parent_game = models.ForeignKey("FetchedGame", on_delete=models.CASCADE, null=True, default=None, blank=True)
 
@@ -62,6 +64,10 @@ class FetchedPlatform(BasePlatform):
     # This basic mapping allows to aggregate multiple source platform ids to same destination platform
     # e.g iOS, Android & J2ME -> Mobile
     fg_platform = models.ForeignKey(Platform, on_delete=models.SET_NULL, null=True, default=None, blank=True)
+    # Override parent fields
+    # Allow repeated names as for sure will be duplicates once using multiple sources
+    name = models.CharField("Name", max_length=100, unique=False, db_index=True)
+    shortname = models.CharField("Shortname", max_length=40, unique=False, default=None)
 
     def save(self, *args: Any, **kwargs: Any) -> None:
         if not self.shortname:

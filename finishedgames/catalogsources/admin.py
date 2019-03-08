@@ -20,7 +20,7 @@ from core.models import Platform
 # Custom admin action
 def hide_fetched_items(modeladmin: admin.ModelAdmin, request: HttpRequest, queryset: QuerySet) -> None:
     queryset.update(hidden=True)
-hide_fetched_items.short_description = "Mark selected items as hidden"  # type:ignore # NOQA: E305
+hide_fetched_items.short_description = "Hide selected items"  # type:ignore # NOQA: E305
 
 
 # Custom admin action
