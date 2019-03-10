@@ -1,0 +1,53 @@
+<script type="text/javascript">
+    function copyAllFields(eventSource, parentNodeName) {
+        const parentNode = document.querySelector("#" + parentNodeName);
+        const copyButtons = parentNode.querySelectorAll(".btn-operation");
+        for (let button of copyButtons) {
+            if (button != eventSource) {
+                button.click();
+            }
+        }
+    }
+
+    function copyField(eventSource) {
+        const sourceNode = document.querySelector("#" + eventSource.dataset.source),
+              sourceValue = sourceNode.firstElementChild.value ? sourceNode.firstElementChild.value :
+                                                                 sourceNode.firstElementChild.innerText;
+
+        let destinationNode = document.querySelector("#" + eventSource.dataset.destination);
+
+        switch(destinationNode.type) {
+            case "checkbox":
+                destinationNode.checked = sourceValue === "True";
+                break;
+            case "select-multiple":
+                const sourceValues = sourceValue.split(",");
+                destinationNode.value = "";
+                for (let option of destinationNode.options) {
+                    if (sourceValues.includes(option.value)) {
+                        option.selected = true;
+                    }
+                }
+                break;
+            default:
+                destinationNode.value = sourceValue;
+                break;
+        }
+    }
+
+    function revertField(eventSource) {
+        const targetNode = document.querySelector("#" + eventSource.dataset.target);
+
+        if (targetNode.type === "select-multiple") {
+            const originalValues = eventSource.dataset.original.split(",");
+            targetNode.value = "";
+            for (let option of targetNode.options) {
+                if (originalValues.includes(option.value)) {
+                    option.selected = true;
+                }
+            }
+        } else {
+            targetNode.value = eventSource.dataset.original;
+        }
+    }
+</script>

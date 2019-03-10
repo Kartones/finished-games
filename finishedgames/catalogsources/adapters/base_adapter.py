@@ -1,12 +1,23 @@
 from abc import (ABC, abstractmethod)
-from typing import (Any, List)
+from typing import (Any, List, Tuple)
 
-from catalogsources.models import FetchedPlatform
+from django.core.management.base import OutputWrapper
+from django.core.management.color import Style
+
+from catalogsources.models import (FetchedGame, FetchedPlatform)
 
 
 class BaseAdapter(ABC):
 
     FIELD_UNSUPPLIED = None
+
+    UNKOWN_TOTAL_RESULTS_VALUE = -1
+
+    DEFAULT_PUBLISH_DATE = 1970
+
+    @abstractmethod
+    def __init__(self, stdout: OutputWrapper, stdout_color_style: Style) -> None:
+        pass
 
     @abstractmethod
     def __enter__(self) -> "BaseAdapter":
@@ -14,6 +25,10 @@ class BaseAdapter(ABC):
 
     @abstractmethod
     def __exit__(self, *args: Any) -> None:
+        pass
+
+    @abstractmethod
+    def reset(self) -> None:
         pass
 
     @staticmethod
@@ -26,13 +41,13 @@ class BaseAdapter(ABC):
         pass
 
     @abstractmethod
+    def fetch_games_block(self, platform_id: int) -> List[Tuple[FetchedGame, List[FetchedPlatform]]]:
+        pass
+
+    @abstractmethod
     def has_more_items(self) -> bool:
         pass
 
     @abstractmethod
     def has_errored(self) -> bool:
-        pass
-
-    @abstractmethod
-    def error_info(self) -> str:
         pass

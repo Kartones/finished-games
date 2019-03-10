@@ -35,7 +35,8 @@ SESSION_COOKIE_SECURE = True
 CATALOG_SOURCES_ADAPTERS = {
     "<source_id>": {
         constants.ADAPTER_API_KEY: "<api_key>",
-        constants.ADAPTER_REQUESTS_PER_HOUR: <amount_per_hour>
+        constants.ADAPTER_REQUESTS_PER_HOUR: <amount_per_hour>,
+        constants.ADAPTER_WAIT_SECONDS_WHEN_RATE_LIMITED: <wait_seconds>,  # value = 3600 / ADAPTER_REQUESTS_PER_HOUR
     }
 }
 

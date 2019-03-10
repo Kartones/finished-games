@@ -1,14 +1,275 @@
 {% extends "admin/base_site.html" %}
 {% load i18n admin_urls static admin_modify %}
 
+{% block extrahead %}
+{{ block.super }}
+<link rel="stylesheet" type="text/css" href="{% static 'admin/css/forms.css' %}">
+<link rel="stylesheet" type="text/css" media="all" href="{% static 'css/admin.css' %}">
+<style type="text/css">
+    input.btn-operation {
+        background: #79aec8;
+        margin-left: 9px;
+        padding: 3px 6px;
+        height: 24px;
+    }
+    label.text-field {
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        padding: 5px 6px;
+        margin-top: 0;
+    }
+    label.number-field {
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        padding: 5px 6px;
+        margin-top: 0;
+    }
+    a.uri-field {
+        font-size: 14px;
+        vertical-align: middle;
+    }
+    div.with-copy-btn {
+        display: flex;
+    }
+    div.with-copy-btn div span {
+        padding-top: 10px;
+        vertical-align: middle;
+    }
+    #form-content {
+        display: flex;
+    }
+    #existing-game {
+        border-left: 1px solid #eee;
+    }
+    span.unavailable {
+        color: grey;
+    }
+    /* Override forms.css ones for this page only */
+    label.vCheckboxLabel {
+        float: left !important;
+        width: 160px !important;
+        padding: 4px 10px 0 0 !important;
+    }
+</style>
+{% endblock %}
+
 {% block breadcrumbs %}
+
 <div class="breadcrumbs">
     <a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
     &rsaquo; <a href="{% url 'admin:app_list' app_label=opts.app_label %}">{{ opts.app_config.verbose_name }}</a>
+    &rsaquo; <a href="{% url 'admin:catalogsources_fetchedgame_changelist' %}">{{ model_class_name }}</a>
     &rsaquo; Import Game
 </div>
+
 {% endblock %}
 
 {% block content %}
-...
+
+<div id="content-main">
+
+    {% if fetched_game %}
+    <form action="{% url 'admin:game_import' %}" method="post">
+        <div id="form-content">
+            <div id="imported-game">
+                <fieldset class="module aligned">
+                    <h3>Source Fetched Game <input onclick="copyAllFields(this, 'imported-game')" type="button" value="➤" class="btn-operation" title="Copy all values"></h3>
+                    <div class="form-row">
+                        <div>
+                            <label for="fetched_name">Name:</label>
+                            <div class="with-copy-btn">
+                                <div class="readonly" id="fetched_name"><span>{{ fetched_game.name }}</span></div>
+                                <input data-source="fetched_name" data-destination="name" onclick="copyField(this)" type="button" value="➤" class="btn-operation" title="Copy value">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div>
+                            <label for="fetched_publish_date">Year Published:</label>
+                            <div class="with-copy-btn">
+                                <div class="readonly" id="fetched_publish_date"><span>{{ fetched_game.publish_date }}</span></div>
+                                <input data-source="fetched_publish_date" data-destination="publish_date" onclick="copyField(this)" type="button" value="➤" class="btn-operation" title="Copy value">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <label for="fetched_platforms">
+                            Fetched Platforms:<br/><br/>
+                            Only those already mapped to a catalog platform will be linked
+                        </label>
+                        <div class="with-copy-btn">
+                            <div class="readonly" id="fetched_platforms">
+                                <input type="hidden" value="{{ fg_plaform_ids }}">
+                                {% for platform in fetched_game.platforms.all %}
+                                    {% if platform.fg_platform %}
+                                        <strong>{{ platform.name }}</strong><br />
+                                    {% else %}
+                                        <span class="unavailable">{{ platform.name }}</span><br />
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                            <input data-source="fetched_platforms" data-destination="platforms" onclick="copyField(this)" type="button" value="➤" class="btn-operation" title="Copy value">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <label for="fetched_dlc_or_expansion">DLC/Expansion:</label>
+                        <div class="with-copy-btn">
+                            <div class="readonly" id="fetched_dlc_or_expansion">
+                                <input type="hidden" value="{% if fetched_game.dlc_or_expansion %}True{% else %}False{% endif %}">
+                                <span>
+                                    {% if fetched_game.dlc_or_expansion %}
+                                        True
+                                    {% else %}
+                                        False
+                                    {% endif %}
+                                </span>
+                            </div>
+                            <input data-source="fetched_dlc_or_expansion" data-destination="dlc_or_expansion" onclick="copyField(this)" type="button" value="➤" class="btn-operation" title="Copy value">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <label for="parent_game">
+                            Parent Fetched Game:<br/><br/>
+                            Must be mapped to a catalog game
+                        </label>
+                        <div class="with-copy-btn">
+                            {% if fetched_game.parent_game and fetched_game.parent_game.fg_game %}
+                                <div class="readonly" id="fetched_parent_game" value="{{ fetched_game.parent_game.fg_game.id }}">
+                                    <span>{{ fetched_game.parent_game }}</span>
+                                </div>
+                                <input data-source="fetched_parent_game" data-destination="parent_game" onclick="copyField(this)" type="button" value="➤" class="btn-operation" title="Copy value">
+                            {% else %}
+                                <div class="readonly">
+                                    {% if fetched_game.parent_game %}
+                                        <span class="unavailable">{{ fetched_game.parent_game.name }}</span>
+                                    {% endif %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div>
+                            <label>Source:</label>
+                            <div class="readonly">{{ fetched_game.source_id }}</div>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div>
+                            <label>Source game identifier:</label>
+                            <div class="readonly">{{ fetched_game.source_game_id }}</div>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div>
+                            <label>Source URI:</label>
+                            <div class="readonly"><a class="uri-field" href="{{ fetched_game.source_url }}" target="_blank" id="fetched_source_url">{{ fetched_game.source_url }}</a></div>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div>
+                            <label>Mapped to Game:</label>
+                            <div class="readonly">
+                                {% if fetched_game.fg_game %}
+                                    <a href="/admin/core/game/{{ fetched_game.fg_game.id }}/change/">{{ fetched_game.fg_game.name }}</a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <label for="fetched_hidden">Item hidden</label>
+                        <div class="readonly">
+                            {% if fetched_game.hidden %}
+                                True
+                            {% else %}
+                                False
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div>
+                            <label>Last data modification:</label>
+                            <div class="readonly">{{ fetched_game.last_modified_date }}</div>
+                        </div>
+                    </div>
+
+                </fieldset>
+            </div>
+
+            <div id="existing-game">
+                {% csrf_token %}
+                <input type="hidden" name="id" value="{% if fetched_game.fg_game %}{{ fetched_game.fg_game.id }}{% endif %}">
+                <input type="hidden" name="fetched_game_id" value="{{ fetched_game.id }}">
+                <div>
+                    <fieldset class="module aligned">
+                        <h3>
+                            Destination Game
+                            {% if fetched_game.fg_game %}
+                                    - <span class="changelink">Modifying existing Game</span>
+                            {% else %}
+                                    - <span class="addlink">Adding new Game</span>
+                            {% endif %}
+                        </h3>
+                        <div class="form-row">
+                            <div>
+                                <label class="required" for="name">Name:</label>
+                                <input type="text" name="name" value="{% if fetched_game.fg_game %}{{ fetched_game.fg_game.name }}{% endif %}" class="vTextField" maxlength="100" id="name" required>
+                                <input data-target="name" data-original="{% if fetched_game.fg_game %}{{ fetched_game.fg_game.name }}{% endif %}" onclick="revertField(this)" type="button" value="↺" class="btn-operation" title="Reset to original value">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div>
+                                <label class="required" for="publish_date">Year Published:</label>
+                                <input type="number" name="publish_date" value="{% if fetched_game.fg_game %}{{ fetched_game.fg_game.publish_date }}{% endif %}" class="vIntegerField" id="publish_date" required>
+                                <input data-target="publish_date" data-original="{% if fetched_game.fg_game %}{{ fetched_game.fg_game.publish_date }}{% endif %}" onclick="revertField(this)" type="button" value="↺" class="btn-operation" title="Reset to original value">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div>
+                                <label class="required" for="platforms">Platforms:</label>
+                                <select name="platforms" required id="platforms" multiple>
+                                    {% for platform in platforms_for_selectbox %}
+                                        <option value="{{ platform.id }}" {% if platform.id in existing_platform_ids_list %}selected{% endif %}>{{ platform.name }}</option>
+                                    {% endfor %}
+                                </select>
+                                <input data-target="platforms" data-original="{{ existing_platform_ids }}" onclick="revertField(this)" type="button" value="↺" class="btn-operation" title="Reset to original value">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="checkbox-row">
+                                <label class="vCheckboxLabel" for="dlc_or_expansion">DLC/Expansion:</label>
+                                <input type="checkbox" name="dlc_or_expansion" {% if fetched_game.fg_game  and fetched_game.fg_game.dlc_or_expansion%}checked{% endif %} id="dlc_or_expansion">
+                                <input data-target="dlc_or_expansion" data-original="{% if fetched_game.fg_game %}{{ fetched_game.fg_game.dlc_or_expansion }}{% endif %}" onclick="revertField(this)" type="button" value="↺" class="btn-operation" title="Reset to original value">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div>
+                                <label class="required" for="parent_game">Parent game:</label>
+                                <select name="parent_game" id="parent_game" class="vTextField">
+                                    <option value="">---------</option>
+                                    {% for game in games_for_selectbox %}
+                                        <option value="{{ game.id }}" {% if game.id == existing_parent_game_id %}selected{% endif %}>{{ game.name }}</option>
+                                    {% endfor %}
+                                </select>
+                                <input data-target="parent_game" data-original="{{ existing_parent_game_id }}" onclick="revertField(this)" type="button" value="↺" class="btn-operation" title="Reset to original value">
+                            </div>
+                        </div>
+                    </fieldset>
+                </div>
+            </div>
+        </div>
+
+        <div class="submit-row">
+            <input type="submit" value="Save" class="default" name="_save">
+        </div>
+    </form>
+
+    {% include "import_js.html" %}
+
+    {% endif %}
+
+</div>
+
 {% endblock %}
