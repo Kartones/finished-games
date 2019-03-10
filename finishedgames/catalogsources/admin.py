@@ -127,45 +127,62 @@ class FetchedGameAdmin(FGModelAdmin):
             "platforms_for_selectbox": platforms,
             "existing_parent_game_id": "",
             "existing_platform_ids": "",
+            "existing_platform_ids_list": [],
         })
 
         if fetched_game.fg_game:
+            platforms_list = [platform.id for platform in fetched_game.fg_game.platforms.all()]
             context.update({
-                "existing_parent_game_id": fetched_game.fg_game.parent_game.id,
-                "existing_platform_ids": ",".join([
-                    str(platform.fg_platform.id) for platform in fetched_game.fg_game.platforms.all()
-                ])
+                "existing_parent_game_id": "",
+                "existing_platform_ids": ",".join([str(platform_id) for platform_id in platforms_list]),
+                "existing_platform_ids_list": platforms_list,
             })
+            if fetched_game.fg_game.parent_game:
+                context.update({
+                    "existing_parent_game_id": fetched_game.fg_game.parent_game.id,
+                })
 
         return TemplateResponse(request, "game_import.html", context)
 
     def import_view(self, request: HttpRequest) -> HttpResponseRedirect:
-        """
         if request.POST["id"]:
-            platform = Platform.objects \
-                               .filter(id=request.POST["id"]) \
-                               .get()
+            game = Game.objects \
+                          .filter(id=request.POST["id"]) \
+                          .get()
         else:
-            platform = Platform()
+            game = Game()
 
-        platform.name = request.POST["name"]
-        platform.shortname = request.POST["shortname"]
-        platform.publish_date = request.POST["publish_date"]
+        game.name = request.POST["name"]
+        game.publish_date = request.POST["publish_date"]
+        game.dlc_or_expansion = request.POST.get("dlc_or_expansion") is not None
+        if request.POST["parent_game"]:
+            game.parent_game_id = request.POST["parent_game"]
         try:
-            platform.save()
+            game.save()
+            pass
         except Exception as error:
-            self.message_user(request, "Error importing Fetched Platform: {}".format(error), level="error")
-            return HttpResponseRedirect(reverse("admin:catalogsources_fetchedplatform_changelist"))
+            self.message_user(request, "Error importing Fetched Game: {}".format(error), level="error")
+            return HttpResponseRedirect(reverse("admin:catalogsources_fetchedgame_changelist"))
 
-        # Update always linked platform
-        fetched_platform = FetchedPlatform.objects \
-                                          .filter(id=request.POST["fetched_platform_id"]) \
-                                          .get()
-        fetched_platform.fg_platform_id = platform.id
-        fetched_platform.save(update_fields=["fg_platform_id"])
+        # many to many need an id to be set, so platforms added after initial save
+        try:
+            platforms = Platform.objects.filter(id__in=request.POST.getlist("platforms"))
+            game.platforms.set(platforms)
+            game.save()
+            pass
+        except Exception as error:
+            self.message_user(request, "Error importing Fetched Game: {}".format(error), level="error")
+            return HttpResponseRedirect(reverse("admin:catalogsources_fetchedgame_changelist"))
 
-        self.message_user(request, "Fetched Platform imported successfully")
-        """
+        # Update always linked game
+        fetched_game = FetchedGame.objects \
+                                  .filter(id=request.POST["fetched_game_id"]) \
+                                  .get()
+        fetched_game.fg_game_id = game.id
+        fetched_game.save(update_fields=["fg_game_id"])
+
+        self.message_user(request, "Fetched Game imported successfully")
+
         return HttpResponseRedirect(reverse("admin:catalogsources_fetchedgame_changelist"))
 
 

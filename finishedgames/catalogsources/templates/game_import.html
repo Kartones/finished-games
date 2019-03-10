@@ -231,7 +231,7 @@
                                 <label class="required" for="platforms">Platforms:</label>
                                 <select name="platforms" required id="platforms" multiple>
                                     {% for platform in platforms_for_selectbox %}
-                                        <option value="{{ platform.id }}">{{ platform.name }}</option>
+                                        <option value="{{ platform.id }}" {% if platform.id in existing_platform_ids_list %}selected{% endif %}>{{ platform.name }}</option>
                                     {% endfor %}
                                 </select>
                                 <input data-target="platforms" data-original="{{ existing_platform_ids }}" onclick="revertField(this)" type="button" value="↺" class="btn-operation" title="Reset to original value">
