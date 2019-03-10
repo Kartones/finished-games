@@ -16,7 +16,7 @@ class FetchedGame(BaseGame):
     source_url = models.CharField("Resource source URI", max_length=255)
     change_hash = models.CharField("Marker to detect data changes after fetch", max_length=32)
     hidden = models.BooleanField("Item hidden", default=False, db_index=True)
-    fg_game_id = models.ForeignKey(Game, on_delete=models.SET_NULL, null=True, default=None, blank=True)
+    fg_game = models.ForeignKey(Game, on_delete=models.SET_NULL, null=True, default=None, blank=True)
     # Override parent fields
     # Allow repeated names as for sure will be duplicates once using multiple sources
     name = models.CharField("Name", max_length=200, unique=False, db_index=True)

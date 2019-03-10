@@ -188,6 +188,7 @@ class GiantBombAdapter(BaseAdapter):
                 "source_game_id": result["id"],
                 "source_id": GiantBombAdapter.source_id(),
                 "source_url": result["site_detail_url"],
+                # TODO: Handle DLCs and parent games
             }
             if result["original_release_date"]:
                 # Cheating here, instead of parsing as datetime and extracting year. sample: `1985-07-23 00:00:00`

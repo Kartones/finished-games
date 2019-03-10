@@ -10,6 +10,7 @@
         background: #79aec8;
         margin-left: 9px;
         padding: 3px 6px;
+        height: 24px;
     }
     label.text-field {
         border: 1px solid #ccc;
@@ -64,7 +65,7 @@
 
                 <div id="imported-platform">
                     <fieldset class="module aligned">
-                        <h3>Source Fetched Platform</h3>
+                        <h3>Source Fetched Platform  <input onclick="copyAllFields(this, 'imported-platform')" type="button" value="➤" class="btn-operation" title="Copy all values"></h3>
                         <div class="form-row">
                             <div>
                                 <label for="fetched_name">Name:</label>
@@ -185,19 +186,8 @@
             </div>
         </form>
 
-        <script type="text/javascript">
-            function copyField(eventSource) {
-                var source_node = document.querySelector('#' + eventSource.dataset.source),
-                    destination_node = document.querySelector('#' + eventSource.dataset.destination);
+        {% include "import_js.html" %}
 
-                destination_node.value = source_node.firstElementChild.innerText;
-            }
-            function revertField(eventSource) {
-                var target_node = document.querySelector('#' + eventSource.dataset.target);
-
-                target_node.value = eventSource.dataset.original;
-            }
-        </script>
     {% endif %}
 
 </div>

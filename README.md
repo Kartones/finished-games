@@ -10,10 +10,6 @@ Finished games is a small personal project whose purposes are:
 
 **2) To practice fully developing a website with Django 2.x.** On my daily work I don't get to touch all the pieces that the framework provides, plus I can learn how to setup `pytest` to run Django `TestCases`, add type hinting everywhere with `mypy` and other personal tastes, like `pytest` for testing (including running Django testcases).
 
-**3) To learn data fetching, scrapping, gathering, etc.**, so managing the database of game titles becomes as automated as possible.
-
-**4) To learn React, so when the project is "MVP ready" I have the idea of rewriting it**. Django will handle the backend as a REST API and the frontend will be redone from scratch in `React`, `Redux` and/or whatever fits best (I'm still learning). It will be properly tagged/marked so the Django only version could still be accessed.
-
 
 Some screenshots:
 
@@ -41,6 +37,8 @@ This project uses [a customized fork](https://github.com/kartones-forks/NES.css)
 
 ### Notes
 
+Javascript uses features from ES2015 and assumes a modern browser, which means: not outdated Firefox, Chrome, Safari or Edge. Internet Explorer and other older browsers are not supported.
+
 Not all functionality is yet implemented, expect missing basic features until reaching MVP 1.1.
 
 There is a roadmap but for now internal, I do plan to make the site fully usable without needing to rely on django-admin, I'll eventually add an autocomplete textfield for selecting the game and/or platform, and other basic features, all before considering MVP 1.1 done.
@@ -49,9 +47,9 @@ The Docker Python image is already compatible with variable type hints (>= 3.6),
 
 ## Setup
 
-This project requires `Python >= 3.5`, `Docker` and `Docker Compose`. Other requirements are specified in the corresponding `requirements.txt` and `requirements-dev.txt` files but are installed inside the containers.
+This project requires `Python >= 3.5`, `Docker` and `Docker Compose` to be built (only Python to run). Python package requirements are specified in the corresponding `requirements.txt` and `requirements-dev.txt` files. These packages are installed inside the containers in development and testing.
 
-Most requirements are not version-pinned on purpose, if a build fails due to some new version breaking change it will be triaged and solved accordingly.
+Most requirements are not version-pinned on purpose, if a build fails due to some new version breaking change it will be triaged and updated accordingly.
 
 To run pending migrations (both initial setup and after an update that brings new ones):
 ```
@@ -76,7 +74,7 @@ Once loaded the site will be available from [http://0.0.0.0:5000/](http://0.0.0.
 
 Admin site is accessible from [http://0.0.0.0:5000/admin/](http://0.0.0.0:5000/admin/) .
 
-**NOTE:** Some Data creation and management is done from the Admin site.
+**NOTE:** Some data creation and management is done from the Admin site. One of the principles of this project is not repeating work already done or more easily done from the Django Admin.
 
 ## Fetching catalog from external sources
 
@@ -86,6 +84,12 @@ Once you have added your key(s) to the settings, you can invoke fetching of plat
 ```
 # Command accepts one or more source_ids
 python3 manage.py fetch_platforms <source_id_1> [<source_id_2> ...]
+```
+
+Or, once you have fetched platforms from a given source, fetch games of one or more fetched platform ids:
+```
+# Command accepts one source_id but multiple platform_ids
+python3 manage.py fetch_games <source_id> <platform_id_1> [<platform_id_2> ...]
 ```
 
 No detailed instructions are provided on how to work with fetched items, but don't worry about your existing catalog, fetched data always goes to different tables and must be manually imported into the catalog to avoid overriding things by mistake.
@@ -125,13 +129,13 @@ python manage.py shell
 
 ### Development tips
 
-Demo of all [NES.css](https://github.com/nostalgic-css/NES.css) available components: https://nostalgic-css.github.io/NES.css/ . Note that this website uses that project CSS but has replaced most external assets (at the moment just some PNG cursors) by local statics, so updates to it are handled manually at the moment.
+- Demo of all [NES.css](https://github.com/nostalgic-css/NES.css) available components: https://nostalgic-css.github.io/NES.css/ . Note that this website uses that project CSS but has removed unused assets and replaced external images by local ones, so updates to it are handled manually at the moment.
 
 
-Personal recommendation of IDE for SQLite browsing: [DB Browser for SQLite](https://sqlitebrowser.org/)
+- Personal recommendation of IDE for SQLite browsing: [DB Browser for SQLite](https://sqlitebrowser.org/)
 
 
-To see the SQL query of an ORM query, use the `.query` property on `QuerySet` objects:
+- To see the SQL query of an ORM query, use the `.query` property on `QuerySet` objects:
 ```
 print(latest_finished_games.query)
 ```
@@ -146,9 +150,9 @@ Also remember that you need to [setup the statics](https://docs.djangoproject.co
 
 ## Roadmap
 
-Note that the second MVP means a radical departure from the current one, so a release tag will be created before embarking in the second phase (it can be useful as a "django starter kit").
+Note that the second MVP means a radical departure from the current one, so, if tackling it, a release tag will be created before embarking in the second phase (it can be useful as a "django starter kit").
 
-**Warning**: Until reaching MVP 1.1 "ready" state, all code, UI and DB schemas are subject to change. Then upon starting MVP 2 until its "ready" state again, expect heavy changes and no guaranteed backwards compatibility.
+**Warning**: Until reaching end of MVP 1.1, all code, UI and DB schemas are subject to change. Then upon starting MVP 2 until its "ready" state again, expect heavy changes and no guaranteed backwards compatibility.
 
 ### ☑️  MVP 1
 
@@ -156,9 +160,9 @@ Django only version, either without javascript or minimal one just to be able to
 
 ### MVP 1.1
 
-Adding CircleCI integration (free for public repos), bugfixes and some additions like wishlisting games and removing games from wishlist or from the user catalog. Plus probably data ingestion from one or two sources (I am the "most interested user" and I have and have played a lot of games!)
+Adding CircleCI integration (free for public repos), bugfixes and some additions like wishlisting games and removing games from wishlist or from the user catalog. Plus probably data ingestion from at least two sources (I am the "most interested user" and I have and have played a lot of games!)
 
-### MVP 2
+### MVP 2 (Optional)
 
 Throw away Django templates and transform existing views into a REST-like API, then create a separate project for the frontend to be built as an SPA using React (but keeping current design).
 

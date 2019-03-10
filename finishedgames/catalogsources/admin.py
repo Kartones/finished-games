@@ -14,7 +14,7 @@ from django.utils.translation import ugettext_lazy as _
 from catalogsources.apps import CatalogSourcesConfig
 from catalogsources.models import (FetchedGame, FetchedPlatform)
 from core.admin import FGModelAdmin
-from core.models import Platform
+from core.models import Game, Platform
 
 
 # Custom admin action
@@ -89,14 +89,15 @@ class FetchedGameAdmin(FGModelAdmin):
     def get_urls(self) -> List[str]:
         urls = super().get_urls()
         my_urls = [
-            path("import_setup/", self.admin_site.admin_view(self.import_setup_view)),
+            path("import_setup/", self.admin_site.admin_view(self.import_setup_view), name="game_import_setup"),
+            path("import/", self.admin_site.admin_view(self.import_view), name="game_import")
         ]
         return cast(List[str], my_urls + urls)
 
     def import_setup_view(self, request: HttpRequest) -> TemplateResponse:
         context = self.admin_site.each_context(request)
         context.update({
-            "title": "Import Game into main catalog",
+            "title": "Import fetched game into main catalog",
             "opts": {
                 # TODO: improve breadcrumbs
                 "app_label": CatalogSourcesConfig.name,
@@ -104,8 +105,68 @@ class FetchedGameAdmin(FGModelAdmin):
                     "verbose_name": CatalogSourcesConfig.name.capitalize
                 },
             },
+            "model_class_name": FetchedGame.__name__,
         })
+
+        selected_ids = list(map(int, request.GET["ids"].split(",")))
+        if len(selected_ids) != 1:
+            self.message_user(request, "This action currently only supports acting upon a single entity", level="error")
+            return TemplateResponse(request, "game_import.html", context)
+
+        fetched_game = FetchedGame.objects.get(id=selected_ids[0])
+
+        games = Game.objects.only("id", "name").all()
+        platforms = Platform.objects.only("id", "name").all()
+
+        context.update({
+            "fetched_game": fetched_game,
+            "fg_plaform_ids": ",".join([
+                str(platform.fg_platform.id) for platform in fetched_game.platforms.all() if platform.fg_platform
+            ]),
+            "games_for_selectbox": games,
+            "platforms_for_selectbox": platforms,
+            "existing_parent_game_id": "",
+            "existing_platform_ids": "",
+        })
+
+        if fetched_game.fg_game:
+            context.update({
+                "existing_parent_game_id": fetched_game.fg_game.parent_game.id,
+                "existing_platform_ids": ",".join([
+                    str(platform.fg_platform.id) for platform in fetched_game.fg_game.platforms.all()
+                ])
+            })
+
         return TemplateResponse(request, "game_import.html", context)
+
+    def import_view(self, request: HttpRequest) -> HttpResponseRedirect:
+        """
+        if request.POST["id"]:
+            platform = Platform.objects \
+                               .filter(id=request.POST["id"]) \
+                               .get()
+        else:
+            platform = Platform()
+
+        platform.name = request.POST["name"]
+        platform.shortname = request.POST["shortname"]
+        platform.publish_date = request.POST["publish_date"]
+        try:
+            platform.save()
+        except Exception as error:
+            self.message_user(request, "Error importing Fetched Platform: {}".format(error), level="error")
+            return HttpResponseRedirect(reverse("admin:catalogsources_fetchedplatform_changelist"))
+
+        # Update always linked platform
+        fetched_platform = FetchedPlatform.objects \
+                                          .filter(id=request.POST["fetched_platform_id"]) \
+                                          .get()
+        fetched_platform.fg_platform_id = platform.id
+        fetched_platform.save(update_fields=["fg_platform_id"])
+
+        self.message_user(request, "Fetched Platform imported successfully")
+        """
+        return HttpResponseRedirect(reverse("admin:catalogsources_fetchedgame_changelist"))
 
 
 class FetchedPlatformAdmin(FGModelAdmin):
