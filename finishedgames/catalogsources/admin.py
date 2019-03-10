@@ -42,16 +42,21 @@ hyperlink_source_url.short_description = "Source URL"  # type:ignore # NOQA: E30
 
 # Don't show platforms which are hidden, and filter by source id if chosen
 class CustomPlatformsFilter(admin.SimpleListFilter):
-    title = "platforms"
+    title = "fetched platforms"
     parameter_name = "platforms"
 
     def lookups(self, request: HttpRequest, model_admin: admin.ModelAdmin) -> Tuple:
+        source_id = request.GET.get("source_id")
         queryset = FetchedPlatform.objects.filter(hidden=False)
-        if request.GET.get("source_id"):
-            queryset = queryset.filter(source_id=request.GET.get("source_id"))
-        return (
-            tuple((platform.id, platform.name) for platform in queryset)
-        )
+        if source_id:
+            queryset = queryset.filter(source_id=source_id)
+            return (
+                tuple((platform.id, platform.name) for platform in queryset)
+            )
+        else:
+            return (
+                tuple((platform.id, "{} [{}]".format(platform.name, platform.source_id)) for platform in queryset)
+            )
 
     def queryset(self, request: HttpRequest, queryset: QuerySet) -> QuerySet:
         return queryset.filter(hidden=False)
