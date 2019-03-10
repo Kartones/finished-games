@@ -184,7 +184,7 @@ def add_game(request: HttpRequest, username: str) -> HttpResponse:
             try:
                 user_game.full_clean()
                 user_game.save()
-                success_message = f"Game '{user_game.game.name}' for '{user_game.platform.shortname}' added"
+                success_message = "Game '{}' for '{}' added".format(user_game.game.name, user_game.platform.shortname)
             except ValidationError as error:
                 error_message = str(error)
 

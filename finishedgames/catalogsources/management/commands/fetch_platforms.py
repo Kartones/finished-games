@@ -20,7 +20,7 @@ class Command(BaseCommand):
 
     def _fetch_source(self, source_id: str) -> None:
         had_errors = False
-        self.stdout.write(self.style.WARNING(f"> Started fetching platforms from '{source_id}'"))
+        self.stdout.write(self.style.WARNING("> Started fetching platforms from '{}'".format(source_id)))
 
         adapter_class = source_class_from_id(source_id)
 
@@ -29,7 +29,7 @@ class Command(BaseCommand):
         with adapter_class(stdout=self.stdout, stdout_color_style=self.style) as adapter:
             while adapter.has_more_items() and not had_errors:
                 total = adapter.total_results if adapter.total_results != adapter.UNKOWN_TOTAL_RESULTS_VALUE else "-"
-                self.stdout.write(f"\n> Fetch call: {adapter.next_offset}/{total}")
+                self.stdout.write("\n> Fetch call: {current}/{total}".format(current=adapter.next_offset, total=total))
 
                 time_start = time.perf_counter()
                 platforms = adapter.fetch_platforms_block()
@@ -42,16 +42,16 @@ class Command(BaseCommand):
             self.stdout.write("")
 
         if had_errors:
-            self.stdout.write(self.style.WARNING(f"> Finished fetching '{source_id}' with errors"))
+            self.stdout.write(self.style.WARNING("> Finished fetching '{}' with errors".format(source_id)))
         else:
-            self.stdout.write(self.style.SUCCESS(f"> Finished fetching '{source_id}'"))
+            self.stdout.write(self.style.SUCCESS("> Finished fetching '{}'".format(source_id)))
 
     def _upsert_results(self, results: List[FetchedPlatform]) -> None:
         errors = []
         count = 0
 
         for platform in results:
-            self.stdout.write(f"{platform.source_platform_id}:", ending="")
+            self.stdout.write("{}:".format(platform.source_platform_id), ending="")
 
             try:
                 existing_platform = FetchedPlatform.objects.get(

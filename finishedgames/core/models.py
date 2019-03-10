@@ -44,7 +44,7 @@ class Game(BaseGame):
 
     def __str__(self) -> str:
         dlc_fragment = " [DLC/Expansion]" if self.dlc_or_expansion else ""
-        return f"{self.name}{dlc_fragment}"
+        return "{}{}".format(self.name, dlc_fragment)
 
 
 class BaseUserGame(models.Model):
@@ -73,28 +73,34 @@ class UserGame(BaseUserGame):
         return self.year_finished is not None
 
     def __str__(self) -> str:
-        return f"{self.user.get_username()}: {self.game.name} ({self.platform.shortname})"
+        return "{}: {} ({})".format(self.user.get_username(), self.game.name, self.platform.shortname)
 
     def clean(self) -> None:
         game_platforms = self.game.platforms.all()
         if self.platform not in game_platforms:
-            available_platforms = "','".join([platform.name for platform in game_platforms])
             raise ValidationError({
-                "platform": f"'{self.game.name}' not available in platform '{self.platform.name}'. Available platforms: '{available_platforms}'"  # NOQA: E501
+                "platform": "'{}'  not available in platform '{}'. Available platforms: '{}'".format(
+                    self.game.name,
+                    self.platform.name,
+                    "','".join([platform.name for platform in game_platforms])
+                    )
                 })
 
 
 class WishlistedUserGame(BaseUserGame):
 
     def __str__(self) -> str:
-        return f"{self.user.get_username()}: {self.game.name} ({self.platform.shortname})"
+        return "{}: {} ({})".format(self.user.get_username(), self.game.name, self.platform.shortname)
 
     def clean(self) -> None:
         game_platforms = self.game.platforms.all()
         if self.platform not in game_platforms:
-            available_platforms = "','".join([platform.name for platform in game_platforms])
             raise ValidationError({
-                "platform": f"'{self.game.name}' not available in platform '{self.platform.name}'. Available platforms: '{available_platforms}'"  # NOQA: E501
+                "platform": "'{}'  not available in platform '{}'. Available platforms: '{}'".format(
+                    self.game.name,
+                    self.platform.name,
+                    "','".join([platform.name for platform in game_platforms])
+                    )
                 })
 
 
@@ -111,5 +117,5 @@ class UserData(models.Model):
     )
 
     def __str__(self) -> str:
-        return f"{self.user.get_username()} ({self.user.email})"
+        return "{} ({})".format(self.user.get_username(), self.user.email)
 """

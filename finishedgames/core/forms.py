@@ -91,11 +91,10 @@ class GameForm(ModelForm):
             ])
             parent_game_platforms = sorted([item.id for item in self.cleaned_data["platforms"].all()])
             if not new_game_platforms == parent_game_platforms:
-                available_platforms = "','".join([
-                    platform.name for platform in self.cleaned_data["parent_game"].platforms.all()
-                ])
                 raise ValidationError({
-                    "platforms": f"Game DLC must be available on subset or all of parent game platforms: '{available_platforms}'"  # NOQA: E501
+                    "platforms": "Game DLC must be available on subset or all of parent game platforms: '{}'".format(
+                        "','".join([platform.name for platform in self.cleaned_data["parent_game"].platforms.all()])
+                    )
                 })
 
         return cast(Dict, self.cleaned_data)

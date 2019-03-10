@@ -21,7 +21,8 @@ class Command(BaseCommand):
     def _fetch_source(self, source_id: str, platforms: List[int]) -> None:
         had_errors = False
         self.stdout.write(self.style.WARNING(
-            f"> Started fetching games from '{source_id}' and source platform ids: {platforms}"
+            "> Started fetching games from '{source}' and source platform ids: {platforms}".format(
+                source=source_id, platforms=platforms)
         ))
 
         adapter_class = source_class_from_id(source_id)
@@ -29,7 +30,7 @@ class Command(BaseCommand):
 
         if not self._source_has_plaforms(source_id):
             self.stdout.write(self.style.ERROR(
-                f"You must first fetch platforms from source '{source_id}' as games needs to be linked to them"
+                "You must first fetch platforms from source '{}' as games needs to be linked to them".format(source_id)
             ))
             exit(1)
 
@@ -41,7 +42,8 @@ class Command(BaseCommand):
                         total = adapter.total_results
                     else:
                         total = "-"
-                    self.stdout.write(f"\n> Fetch call (platform_id {platform_id}): {adapter.next_offset}/{total}")
+                    self.stdout.write("\n> Fetch call (platform_id {id}): {current}/{total}".format(
+                        id=platform_id, current=adapter.next_offset, total=total))
 
                     time_start = time.perf_counter()
                     games = adapter.fetch_games_block(platform_id=platform_id)
@@ -57,16 +59,16 @@ class Command(BaseCommand):
             self.stdout.write("")
 
         if had_errors:
-            self.stdout.write(self.style.WARNING(f"> Finished fetching '{source_id}' with errors"))
+            self.stdout.write(self.style.WARNING("> Finished fetching '{}' with errors".format(source_id)))
         else:
-            self.stdout.write(self.style.SUCCESS(f"> Finished fetching '{source_id}'"))
+            self.stdout.write(self.style.SUCCESS("> Finished fetching '{}'".format(source_id)))
 
     def _upsert_results(self, results: List[Tuple[FetchedGame, List[FetchedPlatform]]]) -> None:
         errors = []
         count = 0
 
         for (game, platforms) in results:
-            self.stdout.write(f"{game.source_game_id}:", ending="")
+            self.stdout.write("{}:".format(game.source_game_id), ending="")
 
             try:
                 existing_game = FetchedGame.objects.get(
