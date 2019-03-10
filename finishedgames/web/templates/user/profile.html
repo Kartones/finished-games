@@ -17,6 +17,11 @@
             <p>
                 <a class="nes-btn is-success" href="{% url 'user_add_game' user.get_username %}">Add game to your catalog</a>
             </p>
+            {% if user.is_staff %}
+                <p>
+                    <a class="nes-btn is-error" href="{% url 'admin:index' %}">Admin Site</a>
+                </p>
+            {% endif %}
         </div>
     </section>
 

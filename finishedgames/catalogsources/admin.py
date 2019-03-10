@@ -9,6 +9,7 @@ from django.forms import ModelForm
 from django.forms.fields import Field as Form_Field
 from django.template.response import TemplateResponse
 from django.urls import (path, reverse)
+from django.utils.html import format_html
 from django.utils.translation import ugettext_lazy as _
 
 from catalogsources.apps import CatalogSourcesConfig
@@ -30,6 +31,12 @@ def import_fetched_items(
     selected_ids = request.POST.getlist(admin.ACTION_CHECKBOX_NAME)
     return HttpResponseRedirect("import_setup/?ids={}".format(",".join(selected_ids)))
 import_fetched_items.short_description = "Import selected items into catalog"  # type:ignore # NOQA: E305
+
+
+# Decorator to render source urls as hyperlinks on the listing pages
+def hyperlink_source_url(model_instance: FGModelAdmin) -> str:
+    return cast(str, format_html("<a href='{url}' target='_blank'>{url}</a>", url=model_instance.source_url))
+hyperlink_source_url.short_description = "Source URL"  # type:ignore # NOQA: E305
 
 
 # By default, hidden items won't show
@@ -62,7 +69,7 @@ class HiddenByDefaultFilter(admin.SimpleListFilter):
 
 class FetchedGameAdmin(FGModelAdmin):
     list_display = [
-        "name", "dlc_or_expansion", "parent_game", "publish_date", "source_id", "last_modified_date", "hidden"
+        "name", "dlc_or_expansion", "fg_game", hyperlink_source_url, "last_modified_date", "source_id", "hidden"
     ]
     list_filter = [HiddenByDefaultFilter, "source_id", "dlc_or_expansion", "platforms"]
     search_fields = ["name"]
@@ -187,7 +194,7 @@ class FetchedGameAdmin(FGModelAdmin):
 
 
 class FetchedPlatformAdmin(FGModelAdmin):
-    list_display = ["name", "fg_platform", "publish_date", "last_modified_date", "source_id", "hidden"]
+    list_display = ["name", "fg_platform", hyperlink_source_url, "last_modified_date", "source_id", "hidden"]
     list_filter = ["last_modified_date", HiddenByDefaultFilter, "source_id"]
     search_fields = ["name"]
     readonly_fields = ["last_modified_date", "change_hash"]

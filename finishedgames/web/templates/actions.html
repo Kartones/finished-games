@@ -78,33 +78,31 @@
                 <button class="nes-btn" type="submit" title="Mark as finished game"><i class="nes-icon trophy" title="Mark as finished game"></i></button>
             </form>
         {% endif %}
-        {% if not item_generic_id in authenticated_user_catalog.currently_playing %}
-            {% if item_generic_id in authenticated_user_catalog.not_owned %}
-                <form action="{% url 'user_no_longer_owned_games' user.get_username %}" method="post">
-                    {% csrf_token %}
-                    <input type="hidden" name="action" value="{{ constants.FORM_ACTION_DELETE }}" />
-                    <input type="hidden" name="user" value="{{ user.id }}" />
-                    <input type="hidden" name="game" value="{{ game_id }}" />
-                    <input type="hidden" name="platform" value="{{ platform_id }}" />
-                    {% if viewed_user and viewed_user != user %}
-                        <input type="hidden" name="viewed_username" value="{{ viewed_user.get_username }}" />
-                    {% endif %}
-                    <input type="hidden" name="next" value="{{ next_url }}" />
-                    <button class="nes-btn is-primary" type="submit" title="Remove no longer owned mark"><i class="nes-pixel-art snes-jp-logo is-disabled" title="Remove no longer owned mark"></i></button>
-                </form>
-            {% else %}
-                <form action="{% url 'user_no_longer_owned_games' user.get_username %}" method="post">
-                    {% csrf_token %}
-                    <input type="hidden" name="user" value="{{ user.id }}" />
-                    <input type="hidden" name="game" value="{{ game_id }}" />
-                    <input type="hidden" name="platform" value="{{ platform_id }}" />
-                    {% if viewed_user and viewed_user != user %}
-                        <input type="hidden" name="viewed_username" value="{{ viewed_user.get_username }}" />
-                    {% endif %}
-                    <input type="hidden" name="next" value="{{ next_url }}" />
-                    <button class="nes-btn" type="submit" title="Mark as no longer owned"><i class="nes-pixel-art snes-jp-logo is-disabled" title="Mark as no longer owned"></i></button>
-                </form>
-            {% endif %}
+        {% if item_generic_id in authenticated_user_catalog.not_owned %}
+            <form action="{% url 'user_no_longer_owned_games' user.get_username %}" method="post">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="{{ constants.FORM_ACTION_DELETE }}" />
+                <input type="hidden" name="user" value="{{ user.id }}" />
+                <input type="hidden" name="game" value="{{ game_id }}" />
+                <input type="hidden" name="platform" value="{{ platform_id }}" />
+                {% if viewed_user and viewed_user != user %}
+                    <input type="hidden" name="viewed_username" value="{{ viewed_user.get_username }}" />
+                {% endif %}
+                <input type="hidden" name="next" value="{{ next_url }}" />
+                <button class="nes-btn is-primary" type="submit" title="Remove no longer owned mark"><i class="nes-pixel-art snes-jp-logo is-disabled" title="Remove no longer owned mark"></i></button>
+            </form>
+        {% else %}
+            <form action="{% url 'user_no_longer_owned_games' user.get_username %}" method="post">
+                {% csrf_token %}
+                <input type="hidden" name="user" value="{{ user.id }}" />
+                <input type="hidden" name="game" value="{{ game_id }}" />
+                <input type="hidden" name="platform" value="{{ platform_id }}" />
+                {% if viewed_user and viewed_user != user %}
+                    <input type="hidden" name="viewed_username" value="{{ viewed_user.get_username }}" />
+                {% endif %}
+                <input type="hidden" name="next" value="{{ next_url }}" />
+                <button class="nes-btn" type="submit" title="Mark as no longer owned"><i class="nes-pixel-art snes-jp-logo is-disabled" title="Mark as no longer owned"></i></button>
+            </form>
         {% endif %}
         <form action="{% url 'user_games' user.get_username %}" method="post">
             {% csrf_token %}
