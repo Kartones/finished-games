@@ -15,6 +15,7 @@ class Command(BaseCommand):
         parser.add_argument("platforms", nargs="+", type=int)
 
     def handle(self, *args: Any, **options: Dict) -> None:
+        self._display_legend()
         self._fetch_source(source_id=cast(str, options["source"]), platforms=cast(List[int], options["platforms"]))
 
     def _fetch_source(self, source_id: str, platforms: List[int]) -> None:
@@ -106,3 +107,14 @@ class Command(BaseCommand):
     @staticmethod
     def _source_has_plaforms(source_id: str) -> bool:
         return FetchedPlatform.objects.filter(source_id=source_id).count() > 0
+
+    def _display_legend(self) -> None:
+        self.stdout.write("Legend: ")
+        self.stdout.write(self.style.SUCCESS("✓ "), ending="")
+        self.stdout.write("Added new game")
+        self.stdout.write(self.style.SUCCESS("☑ "), ending="")
+        self.stdout.write("Updated existing game (new changes)")
+        self.stdout.write(self.style.WARNING("☐ "), ending="")
+        self.stdout.write("Existing game not updated (no changes)")
+        self.stdout.write(self.style.ERROR("✗ "), ending="")
+        self.stdout.write("Error adding/updating game\n\n")

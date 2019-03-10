@@ -14,6 +14,7 @@ class Command(BaseCommand):
         parser.add_argument("sources", nargs="+", type=str)
 
     def handle(self, *args: Any, **options: Dict) -> None:
+        self._display_legend()
         for source_id in options["sources"]:
             self._fetch_source(source_id=source_id)
 
@@ -83,3 +84,14 @@ class Command(BaseCommand):
             self.stdout.write(self.style.ERROR("\nErrors:"))
             for error_item in errors:
                 self.stdout.write(self.style.ERROR(error_item))
+
+    def _display_legend(self) -> None:
+        self.stdout.write("Legend: ")
+        self.stdout.write(self.style.SUCCESS("✓ "), ending="")
+        self.stdout.write("Added new platform")
+        self.stdout.write(self.style.SUCCESS("☑ "), ending="")
+        self.stdout.write("Updated existing platform (new changes)")
+        self.stdout.write(self.style.WARNING("☐ "), ending="")
+        self.stdout.write("Existing platform not updated (no changes)")
+        self.stdout.write(self.style.ERROR("✗ "), ending="")
+        self.stdout.write("Error adding/updating platform\n\n")

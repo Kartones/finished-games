@@ -33,8 +33,6 @@ Form to add an existing game to the user's catalog:
 
 You can see a live demo of the project at [https://finishedgames.kartones.net](https://finishedgames.kartones.net) (user accounts restricted to only friends, not for public use, sorry!).
 
-This project uses [a customized fork](https://github.com/kartones-forks/NES.css) of the awesome [NES.CSS Framework from nostalgic-css](https://github.com/nostalgic-css/NES.css).
-
 ### Notes
 
 Javascript uses features from ES2015 and assumes a modern browser, which means: not outdated Firefox, Chrome, Safari or Edge. Internet Explorer and other older browsers are not supported.
@@ -76,7 +74,7 @@ Admin site is accessible from [http://0.0.0.0:5000/admin/](http://0.0.0.0:5000/a
 
 **NOTE:** Some data creation and management is done from the Admin site. One of the principles of this project is not repeating work already done or more easily done from the Django Admin.
 
-## Fetching catalog from external sources
+## Fetching and importing from external sources
 
 You can manually add `Games` and `Platforms` to your catalog, but this can become a titanic task. The included `catalogsources` django app provides an extensible adapter-based system to fetch data from external sources that provide APIs. This repo includes connectors for [GiantBomb](https://www.giantbomb.com/api/) and [MobyGames](https://www.mobygames.com/info/api), but **you must always request your own API keys and setup them** (see `finishedgames/finishedgames/settings/prod.py.sample` for expected configuration format).
 
@@ -95,6 +93,28 @@ python3 manage.py fetch_games <source_id> <platform_id_1> [<platform_id_2> ...]
 No detailed instructions are provided on how to work with fetched items, but don't worry about your existing catalog, fetched data always goes to different tables and must be manually imported into the catalog to avoid overriding things by mistake.
 
 When using the Admin site to browse fetched items, there are custom convenience *Actions* available, like marking as hidden or importing to the main catalog.
+
+### Fetch and import flow
+
+```
+             +----------------+   +--------------+   +------------------+
+             | django command |   | django admin |   | main catalog/web |
++--------+   |----------------|   |--------------|   |------------------|
+|        |   |                |   |              |   |                  |
+| source +-->|    fetch_xxx   +-->|  import xxx  +-->| <item available> |
+|        |   |                |   |              |   |                  |
++--------+   +----------------+   +--------------+   +------------------+
+                                          ^                   ^
+                                          |                   |
+                                          |                   |
+                                          v                   v
+                                 +-----------------+     +----------+
+                                 |                 |     |          |
+                                 | FetchedGame     |     | Game     |
+                                 | FetchedPlatform |     | Platform |
+                                 |                 |     |          |
+                                 +-----------------+     +----------+
+```
 
 ## Development
 
@@ -169,3 +189,9 @@ Throw away Django templates and transform existing views into a REST-like API, t
 ## License
 
 See [LICENSE](LICENSE).
+
+## Various
+
+CSS are [a customized fork](https://github.com/kartones-forks/NES.css) of the awesome [NES.CSS Framework from nostalgic-css](https://github.com/nostalgic-css/NES.css).
+
+ASCII diagram built with [ASCIIFlow](http://www.asciidraw.com).
