@@ -70,8 +70,8 @@ class GiantBombAdapter(BaseAdapter):
         self.offset = self.next_offset
 
         # Limit is implicitly 100
-        request = requests.get("https://www.giantbomb.com/api/platforms/?api_key={api_key}&format=json&offset={offset}&field_list=id,name,release_date,site_detail_url".format(   # NOQA: E501
-            api_key=self.api_key, offset=self.offset),
+        request = requests.get(
+            f"https://www.giantbomb.com/api/platforms/?api_key={self.api_key}&format=json&offset={self.offset}&field_list=id,name,release_date,site_detail_url",   # NOQA: E501
             headers={
                 "user-agent": settings.CATALOG_SOURCES_ADAPTER_USER_AGENT
             }
@@ -86,9 +86,7 @@ class GiantBombAdapter(BaseAdapter):
         else:
             self.errored = True
             self.stdout.write(self.stdout_style.ERROR(
-                "{code}: {error}.\nInfo: S:{status_code} O:{offset} NO:{next_offset} T:{total_results}".format(
-                    code=request.status_code, error=request.text, status_code=request.status_code, offset=self.offset,
-                    next_offset=self.next_offset, total_results=self.total_results)
+                f"{request.status_code}: {request.text}.\nInfo: S:{request.status_code} O:{self.offset} NO:{self.next_offset} T:{self.total_results}"  # NOQA: E501
             ))
 
         if self.errored:
@@ -107,9 +105,7 @@ class GiantBombAdapter(BaseAdapter):
 
         # Limit is implicitly 100
         # `platforms` parameter is actually a single platform id filter
-        url = "https://www.giantbomb.com/api/games/?api_key={api_key}&format=json&offset={offset}&platforms={platform}&field_list=id,name,aliases,platforms,original_release_date,releases,dlcs,site_detail_url".format(   # NOQA: E501
-            api_key=self.api_key, offset=self.offset, platform=platform_id
-        )
+        url = f"https://www.giantbomb.com/api/games/?api_key={self.api_key}&format=json&offset={self.offset}&platforms={platform_id}&field_list=id,name,aliases,platforms,original_release_date,releases,dlcs,site_detail_url"  # NOQA: E501
         request = requests.get(url, headers={
             "user-agent": settings.CATALOG_SOURCES_ADAPTER_USER_AGENT
         })
@@ -123,9 +119,7 @@ class GiantBombAdapter(BaseAdapter):
         else:
             self.errored = True
             self.stdout.write(self.stdout_style.ERROR(
-                "{code}: {error}.\nInfo: S:{status_code} O:{offset} NO:{next_offset} T:{total_results}".format(
-                    code=request.status_code, error=request.text, status_code=request.status_code, offset=self.offset,
-                    next_offset=self.next_offset, total_results=self.total_results)
+                f"{request.status_code}: {request.text}.\nInfo: S:{request.status_code} O:{self.offset} NO:{self.next_offset} T:{self.total_results}"  # NOQA: E501
             ))
 
         if self.errored:
@@ -233,6 +227,6 @@ class GiantBombAdapter(BaseAdapter):
             )
             if not can_pass:
                 self.stdout.write(self.stdout_style.WARNING(
-                    "> Rate limit hit, waiting {} seconds".format(self.wait_seconds_when_rate_limited))
+                    f"> Rate limit hit, waiting {self.wait_seconds_when_rate_limited} seconds")
                 )
                 time.sleep(self.wait_seconds_when_rate_limited)

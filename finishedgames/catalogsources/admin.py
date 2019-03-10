@@ -28,8 +28,8 @@ hide_fetched_items.short_description = "Hide selected items"  # type:ignore # NO
 def import_fetched_items(
     modeladmin: admin.ModelAdmin, request: HttpRequest, queryset: QuerySet
 ) -> HttpResponseRedirect:
-    selected_ids = request.POST.getlist(admin.ACTION_CHECKBOX_NAME)
-    return HttpResponseRedirect("import_setup/?ids={}".format(",".join(selected_ids)))
+    selected_ids = ",".join(request.POST.getlist(admin.ACTION_CHECKBOX_NAME))
+    return HttpResponseRedirect(f"import_setup/?ids={selected_ids}")
 import_fetched_items.short_description = "Import selected items into catalog"  # type:ignore # NOQA: E305
 
 
@@ -168,7 +168,7 @@ class FetchedGameAdmin(FGModelAdmin):
             game.save()
             pass
         except Exception as error:
-            self.message_user(request, "Error importing Fetched Game: {}".format(error), level="error")
+            self.message_user(request, f"Error importing Fetched Game: {error}", level="error")
             return HttpResponseRedirect(reverse("admin:catalogsources_fetchedgame_changelist"))
 
         # many to many need an id to be set, so platforms added after initial save
@@ -178,7 +178,7 @@ class FetchedGameAdmin(FGModelAdmin):
             game.save()
             pass
         except Exception as error:
-            self.message_user(request, "Error importing Fetched Game: {}".format(error), level="error")
+            self.message_user(request, f"Error importing Fetched Game: {error}", level="error")
             return HttpResponseRedirect(reverse("admin:catalogsources_fetchedgame_changelist"))
 
         # Update always linked game
@@ -250,7 +250,7 @@ class FetchedPlatformAdmin(FGModelAdmin):
         try:
             platform.save()
         except Exception as error:
-            self.message_user(request, "Error importing Fetched Platform: {}".format(error), level="error")
+            self.message_user(request, f"Error importing Fetched Platform: {error}", level="error")
             return HttpResponseRedirect(reverse("admin:catalogsources_fetchedplatform_changelist"))
 
         # Update always linked platform

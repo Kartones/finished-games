@@ -43,13 +43,10 @@ class FetchedGame(BaseGame):
         else:
             platforms = ""
 
-        return "{name}-{publish_date}-{dlc}-{platforms}-{parent}-{source_game_id}-{source_url}".format(
-            name=self.name, publish_date=self.publish_date, dlc=self.dlc_or_expansion, platforms=platforms,
-            parent=self.parent_game, source_game_id=self.source_game_id, source_url=self.source_url
-        )
+        return f"{self.name}-{self.publish_date}-{self.dlc_or_expansion}-{platforms}-{self.parent_game}-{self.source_game_id}-{self.source_url}"  # NOQA: E501
 
     def __str__(self) -> str:
-        return "{} [{}]".format(self.name, self.source_id)
+        return f"{self.name} [{self.source_id}]"
 
 
 class FetchedPlatform(BasePlatform):
@@ -86,10 +83,7 @@ class FetchedPlatform(BasePlatform):
         return md5_hash.hexdigest()
 
     def _get_fields_for_hash(self) -> str:
-        return "{name}-{shortname}-{publish_date}-{source_platform_id}-{source_url}".format(
-            name=self.name, shortname=self.shortname, publish_date=self.publish_date,
-            source_platform_id=self.source_platform_id, source_url=self.source_url
-        )
+        return f"{self.name}-{self.shortname}-{self.publish_date}-{self.source_platform_id}-{self.source_url}"
 
     def __str__(self) -> str:
-        return "{} [{}]".format(self.name, self.source_id)
+        return f"{self.name} [{self.source_id}]"

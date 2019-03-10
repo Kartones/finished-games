@@ -10,7 +10,7 @@ def test_flake8_compliance() -> None:
                                             shell=True,
                                             stderr=sys.stderr).decode("ascii").replace("\n", "")
 
-    result = subprocess.call("{} {}".format(flake8_binary, SOURCE_FOLDER),
+    result = subprocess.call(f"{flake8_binary} {SOURCE_FOLDER}",
                              shell=True,
                              stdout=sys.stdout,
                              stderr=sys.stderr)
@@ -22,7 +22,7 @@ def test_mypy_compliance() -> None:
                                           shell=True,
                                           stderr=sys.stderr).decode("ascii").replace("\n", "")
 
-    result = subprocess.call("{} --config-file ../mypy.ini {}".format(mypy_binary, SOURCE_FOLDER),
+    result = subprocess.call(f"{mypy_binary} --config-file ../mypy.ini {SOURCE_FOLDER}",
                              shell=True,
                              stdout=sys.stdout,
                              stderr=sys.stderr)

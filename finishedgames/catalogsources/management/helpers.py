@@ -16,4 +16,4 @@ def source_class_from_id(source_id: str) -> Type[BaseAdapter]:
     if source_id == GiantBombAdapter.source_id():
         return GiantBombAdapter
 
-    raise ValueError("Unknown source id '{}'".format(source_id))
+    raise ValueError(f"Unknown source id '{source_id}'")
