@@ -14,24 +14,31 @@ Finished games is a small personal project whose purposes are:
 Some screenshots:
 
 Homepage:
-![Homepage](finishedgames/doc/mvp_1_screenshot_1.png)
+![Homepage](finishedgames/doc/homepage.png)
 
 Game details:
-![Game details](finishedgames/doc/mvp_1_screenshot_2.png)
+![Game details](finishedgames/doc/game_details.png)
 
 A user public profile:
-![User public profile](finishedgames/doc/mvp_1_screenshot_5.png)
+![User public profile](finishedgames/doc/user_public_profile.png)
 
 The user catalog main page:
-![User catalog](finishedgames/doc/mvp_1_screenshot_3.png)
+![User catalog](finishedgames/doc/user_catalog.png)
 
 User games catalog filtered by platform:
-![User catalog - games filtered by platform](finishedgames/doc/mvp_1_screenshot_4.png)
+![User catalog - games filtered by platform](finishedgames/doc/use_games_filtered_by_platform.png)
 
 Form to add an existing game to the user's catalog:
-![Form to add a game to the user catalog](finishedgames/doc/mvp_1_screenshot_6.png)
+![Form to add a game to the user catalog](finishedgames/doc/user_add_game_form.png)
+
+Django admin views to manage `Games` and `Platforms`:
+![Game edit admin view](finishedgames/doc/game_edit.png)
+
+![Platform edit admin view](finishedgames/doc/platform_edit.png)
 
 You can see a live demo of the project at [https://finishedgames.kartones.net](https://finishedgames.kartones.net) (user accounts restricted to only friends, not for public use, sorry!).
+
+Also, [navigating to the help](https://finishedgames.kartones.net/help/) quickly explains the meaning of the action buttons.
 
 ### Notes
 
@@ -89,6 +96,18 @@ Or, once you have fetched platforms from a given source, fetch games of one or m
 # Command accepts one source_id but multiple platform_ids
 python3 manage.py fetch_games <source_id> <platform_id_1> [<platform_id_2> ...]
 ```
+
+Sample screenshot of a games fetch command execution:
+![Games fetch command execution](finishedgames/doc/fetch_games_command.png)
+
+There are customized django views to manage all the fetched data:
+![Fetched games list admin view](finishedgames/doc/fetched_game_list.png)
+
+![Fetched game import admin view](finishedgames/doc/fetched_game_import.png)
+
+![Fetched platform import admin view](finishedgames/doc/fetched_platform_import.png)
+
+And you can import both `Fetched Platforms` and `Fetched Games` to the main catalog (so they appear on the website), or hide them if you do not wish to import them.
 
 No detailed instructions are provided on how to work with fetched items, but don't worry about your existing catalog, fetched data always goes to different tables and must be manually imported into the catalog to avoid overriding things by mistake.
 
