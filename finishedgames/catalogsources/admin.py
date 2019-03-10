@@ -3,6 +3,7 @@ from typing import (Any, cast, Generator, List, Optional, Tuple)
 from django.contrib import admin
 from django.contrib.admin.views.main import ChangeList
 from django.db.models.fields import Field
+from django.db.models.functions import Lower
 from django.db.models.query import QuerySet
 from django.http import (HttpRequest, HttpResponseRedirect)
 from django.forms import ModelForm
@@ -39,6 +40,23 @@ def hyperlink_source_url(model_instance: FGModelAdmin) -> str:
 hyperlink_source_url.short_description = "Source URL"  # type:ignore # NOQA: E305
 
 
+# Don't show platforms which are hidden, and filter by source id if chosen
+class CustomPlatformsFilter(admin.SimpleListFilter):
+    title = "platforms"
+    parameter_name = "platforms"
+
+    def lookups(self, request: HttpRequest, model_admin: admin.ModelAdmin) -> Tuple:
+        queryset = FetchedPlatform.objects.filter(hidden=False)
+        if request.GET.get("source_id"):
+            queryset = queryset.filter(source_id=request.GET.get("source_id"))
+        return (
+            tuple((platform.id, platform.name) for platform in queryset)
+        )
+
+    def queryset(self, request: HttpRequest, queryset: QuerySet) -> QuerySet:
+        return queryset.filter(hidden=False)
+
+
 # By default, hidden items won't show
 class HiddenByDefaultFilter(admin.SimpleListFilter):
     title = "Hidden"
@@ -71,7 +89,7 @@ class FetchedGameAdmin(FGModelAdmin):
     list_display = [
         "name", "dlc_or_expansion", "fg_game", hyperlink_source_url, "last_modified_date", "source_id", "hidden"
     ]
-    list_filter = [HiddenByDefaultFilter, "source_id", "dlc_or_expansion", "platforms"]
+    list_filter = ["last_modified_date", HiddenByDefaultFilter, "source_id", CustomPlatformsFilter, "dlc_or_expansion"]
     search_fields = ["name"]
     readonly_fields = ["last_modified_date", "change_hash"]
     ordering = ["-last_modified_date", "source_id", "name"]
@@ -79,7 +97,7 @@ class FetchedGameAdmin(FGModelAdmin):
 
     def get_form(self, request: HttpRequest, obj: Optional[FetchedGame] = None, **kwargs: Any) -> ModelForm:
         # just save obj reference for future processing in Inline
-        request._obj_ = obj
+        request._current_object = obj
         return super().get_form(request, obj, **kwargs)
 
     # When rendering the platforms list of the fetched game, do some custom filtering
@@ -88,10 +106,20 @@ class FetchedGameAdmin(FGModelAdmin):
             # Hidden platforms out (un-hide first if want to use)
             kwargs["queryset"] = FetchedPlatform.objects.filter(hidden=False)
             # Only from same source
-            if request._obj_:
-                kwargs["queryset"] = kwargs["queryset"].filter(source_id=request._obj_.source_id)
+            if request._current_object:
+                kwargs["queryset"] = kwargs["queryset"].filter(source_id=request._current_object.source_id)
             kwargs["queryset"] = kwargs["queryset"].order_by("name")
         return super().formfield_for_manytomany(db_field, request, **kwargs)
+
+    def formfield_for_foreignkey(self, db_field: Field, request: HttpRequest, **kwargs: Any) -> Form_Field:
+        if db_field.name == "parent_game":
+            # Hidden games out
+            kwargs["queryset"] = FetchedGame.objects.filter(hidden=False)
+            # Only from same source
+            if request._current_object:
+                kwargs["queryset"] = kwargs["queryset"].filter(source_id=request._current_object.source_id)
+            kwargs["queryset"] = kwargs["queryset"].order_by(Lower("name"))
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
     def get_urls(self) -> List[str]:
         urls = super().get_urls()
