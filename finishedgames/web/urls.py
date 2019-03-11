@@ -15,7 +15,7 @@ urlpatterns = [
 
     path("platforms/", platform.platforms, name="platforms"),
     path("platforms/<int:platform_id>/", platform.platform_details, name="platform_details"),
-    path("platforms/<int:platform_id>/games/", game.games_by_platform, name="games_by_platform"),
+    path("platforms/<int:platform_id>/games/", game.GamesByPlatformView.as_view(), name="games_by_platform"),
 
     path("users/", user.users, name="users"),
     path("users/<slug:username>/", user.public_profile, name="user_public_profile"),

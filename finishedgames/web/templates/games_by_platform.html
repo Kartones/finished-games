@@ -1,5 +1,7 @@
 {% extends "base_with_menu.html" %}
 
+{% load web_extras %}
+
 {% block title %}{{ platform.name }} games - {{ block.super }}{% endblock %}
 
 {% block content %}
@@ -10,12 +12,21 @@
         <thead>
             <tr>
                 <th>Name</th>
+
+                {% if user.is_authenticated %}
+                    <th>Actions</th>
+                {% endif %}
             </tr>
         </thead>
         <tbody>
             {% for game in games %}
                 <tr>
-                    <td><a href="{% url "game_details" game.id %}">{{ game.name }}</a></td>
+                    <td>
+                        <a href="{% url "game_details" game.id %}">{{ game.name }}</a>
+                    </td>
+                    {% if user.is_authenticated %}
+                        {% render_actions user viewed_user game.id platform.id next_url authenticated_user_catalog constants %}
+                    {% endif %}
                 </tr>
             {% endfor %}
         </tbody>

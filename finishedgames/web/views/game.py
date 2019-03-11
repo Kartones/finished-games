@@ -25,21 +25,28 @@ class GameDetailsView(View):
         return render(request, "game_details.html", context)
 
 
-def games_by_platform(request: HttpRequest, platform_id: int) -> HttpResponse:
-    platform = get_object_or_404(Platform, pk=platform_id)
-    games = Game.objects \
-                .only("id", "name") \
-                .filter(platforms__id=platform_id) \
-                .order_by("name") \
-                .all()
-    games_count = len(games)
+class GamesByPlatformView(View):
 
-    context = {
-        "platform": platform,
-        "games": games,
-        "games_count": games_count
-    }
-    return render(request, "games_by_platform.html", context)
+    @method_decorator(authenticated_user_games)
+    def get(self, request: HttpRequest, platform_id: int, *args: Any, **kwargs: Any) -> HttpResponse:
+        platform = get_object_or_404(Platform, pk=platform_id)
+
+        games = Game.objects \
+                    .only("id", "name") \
+                    .filter(platforms__id=platform_id) \
+                    .order_by("name") \
+                    .all()
+        games_count = len(games)
+
+        context = {
+            "platform": platform,
+            "games": games,
+            "games_count": games_count,
+            "constants": constants,
+            "authenticated_user_catalog": kwargs["authenticated_user_catalog"],
+            "next_url": request.path,
+        }
+        return render(request, "games_by_platform.html", context)
 
 
 def games(request: HttpRequest) -> HttpResponse:
