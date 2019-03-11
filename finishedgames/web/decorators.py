@@ -39,8 +39,6 @@ def authenticated_user_games(wrapped_function: Callable) -> Any:
         authenticated_user_finished_games = [item.generic_id for item in user_games if item.finished()]
         authenticated_user_no_longer_owned_games = [item.generic_id for item in user_games if item.no_longer_owned]
 
-        print(authenticated_user_finished_games)
-
         kwargs["authenticated_user_catalog"] = {
             constants.KEY_GAMES: authenticated_user_games,
             constants.KEY_GAMES_WISHLISTED: authenticated_user_wishlisted_games,

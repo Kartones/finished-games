@@ -25,7 +25,7 @@
                         <a href="{% url "game_details" game.id %}">{{ game.name }}</a>
                     </td>
                     {% if user.is_authenticated %}
-                        {% render_actions user viewed_user game.id platform.id next_url authenticated_user_catalog constants %}
+                        {% render_actions user viewed_user game.id platform.id next_url authenticated_user_catalog %}
                     {% endif %}
                 </tr>
             {% endfor %}

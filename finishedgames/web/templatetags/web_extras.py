@@ -4,6 +4,7 @@ from django import template
 from django.conf import settings
 
 from core.helpers import generic_id as generic_id_helper
+from web import constants
 
 register = template.Library()
 
@@ -21,15 +22,15 @@ def render_actions(
     platform_id: int,
     next_url: str,
     authenticated_user_catalog: Dict,
-    constants: Dict
 ) -> Dict:
+    gen_id = generic_id(game_id, platform_id)
     return {
         "user": user,
         "viewed_user": viewed_user,
         "game_id": game_id,
         "platform_id": platform_id,
-        "item_generic_id": generic_id(game_id, platform_id),
-        "next_url": next_url,
+        "item_generic_id": gen_id,
+        "next_url": "{}#{}".format(next_url, gen_id),
         "authenticated_user_catalog": authenticated_user_catalog,
         "constants": constants,
     }

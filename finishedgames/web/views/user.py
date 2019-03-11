@@ -304,7 +304,6 @@ class GamesByPlatformView(View):
             "finished_games_count": finished_games_count,
             "finished_games_progress": finished_games_progress,
             "progress_class": _progress_bar_class(finished_games_progress),
-            "constants": constants,
             "authenticated_user_catalog": kwargs["authenticated_user_catalog"],
             "next_url": request.path,
         }

@@ -6,7 +6,6 @@ from django.utils.decorators import method_decorator
 from django.views import View
 
 from core.models import (Game, Platform)
-from web import constants
 from web.decorators import authenticated_user_games
 
 
@@ -18,7 +17,6 @@ class GameDetailsView(View):
 
         context = {
             "game": game,
-            "constants": constants,
             "authenticated_user_catalog": kwargs["authenticated_user_catalog"],
             "next_url": request.path,
         }
@@ -42,7 +40,6 @@ class GamesByPlatformView(View):
             "platform": platform,
             "games": games,
             "games_count": games_count,
-            "constants": constants,
             "authenticated_user_catalog": kwargs["authenticated_user_catalog"],
             "next_url": request.path,
         }

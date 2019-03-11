@@ -1,4 +1,5 @@
 <td class="is-centered actions">
+    <a name="{{ item_generic_id }}"></a>
     {% if item_generic_id in authenticated_user_catalog.wishlisted %}
         <form action="{% url 'user_wishlisted_games' user.get_username %}" method="post">
             {% csrf_token %}
