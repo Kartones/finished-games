@@ -111,7 +111,7 @@ def platforms(request: HttpRequest, username: str) -> HttpResponse:
     # trying to use ORM's distinct() causes an extra query and always leaves usergame.id
     user_platform_ids = [user_game.platform_id for user_game in user_games]
     user_platform_ids = sorted(set(user_platform_ids))  # remove duplicates
-    user_platforms = Platform.objects.filter(id__in=user_platform_ids)
+    user_platforms = Platform.objects.filter(id__in=user_platform_ids).order_by("name")
 
     context = {
         "viewed_user": viewed_user,

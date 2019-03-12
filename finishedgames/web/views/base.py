@@ -6,6 +6,9 @@ from core.models import (Game, Platform)
 
 
 def index(request: HttpRequest) -> HttpResponse:
+    games_count = Game.objects.count()
+    platforms_count = Platform.objects.count()
+
     latest_added_games = Game.objects \
                              .only("id", "name", "platforms") \
                              .prefetch_related("platforms") \
@@ -18,6 +21,8 @@ def index(request: HttpRequest) -> HttpResponse:
     context = {
         "latest_added_games": latest_added_games,
         "latest_added_platforms": latest_added_platforms,
+        "games_count": games_count,
+        "platforms_count": platforms_count,
     }
     return render(request, "index.html", context)
 

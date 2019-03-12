@@ -124,6 +124,8 @@ class FetchedGameAdmin(FGModelAdmin):
             if request._current_object:
                 kwargs["queryset"] = kwargs["queryset"].filter(source_id=request._current_object.source_id)
             kwargs["queryset"] = kwargs["queryset"].order_by(Lower("name"))
+        elif db_field.name == "fg_game":
+            kwargs["queryset"] = Game.objects.order_by(Lower("name"))
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
     def get_urls(self) -> List[str]:
@@ -155,7 +157,7 @@ class FetchedGameAdmin(FGModelAdmin):
 
         fetched_game = FetchedGame.objects.get(id=selected_ids[0])
 
-        games = Game.objects.only("id", "name").all()
+        games = Game.objects.only("id", "name").order_by(Lower("name"))
         platforms = Platform.objects.only("id", "name").all()
 
         context.update({
