@@ -1,9 +1,8 @@
-import time
 from typing import (Any, cast, Dict, List, Tuple)
 
 from django.core.management.base import (BaseCommand, CommandParser)
 
-from catalogsources.management.helpers import (source_class_from_id, wait_if_needed)
+from catalogsources.management.helpers import (source_class_from_id, TimeProfiler, wait_if_needed)
 from catalogsources.models import (FetchedGame, FetchedPlatform)
 
 
@@ -45,13 +44,11 @@ class Command(BaseCommand):
                     self.stdout.write("\n> Fetch call (platform_id {id}): {current}/{total}".format(
                         id=platform_id, current=adapter.next_offset, total=total))
 
-                    time_start = time.perf_counter()
-                    games = adapter.fetch_games_block(platform_id=platform_id)
-                    self._upsert_results(results=games)
-                    time_end = time.perf_counter()
-
+                    with TimeProfiler(use_performance_counter=True) as profiler:
+                        games = adapter.fetch_games_block(platform_id=platform_id)
+                        self._upsert_results(results=games)
                     had_errors = adapter.has_errored()
-                    wait_if_needed(time_start=time_start, time_end=time_end)
+                    wait_if_needed(profiler.duration)
 
                 adapter.reset()
                 had_errors = False

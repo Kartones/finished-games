@@ -1,6 +1,6 @@
 import json
 import time
-from typing import (Any, cast, Dict, List, Optional, Tuple)  # NOQA: F401
+from typing import (Any, Callable, cast, Dict, List, Optional, Tuple)  # NOQA: F401
 
 from django.conf import settings
 from django.core.management.base import OutputWrapper
@@ -11,6 +11,29 @@ from catalogsources.adapters.base_adapter import BaseAdapter
 from catalogsources.adapters.helpers import check_rate_limit
 from catalogsources.models import (FetchedGame, FetchedPlatform)
 from finishedgames import constants
+
+
+# Decorator
+def rate_limit(decorated_function: Callable) -> Callable:
+    def wrapper(*args: Any, **kwargs: Any) -> Any:
+        instance = args[0]
+        can_pass = False
+
+        while not can_pass:
+            instance.token_bucket, instance.last_check_timestamp, can_pass = check_rate_limit(
+                max_tokens=instance.max_requests_per_time_window,
+                time_window=instance.time_window,
+                token_bucket=instance.token_bucket,
+                last_check_timestamp=instance.last_check_timestamp
+            )
+            if not can_pass:
+                instance.stdout.write(instance.stdout_style.WARNING(
+                    "> Rate limit hit, waiting {} seconds".format(instance.wait_seconds_when_rate_limited))
+                )
+                time.sleep(instance.wait_seconds_when_rate_limited)
+
+        return decorated_function(*args, **kwargs)
+    return wrapper
 
 
 class GiantBombAdapter(BaseAdapter):
@@ -64,9 +87,8 @@ class GiantBombAdapter(BaseAdapter):
     def source_id() -> str:
         return GiantBombAdapter.SOURCE_ID
 
+    @rate_limit
     def fetch_platforms_block(self) -> List[FetchedPlatform]:
-        self._rate_limit_check_and_wait_if_needed()
-
         self.offset = self.next_offset
 
         # Limit is implicitly 100
@@ -100,9 +122,8 @@ class GiantBombAdapter(BaseAdapter):
 
         return fetched_platforms
 
+    @rate_limit
     def fetch_games_block(self, platform_id: int) -> List[Tuple[FetchedGame, List[FetchedPlatform]]]:
-        self._rate_limit_check_and_wait_if_needed()
-
         self.offset = self.next_offset
 
         # Limit is implicitly 100
@@ -221,18 +242,3 @@ class GiantBombAdapter(BaseAdapter):
             self.platforms_cache[source_platform_id] = fetched_platform
 
         return self.platforms_cache[source_platform_id]
-
-    def _rate_limit_check_and_wait_if_needed(self) -> None:
-        can_pass = False
-        while not can_pass:
-            self.token_bucket, self.last_check_timestamp, can_pass = check_rate_limit(
-                max_tokens=self.max_requests_per_time_window,
-                time_window=self.time_window,
-                token_bucket=self.token_bucket,
-                last_check_timestamp=self.last_check_timestamp
-            )
-            if not can_pass:
-                self.stdout.write(self.stdout_style.WARNING(
-                    "> Rate limit hit, waiting {} seconds".format(self.wait_seconds_when_rate_limited))
-                )
-                time.sleep(self.wait_seconds_when_rate_limited)

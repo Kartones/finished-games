@@ -1,9 +1,8 @@
-import time
 from typing import (Any, Dict, List)
 
 from django.core.management.base import (BaseCommand, CommandParser)
 
-from catalogsources.management.helpers import (source_class_from_id, wait_if_needed)
+from catalogsources.management.helpers import (source_class_from_id, TimeProfiler, wait_if_needed)
 from catalogsources.models import FetchedPlatform
 
 
@@ -31,13 +30,11 @@ class Command(BaseCommand):
                 total = adapter.total_results if adapter.total_results != adapter.UNKOWN_TOTAL_RESULTS_VALUE else "-"
                 self.stdout.write("\n> Fetch call: {current}/{total}".format(current=adapter.next_offset, total=total))
 
-                time_start = time.perf_counter()
-                platforms = adapter.fetch_platforms_block()
-                self._upsert_results(results=platforms)
-                time_end = time.perf_counter()
-
+                with TimeProfiler(use_performance_counter=True) as profiler:
+                    platforms = adapter.fetch_platforms_block()
+                    self._upsert_results(results=platforms)
                 had_errors = adapter.has_errored()
-                wait_if_needed(time_start=time_start, time_end=time_end)
+                wait_if_needed(profiler.duration)
 
             self.stdout.write("")
 
