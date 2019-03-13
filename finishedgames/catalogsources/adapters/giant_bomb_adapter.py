@@ -235,7 +235,7 @@ class GiantBombAdapter(BaseAdapter):
         if source_platform_id not in self.platforms_cache:
             try:
                 fetched_platform = FetchedPlatform.objects.get(
-                    source_platform_id=source_platform_id, hidden=False
+                    source_platform_id=source_platform_id, hidden=False, source_id=GiantBombAdapter.source_id()
                 )
             except FetchedPlatform.DoesNotExist:
                 fetched_platform = None
