@@ -14,9 +14,10 @@ from django.utils.html import format_html
 from django.utils.translation import ugettext_lazy as _
 
 from catalogsources.apps import CatalogSourcesConfig
+from catalogsources.managers import (GameImportSaveError, ImportManager, PlatformImportSaveError)
 from catalogsources.models import (FetchedGame, FetchedPlatform)
 from core.admin import FGModelAdmin
-from core.models import Game, Platform
+from core.models import (Game, Platform)
 
 
 # Custom admin action
@@ -187,44 +188,22 @@ class FetchedGameAdmin(FGModelAdmin):
         return TemplateResponse(request, "game_import.html", context)
 
     def import_view(self, request: HttpRequest) -> HttpResponseRedirect:
-        if request.POST["id"]:
-            game = Game.objects \
-                          .filter(id=request.POST["id"]) \
-                          .get()
-        else:
-            game = Game()
-
-        game.name = request.POST["name"]
-        game.publish_date = request.POST["publish_date"]
-        game.dlc_or_expansion = request.POST.get("dlc_or_expansion") is not None
-        if request.POST["parent_game"]:
-            game.parent_game_id = request.POST["parent_game"]
+        name = request.POST["name"]
         try:
-            game.save()
-            pass
-        except Exception as error:
-            self.message_user(request, "Error importing Fetched Game: {}".format(error), level="error")
+            ImportManager.import_fetched_game(
+                name=name,
+                publish_date_string=request.POST["publish_date"],
+                dlc_or_expansion=(request.POST.get("dlc_or_expansion") is not None),
+                platforms=request.POST.getlist("platforms"),
+                fg_game_id=request.POST["fetched_game_id"],
+                game_id=request.POST["id"],
+                parent_game_id=request.POST["parent_game"]
+            )
+        except GameImportSaveError as error:
+            self.message_user(request, "Error importing Fetched Game '{}': {}".format(name, error), level="error")
             return HttpResponseRedirect(reverse("admin:catalogsources_fetchedgame_changelist"))
 
-        # many to many need an id to be set, so platforms added after initial save
-        try:
-            platforms = Platform.objects.filter(id__in=request.POST.getlist("platforms"))
-            game.platforms.set(platforms)
-            game.save()
-            pass
-        except Exception as error:
-            self.message_user(request, "Error importing Fetched Game: {}".format(error), level="error")
-            return HttpResponseRedirect(reverse("admin:catalogsources_fetchedgame_changelist"))
-
-        # Update always linked game
-        fetched_game = FetchedGame.objects \
-                                  .filter(id=request.POST["fetched_game_id"]) \
-                                  .get()
-        fetched_game.fg_game_id = game.id
-        fetched_game.save(update_fields=["fg_game_id"])
-
-        self.message_user(request, "Fetched Game imported successfully")
-
+        self.message_user(request, "Fetched Game {} imported successfully".format(name))
         return HttpResponseRedirect(reverse("admin:catalogsources_fetchedgame_changelist"))
 
 
@@ -272,30 +251,20 @@ class FetchedPlatformAdmin(FGModelAdmin):
         return TemplateResponse(request, "platform_import.html", context)
 
     def import_view(self, request: HttpRequest) -> HttpResponseRedirect:
-        if request.POST["id"]:
-            platform = Platform.objects \
-                               .filter(id=request.POST["id"]) \
-                               .get()
-        else:
-            platform = Platform()
-
-        platform.name = request.POST["name"]
-        platform.shortname = request.POST["shortname"]
-        platform.publish_date = request.POST["publish_date"]
+        name = request.POST["name"]
         try:
-            platform.save()
-        except Exception as error:
-            self.message_user(request, "Error importing Fetched Platform: {}".format(error), level="error")
+            ImportManager.import_fetched_platform(
+                name=name,
+                shortname=request.POST["shortname"],
+                publish_date_string=request.POST["publish_date"],
+                fg_platform_id=request.POST["fetched_platform_id"],
+                platform_id=request.POST["id"]
+            )
+        except PlatformImportSaveError as error:
+            self.message_user(request, "Error importing Fetched Platform '{}': {}".format(name, error), level="error")
             return HttpResponseRedirect(reverse("admin:catalogsources_fetchedplatform_changelist"))
 
-        # Update always linked platform
-        fetched_platform = FetchedPlatform.objects \
-                                          .filter(id=request.POST["fetched_platform_id"]) \
-                                          .get()
-        fetched_platform.fg_platform_id = platform.id
-        fetched_platform.save(update_fields=["fg_platform_id"])
-
-        self.message_user(request, "Fetched Platform imported successfully")
+        self.message_user(request, "Fetched Platform '{}' imported successfully".format(name))
         return HttpResponseRedirect(reverse("admin:catalogsources_fetchedplatform_changelist"))
 
 
