@@ -16,7 +16,7 @@ class ImportManager():
 
     @staticmethod
     def import_fetched_game(
-        name: str, publish_date_string: str, dlc_or_expansion: bool, platforms: List[int], fg_game_id: int,
+        name: str, publish_date_string: str, dlc_or_expansion: bool, platforms: List[int], fetched_game_id: int,
         game_id: int = None, parent_game_id: int = None
     ) -> None:
         if game_id:
@@ -47,15 +47,14 @@ class ImportManager():
 
         # Update always linked game
         fetched_game = FetchedGame.objects \
-                                  .filter(id=fg_game_id) \
+                                  .filter(id=fetched_game_id) \
                                   .get()
         fetched_game.fg_game_id = game.id
         fetched_game.save(update_fields=["fg_game_id"])
 
     @staticmethod
     def import_fetched_platform(
-        name: str, shortname: str, publish_date_string: str, fg_platform_id: int,
-        platform_id: int = None
+        name: str, shortname: str, publish_date_string: str, fetched_platform_id: int, platform_id: int = None
     ) -> None:
         if platform_id:
             platform = Platform.objects \
@@ -74,7 +73,7 @@ class ImportManager():
 
         # Update always linked platform
         fetched_platform = FetchedPlatform.objects \
-                                          .filter(id=fg_platform_id) \
+                                          .filter(id=fetched_platform_id) \
                                           .get()
         fetched_platform.fg_platform_id = platform.id
         fetched_platform.save(update_fields=["fg_platform_id"])

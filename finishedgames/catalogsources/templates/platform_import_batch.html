@@ -1,0 +1,54 @@
+{% extends "admin/base_site.html" %}
+{% load i18n admin_urls static %}
+
+{% block extrahead %}
+{{ block.super }}
+<link rel="stylesheet" type="text/css" href="{% static 'admin/css/forms.css' %}">
+<link rel="stylesheet" type="text/css" media="all" href="{% static 'css/admin.css' %}">
+{% endblock %}
+
+{% block breadcrumbs %}
+
+<div class="breadcrumbs">
+    <a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
+    &rsaquo; <a href="{% url 'admin:app_list' app_label=opts.app_label %}">{{ opts.app_config.verbose_name }}</a>
+    &rsaquo; <a href="{% url 'admin:catalogsources_fetchedplatform_changelist' %}">{{ model_class_name }}</a>
+    &rsaquo; Import Platform
+</div>
+
+{% endblock %}
+
+{% block content %}
+
+<div id="content-main">
+
+    <div>
+        <p>You are going to import the following Fetched Platforms to the main catalog.<br/>
+            Note that if the destination Platform does not exist, it will be created, but <strong>if exists all imported fields will override existing values</strong>.</p>
+    </div>
+
+    <form action="{% url 'admin:platform_import_batch' %}" method="post">
+        {% csrf_token %}
+
+        <ul>
+            {% for fetched_platform in fetched_platforms %}
+                <li>
+                    {% if fetched_platform.fg_platform %}<span class="changelink" title="Main catalog Platform update"></span>{% else %}<span class="addlink" title="New main catalog Platform"></span>{% endif %}
+                    <strong>{{ fetched_platform.name }}</strong>{% if fetched_platform.fg_platform %} → {{ fetched_platform.fg_platform.name }}{% endif %}
+                    <input type="hidden" name="fetched_platform_id" value="{{ fetched_platform.id }}">
+                    <input type="hidden" name="fg_platform_id" value="{% if fetched_platform.fg_platform %}{{ fetched_platform.fg_platform.id }}{% else %}{{ admin_constants.NO_PLATFORM }}{% endif %}">
+                    <input type="hidden" name="name" value="{{ fetched_platform.name }}">
+                    <input type="hidden" name="shortname" value="{{ fetched_platform.shortname }}">
+                    <input type="hidden" name="publish_date" value="{{ fetched_platform.publish_date }}">
+                </li>
+            {% endfor %}
+        </ul>
+
+        <div class="submit-row">
+            <input type="submit" value="Save" class="default" name="_save">
+        </div>
+    </form>
+
+</div>
+
+{% endblock %}

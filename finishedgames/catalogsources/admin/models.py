@@ -1,94 +1,22 @@
-from typing import (Any, cast, Generator, List, Optional, Tuple)
+from typing import (Any, cast, List, Optional)
 
-from django.contrib import admin
-from django.contrib.admin.views.main import ChangeList
 from django.db.models.fields import Field
 from django.db.models.functions import Lower
-from django.db.models.query import QuerySet
 from django.http import (HttpRequest, HttpResponseRedirect)
 from django.forms import ModelForm
 from django.forms.fields import Field as Form_Field
 from django.template.response import TemplateResponse
 from django.urls import (path, reverse)
-from django.utils.html import format_html
-from django.utils.translation import ugettext_lazy as _
 
+from catalogsources.admin import constants as admin_constants
+from catalogsources.admin.actions import (hide_fetched_items, import_fetched_items)
+from catalogsources.admin.decorators import hyperlink_source_url
+from catalogsources.admin.filters import (CustomPlatformsFilter, HiddenByDefaultFilter)
 from catalogsources.apps import CatalogSourcesConfig
 from catalogsources.managers import (GameImportSaveError, ImportManager, PlatformImportSaveError)
 from catalogsources.models import (FetchedGame, FetchedPlatform)
 from core.admin import FGModelAdmin
 from core.models import (Game, Platform)
-
-
-# Custom admin action
-def hide_fetched_items(modeladmin: admin.ModelAdmin, request: HttpRequest, queryset: QuerySet) -> None:
-    queryset.update(hidden=True)
-hide_fetched_items.short_description = "Hide selected items"  # type:ignore # NOQA: E305
-
-
-# Custom admin action
-def import_fetched_items(
-    modeladmin: admin.ModelAdmin, request: HttpRequest, queryset: QuerySet
-) -> HttpResponseRedirect:
-    selected_ids = request.POST.getlist(admin.ACTION_CHECKBOX_NAME)
-    return HttpResponseRedirect("import_setup/?ids={}".format(",".join(selected_ids)))
-import_fetched_items.short_description = "Import selected items into catalog"  # type:ignore # NOQA: E305
-
-
-# Decorator to render source urls as hyperlinks on the listing pages
-def hyperlink_source_url(model_instance: FGModelAdmin) -> str:
-    return cast(str, format_html("<a href='{url}' target='_blank'>{url}</a>", url=model_instance.source_url))
-hyperlink_source_url.short_description = "Source URL"  # type:ignore # NOQA: E305
-
-
-# Don't show platforms which are hidden, and filter by source id if chosen
-class CustomPlatformsFilter(admin.SimpleListFilter):
-    title = "fetched platforms"
-    parameter_name = "platforms"
-
-    def lookups(self, request: HttpRequest, model_admin: admin.ModelAdmin) -> Tuple:
-        source_id = request.GET.get("source_id")
-        queryset = FetchedPlatform.objects.filter(hidden=False)
-        if source_id:
-            queryset = queryset.filter(source_id=source_id)
-            return (
-                tuple((platform.id, platform.name) for platform in queryset)
-            )
-        else:
-            return (
-                tuple((platform.id, "{} [{}]".format(platform.name, platform.source_id)) for platform in queryset)
-            )
-
-    def queryset(self, request: HttpRequest, queryset: QuerySet) -> QuerySet:
-        return queryset.filter(hidden=False)
-
-
-# By default, hidden items won't show
-class HiddenByDefaultFilter(admin.SimpleListFilter):
-    title = "Hidden"
-    parameter_name = "hidden"
-
-    def lookups(self, request: HttpRequest, model_admin: admin.ModelAdmin) -> Tuple:
-        return (
-            ("all", _("All")),
-            (None, _("False")),
-            ("True", _("True")),
-        )
-
-    # Replace default filter choices by ours
-    def choices(self, changelist: ChangeList) -> Generator:
-        for lookup, title in self.lookup_choices:
-            yield {
-                "selected": self.value() == lookup,
-                "query_string": changelist.get_query_string({self.parameter_name: lookup}, []),
-                "display": title,
-            }
-
-    def queryset(self, request: HttpRequest, queryset: QuerySet) -> QuerySet:
-        if self.value() in (None, "False"):
-            return queryset.filter(hidden=False)
-        elif self.value() == "True":
-            return queryset.filter(hidden=True)
 
 
 class FetchedGameAdmin(FGModelAdmin):
@@ -152,40 +80,40 @@ class FetchedGameAdmin(FGModelAdmin):
         })
 
         selected_ids = list(map(int, request.GET["ids"].split(",")))
-        if len(selected_ids) != 1:
+        if len(selected_ids) == 1:
+            fetched_game = FetchedGame.objects.get(id=selected_ids[0])
+
+            games = Game.objects.only("id", "name").order_by(Lower("name"))
+            platforms = Platform.objects.only("id", "name").all()
+
+            context.update({
+                "fetched_game": fetched_game,
+                "fg_plaform_ids": ",".join([
+                    str(platform.fg_platform.id) for platform in fetched_game.platforms.all() if platform.fg_platform
+                ]),
+                "games_for_selectbox": games,
+                "platforms_for_selectbox": platforms,
+                "existing_parent_game_id": "",
+                "existing_platform_ids": "",
+                "existing_platform_ids_list": [],
+            })
+
+            if fetched_game.fg_game:
+                platforms_list = [platform.id for platform in fetched_game.fg_game.platforms.all()]
+                context.update({
+                    "existing_parent_game_id": "",
+                    "existing_platform_ids": ",".join([str(platform_id) for platform_id in platforms_list]),
+                    "existing_platform_ids_list": platforms_list,
+                })
+                if fetched_game.fg_game.parent_game:
+                    context.update({
+                        "existing_parent_game_id": fetched_game.fg_game.parent_game.id,
+                    })
+
+            return TemplateResponse(request, "game_import.html", context)
+        else:
             self.message_user(request, "This action currently only supports acting upon a single entity", level="error")
             return TemplateResponse(request, "game_import.html", context)
-
-        fetched_game = FetchedGame.objects.get(id=selected_ids[0])
-
-        games = Game.objects.only("id", "name").order_by(Lower("name"))
-        platforms = Platform.objects.only("id", "name").all()
-
-        context.update({
-            "fetched_game": fetched_game,
-            "fg_plaform_ids": ",".join([
-                str(platform.fg_platform.id) for platform in fetched_game.platforms.all() if platform.fg_platform
-            ]),
-            "games_for_selectbox": games,
-            "platforms_for_selectbox": platforms,
-            "existing_parent_game_id": "",
-            "existing_platform_ids": "",
-            "existing_platform_ids_list": [],
-        })
-
-        if fetched_game.fg_game:
-            platforms_list = [platform.id for platform in fetched_game.fg_game.platforms.all()]
-            context.update({
-                "existing_parent_game_id": "",
-                "existing_platform_ids": ",".join([str(platform_id) for platform_id in platforms_list]),
-                "existing_platform_ids_list": platforms_list,
-            })
-            if fetched_game.fg_game.parent_game:
-                context.update({
-                    "existing_parent_game_id": fetched_game.fg_game.parent_game.id,
-                })
-
-        return TemplateResponse(request, "game_import.html", context)
 
     def import_view(self, request: HttpRequest) -> HttpResponseRedirect:
         name = request.POST["name"]
@@ -195,7 +123,7 @@ class FetchedGameAdmin(FGModelAdmin):
                 publish_date_string=request.POST["publish_date"],
                 dlc_or_expansion=(request.POST.get("dlc_or_expansion") is not None),
                 platforms=request.POST.getlist("platforms"),
-                fg_game_id=request.POST["fetched_game_id"],
+                fetched_game_id=request.POST["fetched_game_id"],
                 game_id=request.POST["id"],
                 parent_game_id=request.POST["parent_game"]
             )
@@ -219,7 +147,8 @@ class FetchedPlatformAdmin(FGModelAdmin):
         urls = super().get_urls()
         my_urls = [
             path("import_setup/", self.admin_site.admin_view(self.import_setup_view), name="platform_import_setup"),
-            path("import/", self.admin_site.admin_view(self.import_view), name="platform_import")
+            path("import/batch", self.admin_site.admin_view(self.import_batch_view), name="platform_import_batch"),
+            path("import/", self.admin_site.admin_view(self.import_view), name="platform_import"),
         ]
         return cast(List[str], my_urls + urls)
 
@@ -238,17 +167,17 @@ class FetchedPlatformAdmin(FGModelAdmin):
         })
 
         selected_ids = list(map(int, request.GET["ids"].split(",")))
-        if len(selected_ids) != 1:
-            self.message_user(request, "This action currently only supports acting upon a single entity", level="error")
+        if len(selected_ids) == 1:
+            context.update({
+                "fetched_platform": FetchedPlatform.objects.get(id=selected_ids[0]),
+            })
             return TemplateResponse(request, "platform_import.html", context)
-
-        fetched_platform = FetchedPlatform.objects.get(id=selected_ids[0])
-
-        context.update({
-            "fetched_platform": fetched_platform
-        })
-
-        return TemplateResponse(request, "platform_import.html", context)
+        else:
+            context.update({
+                "fetched_platforms": FetchedPlatform.objects.filter(id__in=selected_ids),
+                "admin_constants": admin_constants,
+            })
+            return TemplateResponse(request, "platform_import_batch.html", context)
 
     def import_view(self, request: HttpRequest) -> HttpResponseRedirect:
         name = request.POST["name"]
@@ -257,7 +186,7 @@ class FetchedPlatformAdmin(FGModelAdmin):
                 name=name,
                 shortname=request.POST["shortname"],
                 publish_date_string=request.POST["publish_date"],
-                fg_platform_id=request.POST["fetched_platform_id"],
+                fetched_platform_id=request.POST["fetched_platform_id"],
                 platform_id=request.POST["id"]
             )
         except PlatformImportSaveError as error:
@@ -267,6 +196,49 @@ class FetchedPlatformAdmin(FGModelAdmin):
         self.message_user(request, "Fetched Platform '{}' imported successfully".format(name))
         return HttpResponseRedirect(reverse("admin:catalogsources_fetchedplatform_changelist"))
 
+    def import_batch_view(self, request: HttpRequest) -> HttpResponseRedirect:
+        fetched_platform_ids = request.POST.getlist("fetched_platform_id")
+        fg_platform_ids = request.POST.getlist("fg_platform_id")
+        names = request.POST.getlist("name")
+        shortnames = request.POST.getlist("shortname")
+        publish_date_strings = request.POST.getlist("publish_date")
 
-admin.site.register(FetchedGame, FetchedGameAdmin)
-admin.site.register(FetchedPlatform, FetchedPlatformAdmin)
+        imports_ok = []  # type: List[str]
+        imports_ko = []  # type: List[str]
+
+        for index in range(len(names)):
+            try:
+                name = names[index]
+                if int(fg_platform_ids[index]) != admin_constants.NO_PLATFORM:
+                    platform_id = fg_platform_ids[index]
+                else:
+                    platform_id = None
+                ImportManager.import_fetched_platform(
+                    name=name,
+                    shortname=shortnames[index],
+                    publish_date_string=publish_date_strings[index],
+                    fetched_platform_id=fetched_platform_ids[index],
+                    platform_id=platform_id
+                )
+                imports_ok.append(name)
+            except PlatformImportSaveError as error:
+                imports_ko.append("{} -{} ({})".format(name, fetched_platform_ids[index], error))
+
+        if len(imports_ko) > 0:
+            if len(imports_ok) > 0:
+                self.message_user(
+                    request,
+                    "Some Fetched Platform imports failed. Imports OK: {}. Imports KO: {}".format(
+                        ",".join(imports_ok), ",".join(imports_ko)
+                    ),
+                    level="warning"
+                )
+            else:
+                self.message_user(
+                    request,
+                    "All imports from the following Fetched Platforms failed: {}".format(",".join(imports_ko)),
+                    level="error"
+                )
+        else:
+            self.message_user(request, "Fetched Platforms imported successfully: {}".format(",".join(imports_ok)))
+        return HttpResponseRedirect(reverse("admin:catalogsources_fetchedplatform_changelist"))
