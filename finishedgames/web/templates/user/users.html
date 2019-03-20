@@ -1,28 +1,28 @@
 {% extends "base_with_menu.html" %}
 
-{% block title %}Registered Users - {{ block.super }}{% endblock %}
+{% block title %}Registered Users - {{ block.super }}{% endblock title %}
 
 {% block content %}
 
-    <h2>Registered Users</h2>
+<h2>Registered Users</h2>
 
-    <p>New users first</p>
+<p>New users first</p>
 
-    <table class="nes-table is-bordered">
-        <thead>
+<table class="nes-table is-bordered">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for registered_user in users %}
             <tr>
-                <th>Name</th>
-                <th>Actions</th>
+                <td>{{ registered_user.get_username.capitalize }}</td>
+                <td><a class="nes-btn is-primary" href="{% url "user_public_profile" registered_user.get_username %}">Profile</a></td>
             </tr>
-        </thead>
-        <tbody>
-            {% for registered_user in users %}
-                <tr>
-                    <td>{{ registered_user.get_username.capitalize }}</td>
-                    <td><a class="nes-btn is-primary" href="{% url "user_public_profile" registered_user.get_username %}">Profile</a></td>
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+        {% endfor %}
+    </tbody>
+</table>
 
-{% endblock %}
+{% endblock content %}

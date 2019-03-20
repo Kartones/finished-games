@@ -1,115 +1,115 @@
 {% extends "base_with_menu.html" %}
 
-{% block title %}Help - {{ block.super }}{% endblock %}
+{% block title %}Help - {{ block.super }}{% endblock title %}
 
 {% block content %}
 
-    <section class="nes-container with-title">
-        <h2 class="title">Legend</h2>
-        <div>
-            <table class="nes-table is-bordered">
-                <thead>
-                    <tr>
-                        <th>Icon</th>
-                        <th>Meaning</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td class="is-centered">
-                            <i class="nes-icon star" title="Add to your catalog"></i>
-                        </td>
-                        <td>
-                            Adds the game on a specific platform to your catalog.
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="is-centered">
-                            <i class="nes-icon heart" title="Add to your wishlist"></i>
-                        </td>
-                        <td>
-                            Adds the game on a specific platform to your wishlist.
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="is-centered">
-                            <i class="nes-pixel-art snes-jp-logo" title="Currently Playing"></i>
-                        </td>
-                        <td>
-                            Marks the game as currently playing. You must have it on your catalog.
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="is-centered">
-                            <i class="nes-icon trophy" title="Mark as finished game"></i>
-                        </td>
-                        <td>
-                            Marks the game as finished. You must have it on your catalog.
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="is-centered">
-                            <i class="nes-pixel-art snes-jp-logo is-disabled" title="Mark as no longer owned"></i>
-                        </td>
-                        <td>
-                            Marks the game as no longer owned. You must have it on your catalog and not being currently playing it.
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+<section class="nes-container with-title">
+    <h2 class="title">Legend</h2>
+    <div>
+        <table class="nes-table is-bordered">
+            <thead>
+                <tr>
+                    <th>Icon</th>
+                    <th>Meaning</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="is-centered">
+                        <i class="nes-icon star" title="Add to your catalog"></i>
+                    </td>
+                    <td>
+                        Adds the game on a specific platform to your catalog.
+                    </td>
+                </tr>
+                <tr>
+                    <td class="is-centered">
+                        <i class="nes-icon heart" title="Add to your wishlist"></i>
+                    </td>
+                    <td>
+                        Adds the game on a specific platform to your wishlist.
+                    </td>
+                </tr>
+                <tr>
+                    <td class="is-centered">
+                        <i class="nes-pixel-art snes-jp-logo" title="Currently Playing"></i>
+                    </td>
+                    <td>
+                        Marks the game as currently playing. You must have it on your catalog.
+                    </td>
+                </tr>
+                <tr>
+                    <td class="is-centered">
+                        <i class="nes-icon trophy" title="Mark as finished game"></i>
+                    </td>
+                    <td>
+                        Marks the game as finished. You must have it on your catalog.
+                    </td>
+                </tr>
+                <tr>
+                    <td class="is-centered">
+                        <i class="nes-pixel-art snes-jp-logo is-disabled" title="Mark as no longer owned"></i>
+                    </td>
+                    <td>
+                        Marks the game as no longer owned. You must have it on your catalog and not being currently playing it.
+                    </td>
+                </tr>
+            </tbody>
+        </table>
 
-            <table class="nes-table is-bordered">
-                <thead>
-                    <tr>
-                        <th>Button Color</th>
-                        <th>Meaning</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td class="is-centered">
-                            <button class="nes-btn" type="submit" title="Add/Mark">White</button>
-                        </td>
-                        <td>
-                            Game is inactive/unmarked. Adds it to your catalog/wishlist or marks it as currently playing/finished/no longer owned.
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="is-centered">
-                            <button class="nes-btn is-primary" type="submit" title="Add/Mark">Blue</button>
-                        </td>
-                        <td>
-                            Game is marked. Unmarks it from currently playing/finished/no longer owned.
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="is-centered">
-                            <button class="nes-btn is-error" type="submit" title="Remove">Red</button>
-                        </td>
-                        <td>
-                            Game is added. Removes it from your catalog/wishlist.
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </section>
-    <section class="nes-container with-title">
-            <h2 class="title">Data Sources</h2>
-            <div>
-                <p>
-                    Some of the content of this page (Platforms and Games) comes from <a href="https://www.giantbomb.com/" target="_blank">GiantBomb.com</a>. Our sincere thanks for providing access to their catalog, as without it <strong>Finished Games</strong> would be incomplete <i class="nes-icon heart is-small" title="love"></i>
-                </p>
-            </div>
-        </section>
-    <section class="nes-container with-title">
-        <h2 class="title">Privacy</h2>
+        <table class="nes-table is-bordered">
+            <thead>
+                <tr>
+                    <th>Button Color</th>
+                    <th>Meaning</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="is-centered">
+                        <button class="nes-btn" type="submit" title="Add/Mark">White</button>
+                    </td>
+                    <td>
+                        Game is inactive/unmarked. Adds it to your catalog/wishlist or marks it as currently playing/finished/no longer owned.
+                    </td>
+                </tr>
+                <tr>
+                    <td class="is-centered">
+                        <button class="nes-btn is-primary" type="submit" title="Add/Mark">Blue</button>
+                    </td>
+                    <td>
+                        Game is marked. Unmarks it from currently playing/finished/no longer owned.
+                    </td>
+                </tr>
+                <tr>
+                    <td class="is-centered">
+                        <button class="nes-btn is-error" type="submit" title="Remove">Red</button>
+                    </td>
+                    <td>
+                        Game is added. Removes it from your catalog/wishlist.
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</section>
+<section class="nes-container with-title">
+        <h2 class="title">Data Sources</h2>
         <div>
             <p>
-                This website only stores a required session cookie for logged-in users. It uses no tracking cookies nor scripts and doesn't gathers any PII (Personally Identifiable Information).<br />
-                Registered users must have manually given consent to provide their email addresses as user registration is closed and accounts are only manually provided by the administrator(s).
+                Some of the content of this page (Platforms and Games) comes from <a href="https://www.giantbomb.com/" target="_blank">GiantBomb.com</a>. Our sincere thanks for providing access to their catalog, as without it <strong>Finished Games</strong> would be incomplete <i class="nes-icon heart is-small" title="love"></i>
             </p>
         </div>
     </section>
+<section class="nes-container with-title">
+    <h2 class="title">Privacy</h2>
+    <div>
+        <p>
+            This website only stores a required session cookie for logged-in users. It uses no tracking cookies nor scripts and doesn't gathers any PII (Personally Identifiable Information).<br />
+            Registered users must have manually given consent to provide their email addresses as user registration is closed and accounts are only manually provided by the administrator(s).
+        </p>
+    </div>
+</section>
 
-{% endblock %}
+{% endblock content %}

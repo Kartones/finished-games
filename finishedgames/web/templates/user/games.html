@@ -2,57 +2,57 @@
 
 {% load web_extras %}
 
-{% block title %}Videogames Catalog of {{ viewed_user.get_username.capitalize }} - {{ block.super }}{% endblock %}
+{% block title %}Videogames Catalog of {{ viewed_user.get_username.capitalize }} - {{ block.super }}{% endblock title %}
 
 {% block content %}
 
-    <h2>Videogames Catalog of {{ viewed_user.get_username.capitalize }}</h2>
+<h2>Videogames Catalog of {{ viewed_user.get_username.capitalize }}</h2>
 
-    <table class="nes-table is-bordered">
-        <thead>
+<table class="nes-table is-bordered">
+    <thead>
+        <tr>
+            {% if sort_by == constants.SORT_BY_GAME_NAME %}
+                <th>Game <a href="{{ request.path }}?sort_by={{ constants.SORT_BY_GAME_NAME_DESC }}">&#8593;</a></th>
+            {% else %}
+                <th>Game <a href="{{ request.path }}?sort_by={{ constants.SORT_BY_GAME_NAME }}">&#8595;</a></th>
+            {% endif %}
+
+            {% if sort_by == constants.SORT_BY_PLATFORM %}
+                <th>Platform <a href="{{ request.path }}?sort_by={{ constants.SORT_BY_PLATFORM_DESC }}">️️️️&#8593;</a></th>
+            {% else %}
+                <th>Platform <a href="{{ request.path }}?sort_by={{ constants.SORT_BY_PLATFORM }}">&#8595;</a></th>
+            {% endif %}
+
+            {% if user.is_authenticated %}
+                <th>Actions</th>
+            {% endif %}
+        </tr>
+    </thead>
+    <tbody>
+        {% for item in user_games %}
             <tr>
-                {% if sort_by == constants.SORT_BY_GAME_NAME %}
-                    <th>Game <a href="{{ request.path }}?sort_by={{ constants.SORT_BY_GAME_NAME_DESC }}">&#8593;</a></th>
-                {% else %}
-                    <th>Game <a href="{{ request.path }}?sort_by={{ constants.SORT_BY_GAME_NAME }}">&#8595;</a></th>
-                {% endif %}
-
-                {% if sort_by == constants.SORT_BY_PLATFORM %}
-                    <th>Platform <a href="{{ request.path }}?sort_by={{ constants.SORT_BY_PLATFORM_DESC }}">️️️️&#8593;</a></th>
-                {% else %}
-                    <th>Platform <a href="{{ request.path }}?sort_by={{ constants.SORT_BY_PLATFORM }}">&#8595;</a></th>
-                {% endif %}
-
+                <td>
+                    <a href="{% url 'game_details' item.game.id %}">{{ item.game.name }}</a>{% if item.year_finished %} <i class="nes-icon trophy" title="Finished"></i>{% endif %}{% if item.currently_playing %} <i class="nes-pixel-art snes-jp-logo" title="Currently playing"></i>{% endif %}{% if item.no_longer_owned %}
+                        <i class="nes-pixel-art snes-jp-logo is-disabled" title="No longer owned"></i>{% endif %}
+                </td>
+                <td class="is-centered">
+                    {{ item.platform.shortname }}
+                </td>
                 {% if user.is_authenticated %}
-                    <th>Actions</th>
+                    {% render_actions user viewed_user item.game.id item.platform.id next_url authenticated_user_catalog %}
                 {% endif %}
             </tr>
-        </thead>
-        <tbody>
-            {% for item in user_games %}
-                <tr>
-                    <td>
-                        <a href="{% url 'game_details' item.game.id %}">{{ item.game.name }}</a>{% if item.year_finished %} <i class="nes-icon trophy" title="Finished"></i>{% endif %}{% if item.currently_playing %} <i class="nes-pixel-art snes-jp-logo" title="Currently playing"></i>{% endif %}{% if item.no_longer_owned %}
-                         <i class="nes-pixel-art snes-jp-logo is-disabled" title="No longer owned"></i>{% endif %}
-                    </td>
-                    <td class="is-centered">
-                        {{ item.platform.shortname }}
-                    </td>
-                    {% if user.is_authenticated %}
-                        {% render_actions user viewed_user item.game.id item.platform.id next_url authenticated_user_catalog %}
-                    {% endif %}
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+        {% endfor %}
+    </tbody>
+</table>
 
-    <section class="nes-container with-title">
-        <h3 class="title">Stats</h3>
-        <div>
-            <p>
-                <strong>{{ user_games_count }}</strong> games.
-            </p>
-        </div>
-    </section>
+<section class="nes-container with-title">
+    <h3 class="title">Stats</h3>
+    <div>
+        <p>
+            <strong>{{ user_games_count }}</strong> games.
+        </p>
+    </div>
+</section>
 
-{% endblock %}
+{% endblock content %}

@@ -1,35 +1,35 @@
 {% extends "base_with_menu.html" %}
 
-{% block title %}Platforms {{ viewed_user.get_username.capitalize }} has played in - {{ block.super }}{% endblock %}
+{% block title %}Platforms {{ viewed_user.get_username.capitalize }} has played in - {{ block.super }}{% endblock title %}
 
 {% block content %}
 
-    <h2>Platforms {{ viewed_user.get_username.capitalize }} has played in</h2>
+<h2>Platforms {{ viewed_user.get_username.capitalize }} has played in</h2>
 
-    <table class="nes-table is-bordered">
-        <thead>
+<table class="nes-table is-bordered">
+    <thead>
+        <tr>
+            <th>Platform</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for platform in user_platforms %}
             <tr>
-                <th>Platform</th>
+                <td>
+                    <a href="{% url "user_games_by_platform" viewed_user.get_username platform.id %}">{{ platform.name }}</a>
+                </td>
             </tr>
-        </thead>
-        <tbody>
-            {% for platform in user_platforms %}
-                <tr>
-                    <td>
-                        <a href="{% url "user_games_by_platform" viewed_user.get_username platform.id %}">{{ platform.name }}</a>
-                    </td>
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+        {% endfor %}
+    </tbody>
+</table>
 
-    <section class="nes-container with-title">
-        <h3 class="title">Stats</h3>
-        <div>
-            <p>
-                <strong>{{ user_platforms_count }}</strong> platforms.
-            </p>
-        </div>
-    </section>
+<section class="nes-container with-title">
+    <h3 class="title">Stats</h3>
+    <div>
+        <p>
+            <strong>{{ user_platforms_count }}</strong> platforms.
+        </p>
+    </div>
+</section>
 
-    {% endblock %}
+{% endblock content %}

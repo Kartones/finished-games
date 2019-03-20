@@ -2,12 +2,11 @@
 
 {% load web_extras %}
 
-{% block title %}{{ viewed_user.get_username.capitalize }} Currently playing games list - {{ block.super }}{% endblock %}
+{% block title %}{{ viewed_user.get_username.capitalize }} Currently playing games list - {{ block.super }}{% endblock title %}
 
 {% block content %}
 
-<h2><i class="nes-pixel-art snes-jp-logo" title="Currently Playing"></i> {{ viewed_user.get_username.capitalize }} Currently playing games
-    list</h2>
+<h2><i class="nes-pixel-art snes-jp-logo" title="Currently Playing"></i> {{ viewed_user.get_username.capitalize }} Currently playing games list</h2>
 
 <table class="nes-table is-bordered">
     <thead>
@@ -55,4 +54,4 @@
     </div>
 </section>
 
-{% endblock %}
+{% endblock content %}

@@ -1,6 +1,5 @@
 from typing import (Generator, Tuple)
 
-
 from django.contrib import admin
 from django.contrib.admin.views.main import ChangeList
 from django.db.models.query import QuerySet
@@ -10,7 +9,7 @@ from django.utils.translation import ugettext_lazy as _
 from catalogsources.models import FetchedPlatform
 
 
-# Don't show platforms which are hidden, and filter by source id if chosen
+# Don't show platforms which are hidden, and filter by source_id if one chosen
 class CustomPlatformsFilter(admin.SimpleListFilter):
     title = "fetched platforms"
     parameter_name = "platforms"

@@ -2,36 +2,36 @@
 
 {% load web_extras %}
 
-{% block title %}{{ platform.name }} games - {{ block.super }}{% endblock %}
+{% block title %}{{ platform.name }} games - {{ block.super }}{% endblock title %}
 
 {% block content %}
 
-    <h2>{{ platform.name }} games</h2>
+<h2>{{ platform.name }} games</h2>
 
-    <table class="nes-table is-bordered">
-        <thead>
+<table class="nes-table is-bordered">
+    <thead>
+        <tr>
+            <th>Name</th>
+
+            {% if user.is_authenticated %}
+                <th>Actions</th>
+            {% endif %}
+        </tr>
+    </thead>
+    <tbody>
+        {% for game in games %}
             <tr>
-                <th>Name</th>
-
+                <td>
+                    <a href="{% url "game_details" game.id %}">{{ game.name }}</a>
+                </td>
                 {% if user.is_authenticated %}
-                    <th>Actions</th>
+                    {% render_actions user viewed_user game.id platform.id next_url authenticated_user_catalog %}
                 {% endif %}
             </tr>
-        </thead>
-        <tbody>
-            {% for game in games %}
-                <tr>
-                    <td>
-                        <a href="{% url "game_details" game.id %}">{{ game.name }}</a>
-                    </td>
-                    {% if user.is_authenticated %}
-                        {% render_actions user viewed_user game.id platform.id next_url authenticated_user_catalog %}
-                    {% endif %}
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+        {% endfor %}
+    </tbody>
+</table>
 
-    <p><strong>{{ games_count }}</strong> games for <strong>{{ platform.name }}</strong>.</p>
+<p><strong>{{ games_count }}</strong> games for <strong>{{ platform.name }}</strong>.</p>
 
-{% endblock %}
+{% endblock content %}

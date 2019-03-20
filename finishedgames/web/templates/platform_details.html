@@ -1,17 +1,17 @@
 {% extends "base_with_menu.html" %}
 
-{% block title %}{{ platform.name }} - {{ block.super }}{% endblock %}
+{% block title %}{{ platform.name }} - {{ block.super }}{% endblock title %}
 
 {% block content %}
 
-    <h2>Platform: {{ platform.name }}</h2>
+<h2>Platform: {{ platform.name }}</h2>
 
-    <p><strong>Aliases</strong>: {{ platform.shortname}} </p>
+<p><strong>Aliases</strong>: {{ platform.shortname}} </p>
 
-    <p><strong>Year published</strong>: {{ platform.publish_date }}</p>
+<p><strong>Year published</strong>: {{ platform.publish_date }}</p>
 
-    <p><strong>Games and DLCs/expansions</strong>: {{ platform_games_count }}</p>
+<p><strong>Games and DLCs/expansions</strong>: {{ platform_games_count }}</p>
 
-    <p><a class="nes-btn is-primary" href="{% url "games_by_platform" platform.id %}">View Games</a></p>
+<p><a class="nes-btn is-primary" href="{% url "games_by_platform" platform.id %}">View Games</a></p>
 
-{% endblock %}
+{% endblock content %}

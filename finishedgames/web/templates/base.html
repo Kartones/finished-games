@@ -7,20 +7,20 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Press+Start+2P">
     <link rel="stylesheet" href="{% static 'css/styles.css' %}" />
     <link rel="shortcut icon" type="image/x-icon" href="{% static 'favicon.ico' %}" />
-    <title>{% block title %}Finished Games{% endblock %}</title>
+    <title>{% block title %}Finished Games{% endblock title %}</title>
 </head>
 
 <body>
     <header>
         <h1><a href="{% url 'index' %}">Finished Games</a></h1>
         <p>Track your playing history</p>
-        {% block menu %}{% endblock %}
+        {% block menu %}{% endblock menu %}
     </header>
 
     <div id="content">
         <section class="nes-container">
             <div>
-                {% block content %}{% endblock %}
+                {% block content %}{% endblock content %}
             </div>
         </section>
     </div>

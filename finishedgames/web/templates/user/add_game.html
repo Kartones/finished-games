@@ -1,70 +1,70 @@
 {% extends "base_with_menu.html" %}
 
-{% block title %}Add game to catalog - {{ block.super }}{% endblock %}
+{% block title %}Add game to catalog - {{ block.super }}{% endblock title %}
 
 {% block content %}
 
-    <h2>Add game to your catalog</h2>
+<h2>Add game to your catalog</h2>
 
-    {% if error_message %}
+{% if error_message %}
+    <p>
+        <div class="nes-container is-centered is-dark with-title">
+            <p class="title">Error</p>
+            <p>{{ error_message }}</p>
+        </div>
+    </p>
+{% endif %}
+{% if success_message %}
+    <p>
+        <div class="nes-container is-centered with-title">
+            <p class="title">Success</p>
+            <p>{{ success_message }}</p>
+        </div>
+    </p>
+{% endif %}
+
+<form action="{% url 'user_add_game' user.get_username %}" method="post">
+    <section class="form nes-container">
         <p>
-            <div class="nes-container is-centered is-dark with-title">
-                <p class="title">Error</p>
-                <p>{{ error_message }}</p>
+            {% csrf_token %}
+            <input type="hidden" name="user" value="{{ user.id }}" />
+            <div class="nes-field is-inline">
+                <label for="game">Game</label>
+                <select id="game" name="game" class="nes-input" required>
+                    <option value="" selected="">Choose a game from the list</option>
+                    {% for game in games %}
+                        <option value="{{ game.id }}">{{ game.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="nes-field is-inline">
+                <label for="platform">Platform</label>
+                <select id="platform" name="platform" class="nes-input" required>
+                    <option value="" selected="">Choose a platform from the list</option>
+                    {% for platform in platforms %}
+                        <option value="{{ platform.id }}">{{ platform.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="nes-field is-inline inline-checkbox">
+                <label>
+                    <input type="checkbox" id="currently_playing" name="currently_playing"
+                        class="nes-checkbox">
+                    <span>Currently playing?</span>
+                </label>
+            </div>
+            <div class="nes-field is-inline">
+                <label for="year_finished">Finished it? When?</label>
+                <input type="number" id="year_finished" name="year_finished" class="nes-input" value=""
+                    placeholder="Year you finished the game" min="1900" max="3000" />
             </div>
         </p>
-    {% endif %}
-    {% if success_message %}
-        <p>
-            <div class="nes-container is-centered with-title">
-                <p class="title">Success</p>
-                <p>{{ success_message }}</p>
-            </div>
+
+        <p style="text-align: center">
+            <button class="nes-btn is-success" type="submit">Submit</button>
         </p>
-    {% endif %}
+    </section>
 
-    <form action="{% url 'user_add_game' user.get_username %}" method="post">
-        <section class="form nes-container">
-            <p>
-                {% csrf_token %}
-                <input type="hidden" name="user" value="{{ user.id }}" />
-                <div class="nes-field is-inline">
-                    <label for="game">Game</label>
-                    <select id="game" name="game" class="nes-input" required>
-                        <option value="" selected="">Choose a game from the list</option>
-                        {% for game in games %}
-                            <option value="{{ game.id }}">{{ game.name }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <div class="nes-field is-inline">
-                    <label for="platform">Platform</label>
-                    <select id="platform" name="platform" class="nes-input" required>
-                        <option value="" selected="">Choose a platform from the list</option>
-                        {% for platform in platforms %}
-                            <option value="{{ platform.id }}">{{ platform.name }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <div class="nes-field is-inline inline-checkbox">
-                    <label>
-                        <input type="checkbox" id="currently_playing" name="currently_playing"
-                            class="nes-checkbox">
-                        <span>Currently playing?</span>
-                    </label>
-                </div>
-                <div class="nes-field is-inline">
-                    <label for="year_finished">Finished it? When?</label>
-                    <input type="number" id="year_finished" name="year_finished" class="nes-input" value=""
-                        placeholder="Year you finished the game" min="1900" max="3000" />
-                </div>
-            </p>
+</form>
 
-            <p style="text-align: center">
-                <button class="nes-btn is-success" type="submit">Submit</button>
-            </p>
-        </section>
-
-    </form>
-
-{% endblock %}
+{% endblock content %}

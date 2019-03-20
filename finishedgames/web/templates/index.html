@@ -2,60 +2,60 @@
 
 {% block content %}
 
-    <section class="nes-container">
-        <div>
-            Currently there are <strong>{{ games_count }}</strong> games from <strong>{{ platforms_count }}</strong> platforms in the catalog.
-        </div>
-    </section>
+<section class="nes-container">
+    <div>
+        Currently there are <strong>{{ games_count }}</strong> games from <strong>{{ platforms_count }}</strong> platforms in the catalog.
+    </div>
+</section>
 
-    <section class="nes-container with-title">
-        <h2 class="title">Latest Games Added</h2>
-        <div>
-            <table class="nes-table is-bordered">
-                <thead>
+<section class="nes-container with-title">
+    <h2 class="title">Latest Games Added</h2>
+    <div>
+        <table class="nes-table is-bordered">
+            <thead>
+                <tr>
+                    <th>Game</th>
+                    <th>Platforms</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for game in latest_added_games %}
                     <tr>
-                        <th>Game</th>
-                        <th>Platforms</th>
+                        <td>
+                            <a href="{% url "game_details" game.id %}">{{ game.name }}</a>
+                        </td>
+                        <td class="is-centered">
+                            {% for platform in game.platforms.all %}
+                                {{ platform.shortname }}{% if not forloop.last %}, {% endif %}
+                            {% endfor %}
+                        </td>
                     </tr>
-                </thead>
-                <tbody>
-                    {% for game in latest_added_games %}
-                        <tr>
-                            <td>
-                                <a href="{% url "game_details" game.id %}">{{ game.name }}</a>
-                            </td>
-                            <td class="is-centered">
-                                {% for platform in game.platforms.all %}
-                                    {{ platform.shortname }}{% if not forloop.last %}, {% endif %}
-                                {% endfor %}
-                            </td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    </section>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
 
-    <section class="nes-container with-title">
-        <h2 class="title">Latest Platforms Added</h2>
-        <div>
-            <table class="nes-table is-bordered">
-                <thead>
+<section class="nes-container with-title">
+    <h2 class="title">Latest Platforms Added</h2>
+    <div>
+        <table class="nes-table is-bordered">
+            <thead>
+                <tr>
+                    <th>Platform</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for platform in latest_added_platforms %}
                     <tr>
-                        <th>Platform</th>
+                        <td>
+                            <a href="{% url "platform_details" platform.id %}">{{ platform.name }}</a>
+                        </td>
                     </tr>
-                </thead>
-                <tbody>
-                    {% for platform in latest_added_platforms %}
-                        <tr>
-                            <td>
-                                <a href="{% url "platform_details" platform.id %}">{{ platform.name }}</a>
-                            </td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    </section>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
 
-{% endblock %}
+{% endblock content %}

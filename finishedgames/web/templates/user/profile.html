@@ -1,28 +1,28 @@
 {% extends "base_with_menu.html" %}
 
-{% block title %}Your Profile - {{ block.super }}{% endblock %}
+{% block title %}Your Profile - {{ block.super }}{% endblock title %}
 
 {% block content %}
 
-    <h2>Hi {{ user.get_username.capitalize }},this is your profile</h2>
+<h2>Hi {{ user.get_username.capitalize }},this is your profile</h2>
 
-    <section class="nes-container">
-        <div>
+<section class="nes-container">
+    <div>
+        <p>
+            <a class="nes-btn is-primary" href="{% url 'user_public_profile' user.get_username %}">Your public profile</a>
+        </p>
+        <p>
+            <a class="nes-btn is-primary" href="{% url 'user_catalog' user.get_username %}">Your catalog</a>
+        </p>
+        <p>
+            <a class="nes-btn is-success" href="{% url 'user_add_game' user.get_username %}">Add game to your catalog</a>
+        </p>
+        {% if user.is_staff %}
             <p>
-                <a class="nes-btn is-primary" href="{% url 'user_public_profile' user.get_username %}">Your public profile</a>
+                <a class="nes-btn is-error" href="{% url 'admin:index' %}">Admin Site</a>
             </p>
-            <p>
-                <a class="nes-btn is-primary" href="{% url 'user_catalog' user.get_username %}">Your catalog</a>
-            </p>
-            <p>
-                <a class="nes-btn is-success" href="{% url 'user_add_game' user.get_username %}">Add game to your catalog</a>
-            </p>
-            {% if user.is_staff %}
-                <p>
-                    <a class="nes-btn is-error" href="{% url 'admin:index' %}">Admin Site</a>
-                </p>
-            {% endif %}
-        </div>
-    </section>
+        {% endif %}
+    </div>
+</section>
 
-{% endblock %}
+{% endblock content %}

@@ -2,10 +2,12 @@
 {% load i18n admin_urls static %}
 
 {% block extrahead %}
+
 {{ block.super }}
 <link rel="stylesheet" type="text/css" href="{% static 'admin/css/forms.css' %}">
 <link rel="stylesheet" type="text/css" media="all" href="{% static 'css/admin.css' %}">
-{% endblock %}
+
+{% endblock extrahead %}
 
 {% block breadcrumbs %}
 
@@ -16,7 +18,7 @@
     &rsaquo; Import Platform
 </div>
 
-{% endblock %}
+{% endblock breadcrumbs %}
 
 {% block content %}
 
@@ -51,4 +53,4 @@
 
 </div>
 
-{% endblock %}
+{% endblock content %}

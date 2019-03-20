@@ -2,7 +2,7 @@
 
 {% load web_extras %}
 
-{% block title %}{{ viewed_user.get_username.capitalize }} wishlisted games list - {{ block.super }}{% endblock %}
+{% block title %}{{ viewed_user.get_username.capitalize }} wishlisted games list - {{ block.super }}{% endblock title %}
 
 {% block content %}
 
@@ -53,4 +53,4 @@
     </div>
 </section>
 
-{% endblock %}
+{% endblock content %}

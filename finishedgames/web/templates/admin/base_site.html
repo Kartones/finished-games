@@ -1,12 +1,16 @@
 {% extends "admin/base.html" %}
 {% load staticfiles %}
 
-{% block title %}{{ title }} | FG Admin{% endblock %}
+{% block title %}{{ title }} | FG Admin{% endblock title %}
 
 {% block extrahead %}
-    <link rel="shortcut icon" href="{% static 'favicon.ico' %}" />
-{% endblock %}
+
+<link rel="shortcut icon" href="{% static 'favicon.ico' %}" />
+
+{% endblock extrahead %}
 
 {% block branding %}
-    <h1 id="site-name"><a href="{% url 'admin:index' %}">Finished Games Administration</a></h1>
-{% endblock %}
+
+<h1 id="site-name"><a href="{% url 'admin:index' %}">Finished Games Administration</a></h1>
+
+{% endblock branding %}

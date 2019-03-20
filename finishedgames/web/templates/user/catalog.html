@@ -1,34 +1,34 @@
 {% extends "base_with_menu.html" %}
 
-{% block title %}{{ viewed_user.get_username.capitalize }} Catalog - {{ block.super }}{% endblock %}
+{% block title %}{{ viewed_user.get_username.capitalize }} Catalog - {{ block.super }}{% endblock title %}
 
 {% block content %}
 
-    <h2>{{ viewed_user.get_username.capitalize }} Catalog</h2>
+<h2>{{ viewed_user.get_username.capitalize }} Catalog</h2>
 
-    <section class="nes-container with-title">
-        <h3 class="title">Stats</h3>
-        <div>
-            <p>
-                 <i class="nes-icon star is-small" style="margin-left:9px;margin-right: 9px"></i> <a href="{% url 'user_games' viewed_user.get_username %}"><strong>{{ user_games_count }}</strong> games</a>
-            </p>
-            <p>
-                 <i class="nes-icon star is-small" style="margin-left:9px;margin-right: 9px"></i> <a href="{% url 'user_platforms' viewed_user.get_username %}"><strong>{{ user_platforms_count }}</strong> platforms played in</a>
-            </p>
-            <p>
-                 <i class="nes-pixel-art snes-jp-logo is-small"></i> <a href="{% url 'user_currently_playing_games' viewed_user.get_username %}"><strong>{{ currently_playing_games_count }}</strong> currently playing games</a>
-            </p>
-            <p>
-                <i class="nes-icon trophy is-small" style="margin-left:9px;margin-right: 9px"></i> <a href="{% url 'user_finished_games' viewed_user.get_username %}"><strong>{{ finished_games_count }}</strong> finished games</a>
-                <br/>
-                <progress class="nes-progress {{ progress_class }}" value="{{ finished_games_progress }}"
-                    max="100"
-                    title="Finished {{ finished_games_progress }}% of the catalog ({{ finished_games_count }}/{{ user_games_count }})" style="margin-top: 12px"></progress>
-            </p>
-            <p>
-                 <i class="nes-icon heart is-small" style="margin-left:9px;margin-right: 9px"></i> <a href="{% url 'user_wishlisted_games' viewed_user.get_username %}"><strong>{{ wishlisted_games_count }}</strong> wishlisted games</a>
-            </p>
-        </div>
-    </section>
+<section class="nes-container with-title">
+    <h3 class="title">Stats</h3>
+    <div>
+        <p>
+            <i class="nes-icon star is-small" style="margin-left:9px;margin-right: 9px"></i> <a href="{% url 'user_games' viewed_user.get_username %}"><strong>{{ user_games_count }}</strong> games</a>
+        </p>
+        <p>
+            <i class="nes-icon star is-small" style="margin-left:9px;margin-right: 9px"></i> <a href="{% url 'user_platforms' viewed_user.get_username %}"><strong>{{ user_platforms_count }}</strong> platforms played in</a>
+        </p>
+        <p>
+            <i class="nes-pixel-art snes-jp-logo is-small"></i> <a href="{% url 'user_currently_playing_games' viewed_user.get_username %}"><strong>{{ currently_playing_games_count }}</strong> currently playing games</a>
+        </p>
+        <p>
+            <i class="nes-icon trophy is-small" style="margin-left:9px;margin-right: 9px"></i> <a href="{% url 'user_finished_games' viewed_user.get_username %}"><strong>{{ finished_games_count }}</strong> finished games</a>
+            <br/>
+            <progress class="nes-progress {{ progress_class }}" value="{{ finished_games_progress }}"
+                max="100"
+                title="Finished {{ finished_games_progress }}% of the catalog ({{ finished_games_count }}/{{ user_games_count }})" style="margin-top: 12px"></progress>
+        </p>
+        <p>
+            <i class="nes-icon heart is-small" style="margin-left:9px;margin-right: 9px"></i> <a href="{% url 'user_wishlisted_games' viewed_user.get_username %}"><strong>{{ wishlisted_games_count }}</strong> wishlisted games</a>
+        </p>
+    </div>
+</section>
 
-{% endblock %}
+{% endblock content %}

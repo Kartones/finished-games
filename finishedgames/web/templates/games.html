@@ -1,34 +1,34 @@
 {% extends "base_with_menu.html" %}
 
-{% block title %}All games - {{ block.super }}{% endblock %}
+{% block title %}All games - {{ block.super }}{% endblock title %}
 
 {% block content %}
 
-    <h2>All games</h2>
+<h2>All games</h2>
 
-    <table class="nes-table is-bordered">
-        <thead>
+<table class="nes-table is-bordered">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for game in games %}
             <tr>
-                <th>Name</th>
-                <th>Actions</th>
+                <td>{{ game.name }}</td>
+                <td><a class="nes-btn is-primary" href="{% url "game_details" game.id %}">Details</a></td>
             </tr>
-        </thead>
-        <tbody>
-            {% for game in games %}
-                <tr>
-                    <td>{{ game.name }}</td>
-                    <td><a class="nes-btn is-primary" href="{% url "game_details" game.id %}">Details</a></td>
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+        {% endfor %}
+    </tbody>
+</table>
 
-    <section class="nes-container">
-        <div>
-            <p>
-                <strong>{{ games_count }}</strong> games.</a>
-            </p>
-        </div>
-    </section>
+<section class="nes-container">
+    <div>
+        <p>
+            <strong>{{ games_count }}</strong> games.</a>
+        </p>
+    </div>
+</section>
 
-{% endblock %}
+{% endblock content %}

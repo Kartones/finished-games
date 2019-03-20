@@ -2,7 +2,7 @@
     function copyAllFields(eventSource, parentNodeName) {
         const parentNode = document.querySelector("#" + parentNodeName);
         const copyButtons = parentNode.querySelectorAll(".btn-operation");
-        for (let button of copyButtons) {
+        for (const button of copyButtons) {
             if (button != eventSource) {
                 button.click();
             }
