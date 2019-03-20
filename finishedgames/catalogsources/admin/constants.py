@@ -1,1 +1,2 @@
 NO_PLATFORM = -1
+NO_GAME = -1

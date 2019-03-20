@@ -1,0 +1,66 @@
+
+{% extends "admin/base_site.html" %}
+{% load i18n admin_urls static %}
+
+{% block extrahead %}
+
+{{ block.super }}
+<link rel="stylesheet" type="text/css" href="{% static 'admin/css/forms.css' %}">
+<link rel="stylesheet" type="text/css" media="all" href="{% static 'css/admin.css' %}">
+
+{% endblock extrahead %}
+
+{% block breadcrumbs %}
+
+<div class="breadcrumbs">
+    <a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
+    &rsaquo; <a href="{% url 'admin:app_list' app_label=opts.app_label %}">{{ opts.app_config.verbose_name }}</a>
+    &rsaquo; <a href="{% url 'admin:catalogsources_fetchedgame_changelist' %}">{{ model_class_name }}</a>
+    &rsaquo; Import Game
+</div>
+
+{% endblock breadcrumbs %}
+
+{% block content %}
+
+<div id="content-main">
+
+    <div>
+        <p>You are going to import the following Fetched Games to the main catalog.<br/>
+            Note that if the destination Game does not exist, it will be created, but <strong>if exists all imported fields will override existing values</strong>.</p>
+    </div>
+
+    <form action="{% url 'admin:game_import_batch' %}" method="post">
+        {% csrf_token %}
+
+        <ul>
+            {% for fetched_game, platforms in fetched_games_with_plaforms %}
+                <li>
+                    {% if fetched_game.fg_game %}<span class="changelink" title="Main catalog Game update"></span>{% else %}<span class="addlink" title="New main catalog Game"></span>{% endif %}
+                    <strong>{{ fetched_game.name }}</strong>{% if fetched_game.fg_game %} → {{ fetched_game.fg_game.name }}{% endif %}
+                    <input type="hidden" name="fetched_game_id" value="{{ fetched_game.id }}">
+                    <input type="hidden" name="fg_game_id" value="{% if fetched_game.fg_game %}{{ fetched_game.fg_game.id }}{% else %}{{ admin_constants.NO_GAME }}{% endif %}">
+                    <input type="hidden" name="name" value="{{ fetched_game.name }}">
+                    <input type="hidden" name="publish_date" value="{{ fetched_game.publish_date }}">
+                    <input type="hidden" name="dlc_or_expansion" value="{% if fetched_game.dlc_or_expansion %}true{% else %}false{% endif %}">
+                    <input type="hidden" name="platforms" value="{{ platforms }}">
+
+                    {% if fetched_game.parent_game and fetched_game.parent_game.fg_game %}
+                        <input type="hidden" name="parent_game_id" value="{{ fetched_game.parent_game.fg_game.id }}">
+                    {% else %}
+                        <input type="hidden" name="parent_game_id" value="{{ admin_constants.NO_GAME }}">
+                    {% endif %}
+
+
+                </li>
+            {% endfor %}
+        </ul>
+
+        <div class="submit-row">
+            <input type="submit" value="Save" class="default" name="_save">
+        </div>
+    </form>
+
+</div>
+
+{% endblock content %}

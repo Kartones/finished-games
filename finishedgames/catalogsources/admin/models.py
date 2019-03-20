@@ -61,6 +61,7 @@ class FetchedGameAdmin(FGModelAdmin):
         urls = super().get_urls()
         my_urls = [
             path("import_setup/", self.admin_site.admin_view(self.import_setup_view), name="game_import_setup"),
+            path("import/batch", self.admin_site.admin_view(self.import_batch_view), name="game_import_batch"),
             path("import/", self.admin_site.admin_view(self.import_view), name="game_import")
         ]
         return cast(List[str], my_urls + urls)
@@ -112,8 +113,24 @@ class FetchedGameAdmin(FGModelAdmin):
 
             return TemplateResponse(request, "game_import.html", context)
         else:
-            self.message_user(request, "This action currently only supports acting upon a single entity", level="error")
-            return TemplateResponse(request, "game_import.html", context)
+            fetched_games = FetchedGame.objects.filter(id__in=selected_ids)
+            fg_platform_ids = {
+                str(fetched_game.id): ",".join(
+                    [str(platform.fg_platform.id) for platform in fetched_game.platforms.all() if platform.fg_platform]
+                )
+                for fetched_game in fetched_games
+            }
+            # we'll have to iterate both games and platforms and django templates don't allow array item access,
+            # so build a list of tuples which can be easily iterated
+            fetched_games_with_plaforms = [
+                (fetched_game, fg_platform_ids[str(fetched_game.id)],) for fetched_game in fetched_games
+            ]
+
+            context.update({
+                "fetched_games_with_plaforms": fetched_games_with_plaforms,
+                "admin_constants": admin_constants,
+            })
+            return TemplateResponse(request, "game_import_batch.html", context)
 
     def import_view(self, request: HttpRequest) -> HttpResponseRedirect:
         name = request.POST["name"]
@@ -132,6 +149,62 @@ class FetchedGameAdmin(FGModelAdmin):
             return HttpResponseRedirect(reverse("admin:catalogsources_fetchedgame_changelist"))
 
         self.message_user(request, "Fetched Game {} imported successfully".format(name))
+        return HttpResponseRedirect(reverse("admin:catalogsources_fetchedgame_changelist"))
+
+    def import_batch_view(self, request: HttpRequest) -> HttpResponseRedirect:
+        fetched_game_ids = request.POST.getlist("fetched_game_id")
+        fg_game_ids = request.POST.getlist("fg_game_id")
+        names = request.POST.getlist("name")
+        publish_date_strings = request.POST.getlist("publish_date")
+        dlcs_or_expansions = [(True if dlc == "true" else False) for dlc in request.POST.getlist("dlc_or_expansion")]
+        platforms_lists = [platforms.split(",") for platforms in request.POST.getlist("platforms")]
+        parent_game_ids = request.POST.getlist("parent_game_id")
+
+        imports_ok = []  # type: List[str]
+        imports_ko = []  # type: List[str]
+
+        for index in range(len(names)):
+            try:
+                name = names[index]
+                if int(fg_game_ids[index]) != admin_constants.NO_GAME:
+                    game_id = fg_game_ids[index]
+                else:
+                    game_id = None
+                if int(parent_game_ids[index]) != admin_constants.NO_GAME:
+                    parent_game_id = parent_game_ids[index]
+                else:
+                    parent_game_id = None
+
+                ImportManager.import_fetched_game(
+                    name=name,
+                    publish_date_string=publish_date_strings[index],
+                    dlc_or_expansion=dlcs_or_expansions[index],
+                    platforms=platforms_lists[index],
+                    fetched_game_id=fetched_game_ids[index],
+                    game_id=game_id,
+                    parent_game_id=parent_game_id
+                )
+                imports_ok.append(name)
+            except GameImportSaveError as error:
+                imports_ko.append("{} -{} ({})".format(name, fetched_game_ids[index], error))
+
+        if len(imports_ko) > 0:
+            if len(imports_ok) > 0:
+                self.message_user(
+                    request,
+                    "Some Fetched Game imports failed. Imports OK: {}. Imports KO: {}".format(
+                        ",".join(imports_ok), ",".join(imports_ko)
+                    ),
+                    level="warning"
+                )
+            else:
+                self.message_user(
+                    request,
+                    "All imports from the following Fetched Games failed: {}".format(",".join(imports_ko)),
+                    level="error"
+                )
+        else:
+            self.message_user(request, "Fetched Games imported successfully: {}".format(",".join(imports_ok)))
         return HttpResponseRedirect(reverse("admin:catalogsources_fetchedgame_changelist"))
 
 
