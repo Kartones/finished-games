@@ -83,8 +83,13 @@ class FetchedGameAdmin(FGModelAdmin):
             "model_class_name": FetchedGame.__name__,
         })
 
-        selected_ids = list(map(int, request.GET["ids"].split(",")))
-        if len(selected_ids) == 1:
+        if request.GET["ids"] == "*":
+            import_all_games = True
+        else:
+            import_all_games = False
+            selected_ids = list(map(int, request.GET["ids"].split(",")))
+
+        if not import_all_games and len(selected_ids) == 1:
             fetched_game = FetchedGame.objects.get(id=selected_ids[0])
 
             games = Game.objects.only("id", "name").order_by(Lower("name"))
@@ -122,9 +127,17 @@ class FetchedGameAdmin(FGModelAdmin):
 
             return TemplateResponse(request, "game_import.html", context)
         else:
-            fetched_games = FetchedGame.objects  \
-                                       .filter(id__in=selected_ids)  \
-                                       .prefetch_related("platforms", "fg_game", "parent_game")
+            if import_all_games:
+                hidden_filter = request.GET.get("hidden", "False")
+                fetched_games = FetchedGame.objects
+                # if == "all" don't filter
+                if hidden_filter == "True" or hidden_filter == "False":
+                    fetched_games = fetched_games.filter(hidden=(hidden_filter == "True"))
+                fetched_games = fetched_games.prefetch_related("platforms", "fg_game", "parent_game")
+            else:
+                fetched_games = FetchedGame.objects  \
+                                           .filter(id__in=selected_ids)  \
+                                           .prefetch_related("platforms", "fg_game", "parent_game")
             fg_platform_ids = {
                 str(fetched_game.id): ",".join([
                     str(platform.fg_platform.id)
@@ -143,6 +156,7 @@ class FetchedGameAdmin(FGModelAdmin):
 
             context.update({
                 "fetched_games_with_platforms": fetched_games_with_platforms,
+                "count_items_to_import": len(fetched_games_with_platforms),
                 "admin_constants": admin_constants,
                 "source_display_name":
                     settings.CATALOG_SOURCES_ADAPTERS[fetched_games[0].source_id][constants.ADAPTER_DISPLAY_NAME],
@@ -209,13 +223,13 @@ class FetchedGameAdmin(FGModelAdmin):
                 )
                 imports_ok.append(name)
             except GameImportSaveError as error:
-                imports_ko.append("{} -{} ({})".format(name, fetched_game_ids[index], error))
+                imports_ko.append("{} ({}) [{}]".format(name, fetched_game_ids[index], error))
 
         if len(imports_ko) > 0:
             if len(imports_ok) > 0:
                 self.message_user(
                     request,
-                    "Some Fetched Game imports failed. Imports OK: {}. Imports KO: {}".format(
+                    "Some Fetched Game imports failed... Imports OK: {} ... Imports KO: {}".format(
                         ",".join(imports_ok), ",".join(imports_ko)
                     ),
                     level="warning"
@@ -264,17 +278,33 @@ class FetchedPlatformAdmin(FGModelAdmin):
             "model_class_name": FetchedPlatform.__name__,
         })
 
-        selected_ids = list(map(int, request.GET["ids"].split(",")))
-        if len(selected_ids) == 1:
+        if request.GET["ids"] == "*":
+            import_all_platforms = True
+        else:
+            import_all_platforms = False
+            selected_ids = list(map(int, request.GET["ids"].split(",")))
+
+        if not import_all_platforms and len(selected_ids) == 1:
             context.update({
                 "fetched_platform": FetchedPlatform.objects.get(id=selected_ids[0]),
             })
             return TemplateResponse(request, "platform_import.html", context)
         else:
+            if import_all_platforms:
+                hidden_filter = request.GET.get("hidden", "False")
+                fetched_platforms = FetchedPlatform.objects
+                # if == "all" don't filter
+                if hidden_filter == "True" or hidden_filter == "False":
+                    fetched_platforms = fetched_platforms.filter(hidden=(hidden_filter == "True"))
+                fetched_platforms = fetched_platforms.prefetch_related("fg_platform")
+            else:
+                fetched_platforms = FetchedPlatform.objects  \
+                                                   .filter(id__in=selected_ids)  \
+                                                   .prefetch_related("fg_platform")
+
             context.update({
-                "fetched_platforms": FetchedPlatform.objects
-                                                    .filter(id__in=selected_ids)
-                                                    .prefetch_related("fg_platform"),
+                "fetched_platforms": fetched_platforms,
+                "count_items_to_import": len(fetched_platforms),
                 "admin_constants": admin_constants,
             })
             return TemplateResponse(request, "platform_import_batch.html", context)
@@ -322,13 +352,13 @@ class FetchedPlatformAdmin(FGModelAdmin):
                 )
                 imports_ok.append(name)
             except PlatformImportSaveError as error:
-                imports_ko.append("{} -{} ({})".format(name, fetched_platform_ids[index], error))
+                imports_ko.append("{} ({}) [{}]".format(name, fetched_platform_ids[index], error))
 
         if len(imports_ko) > 0:
             if len(imports_ok) > 0:
                 self.message_user(
                     request,
-                    "Some Fetched Platform imports failed. Imports OK: {}. Imports KO: {}".format(
+                    "Some Fetched Platform imports failed... Imports OK: {} ... Imports KO: {}".format(
                         ",".join(imports_ok), ",".join(imports_ko)
                     ),
                     level="warning"
