@@ -1,5 +1,6 @@
 from typing import (Any, cast, List, Optional)
 
+from django.conf import settings
 from django.db.models.fields import Field
 from django.db.models.functions import Lower
 from django.http import (HttpRequest, HttpResponseRedirect)
@@ -17,6 +18,7 @@ from catalogsources.managers import (GameImportSaveError, ImportManager, Platfor
 from catalogsources.models import (FetchedGame, FetchedPlatform)
 from core.admin import FGModelAdmin
 from core.models import (Game, Platform)
+from finishedgames import constants
 
 
 class FetchedGameAdmin(FGModelAdmin):
@@ -89,6 +91,8 @@ class FetchedGameAdmin(FGModelAdmin):
             platforms = Platform.objects.only("id", "name").all()
 
             context.update({
+                "source_display_name":
+                    settings.CATALOG_SOURCES_ADAPTERS[fetched_game.source_id][constants.ADAPTER_DISPLAY_NAME],
                 "fetched_game": fetched_game,
                 "fg_plaform_ids": ",".join([
                     str(platform.fg_platform.id)
@@ -140,6 +144,8 @@ class FetchedGameAdmin(FGModelAdmin):
             context.update({
                 "fetched_games_with_platforms": fetched_games_with_platforms,
                 "admin_constants": admin_constants,
+                "source_display_name":
+                    settings.CATALOG_SOURCES_ADAPTERS[fetched_games[0].source_id][constants.ADAPTER_DISPLAY_NAME],
             })
             return TemplateResponse(request, "game_import_batch.html", context)
 
@@ -153,7 +159,9 @@ class FetchedGameAdmin(FGModelAdmin):
                 platforms=request.POST.getlist("platforms"),
                 fetched_game_id=request.POST["fetched_game_id"],
                 game_id=request.POST["id"],
-                parent_game_id=request.POST["parent_game"]
+                parent_game_id=request.POST["parent_game"],
+                source_display_name=request.POST["source_display_name"],
+                source_url=request.POST["source_url"]
             )
         except GameImportSaveError as error:
             self.message_user(request, "Error importing Fetched Game '{}': {}".format(name, error), level="error")
@@ -170,6 +178,8 @@ class FetchedGameAdmin(FGModelAdmin):
         dlcs_or_expansions = [(True if dlc == "true" else False) for dlc in request.POST.getlist("dlc_or_expansion")]
         platforms_lists = [platforms.split(",") for platforms in request.POST.getlist("platforms")]
         parent_game_ids = request.POST.getlist("parent_game_id")
+        source_display_names = request.POST.getlist("source_display_name")
+        source_urls = request.POST.getlist("source_url")
 
         imports_ok = []  # type: List[str]
         imports_ko = []  # type: List[str]
@@ -193,7 +203,9 @@ class FetchedGameAdmin(FGModelAdmin):
                     platforms=platforms_lists[index],
                     fetched_game_id=fetched_game_ids[index],
                     game_id=game_id,
-                    parent_game_id=parent_game_id
+                    parent_game_id=parent_game_id,
+                    source_display_name=source_display_names[index],
+                    source_url=source_urls[index],
                 )
                 imports_ok.append(name)
             except GameImportSaveError as error:

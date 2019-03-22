@@ -60,13 +60,13 @@
                     <input type="hidden" name="publish_date" value="{{ fetched_game.publish_date }}">
                     <input type="hidden" name="dlc_or_expansion" value="{% if fetched_game.dlc_or_expansion %}true{% else %}false{% endif %}">
                     <input type="hidden" name="platforms" value="{{ platforms }}">
-
                     {% if fetched_game.parent_game and fetched_game.parent_game.fg_game %}
                         <input type="hidden" name="parent_game_id" value="{{ fetched_game.parent_game.fg_game.id }}">
                     {% else %}
                         <input type="hidden" name="parent_game_id" value="{{ admin_constants.NO_GAME }}">
                     {% endif %}
-
+                    <input type="hidden" name="source_display_name" value="{{ source_display_name }}">
+                    <input type="hidden" name="source_url" value="{{ fetched_game.source_url }}">
 
                 </li>
             {% endfor %}

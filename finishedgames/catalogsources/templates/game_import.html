@@ -167,7 +167,9 @@
                     <div class="form-row">
                         <div>
                             <label>Source URI:</label>
-                            <div class="readonly"><a class="uri-field" href="{{ fetched_game.source_url }}" target="_blank" id="fetched_source_url">{{ fetched_game.source_url }}</a></div>
+                            <div class="readonly">
+                                <a class="uri-field" href="{{ fetched_game.source_url }}" target="_blank">{{ fetched_game.source_url }}</a>
+                            </div>
                         </div>
                     </div>
                     <div class="form-row">
@@ -257,6 +259,14 @@
                                 </select>
                                 <input data-target="parent_game" data-original="{{ existing_parent_game_id }}" onclick="revertField(this)" type="button" value="↺" class="btn-operation" title="Reset to original value">
                             </div>
+                        </div>
+                        <div class="form-row">
+                            <label for="source_display_name">Source display name<br/>(for URL button):</label>
+                            <input type="text" class="vTextField" name="source_display_name" value="{{ source_display_name }}" readonly>
+                        </div>
+                        <div class="form-row">
+                            <label for="source_url">Source URL<br/>(will be added/updated to existing ones):</label>
+                            <input type="text" class="vTextField" name="source_url" value="{{ fetched_game.source_url }}" maxlength="255" readonly>
                         </div>
                     </fieldset>
                 </div>

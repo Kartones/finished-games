@@ -38,4 +38,17 @@
     </tbody>
 </table>
 
+{% if game.urls %}
+    <p>
+        View game info at:
+        <ul class="buttons-list">
+        {% for display_name, url in game.urls_dict.items %}
+            <li>
+                <a class="nes-btn is-primary" href="{{ url }}" target="_blank">{{ display_name }}</a>
+            </li>
+        {% endfor %}
+        </ul>
+    </p>
+{% endif %}
+
 {% endblock content %}

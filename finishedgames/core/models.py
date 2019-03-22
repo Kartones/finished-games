@@ -1,4 +1,4 @@
-from typing import cast
+from typing import (cast, Dict)
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
@@ -6,6 +6,10 @@ from django.core.validators import (MaxValueValidator, MinValueValidator)
 from django.db import models
 
 from core.helpers import generic_id as generic_id_helper
+
+
+URLS_KEY_VALUE_GLUE = "||"
+URLS_ITEMS_GLUE = "@@"
 
 
 class BasePlatform(models.Model):
@@ -41,6 +45,26 @@ class BaseGame(models.Model):
 
 
 class Game(BaseGame):
+    urls = models.CharField("URLs", max_length=2000, blank=True, default="")
+
+    @property
+    def urls_dict(self) -> Dict[str, str]:
+        _urls_dict = {}  # type: Dict[str, str]
+
+        for urldata in self.urls.split(URLS_ITEMS_GLUE):
+            fragments = urldata.split(URLS_KEY_VALUE_GLUE)
+            if len(fragments) == 2:
+                _urls_dict[fragments[0]] = fragments[1]
+
+        return _urls_dict
+
+    def upsert_url(self, display_name: str, url: str) -> None:
+        _urls_dict = self.urls_dict
+        _urls_dict[display_name] = url
+
+        self.urls = URLS_ITEMS_GLUE.join(
+            ["{}{}{}".format(key, URLS_KEY_VALUE_GLUE, _urls_dict[key]) for key in _urls_dict.keys()]
+        )
 
     def __str__(self) -> str:
         dlc_fragment = " [DLC/Expansion]" if self.dlc_or_expansion else ""

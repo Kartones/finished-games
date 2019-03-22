@@ -65,6 +65,7 @@ class GameAdmin(FGModelAdmin):
     fieldsets = [
         ("Basic Info", {"fields": ["name", "platforms", "publish_date"]}),
         ("DLCs & Expansions", {"fields": ["dlc_or_expansion", "parent_game"]}),
+        ("Advanced (don't touch if you don't know what you're doing)", {"fields": ["urls"]}),
     ]
     list_display = ["name", "dlc_or_expansion", "parent_game"]
     list_filter = ["dlc_or_expansion"]

@@ -1,4 +1,4 @@
-from typing import List
+from typing import (List, Optional)
 
 from catalogsources.models import (FetchedGame, FetchedPlatform)
 from core.models import (Game, Platform)
@@ -17,7 +17,8 @@ class ImportManager():
     @staticmethod
     def import_fetched_game(
         name: str, publish_date_string: str, dlc_or_expansion: bool, platforms: List[int], fetched_game_id: int,
-        game_id: int = None, parent_game_id: int = None
+        game_id: int = None, parent_game_id: int = None, source_display_name: Optional[str] = None,
+        source_url: Optional[str] = None
     ) -> None:
         if game_id:
             game = Game.objects \
@@ -31,6 +32,8 @@ class ImportManager():
         game.dlc_or_expansion = dlc_or_expansion
         if parent_game_id:
             game.parent_game_id = parent_game_id
+        if source_display_name and source_url:
+            game.upsert_url(display_name=source_display_name, url=source_url)
 
         try:
             game.save()

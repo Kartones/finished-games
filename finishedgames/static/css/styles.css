@@ -80,3 +80,11 @@ td.actions {
 td.actions form {
     margin-right: 6px;
 }
+
+ul.buttons-list {
+    list-style: none;
+}
+
+ul.buttons-list li {
+    display: inline;
+}
