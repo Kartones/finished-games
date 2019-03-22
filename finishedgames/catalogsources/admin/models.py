@@ -10,7 +10,7 @@ from django.urls import (path, reverse)
 
 from catalogsources.admin import constants as admin_constants
 from catalogsources.admin.actions import (hide_fetched_items, import_fetched_items)
-from catalogsources.admin.decorators import hyperlink_source_url
+from catalogsources.admin.decorators import (hyperlink_fg_game, hyperlink_fg_platform, hyperlink_source_url)
 from catalogsources.admin.filters import (CustomPlatformsFilter, HiddenByDefaultFilter)
 from catalogsources.apps import CatalogSourcesConfig
 from catalogsources.managers import (GameImportSaveError, ImportManager, PlatformImportSaveError)
@@ -21,7 +21,8 @@ from core.models import (Game, Platform)
 
 class FetchedGameAdmin(FGModelAdmin):
     list_display = [
-        "name", "dlc_or_expansion", "fg_game", hyperlink_source_url, "last_modified_date", "source_id", "hidden"
+        "name", "dlc_or_expansion", "fg_game", hyperlink_fg_game, hyperlink_source_url, "last_modified_date",
+        "source_id", "hidden"
     ]
     list_filter = ["last_modified_date", HiddenByDefaultFilter, "source_id", CustomPlatformsFilter, "dlc_or_expansion"]
     search_fields = ["name"]
@@ -90,7 +91,11 @@ class FetchedGameAdmin(FGModelAdmin):
             context.update({
                 "fetched_game": fetched_game,
                 "fg_plaform_ids": ",".join([
-                    str(platform.fg_platform.id) for platform in fetched_game.platforms.all() if platform.fg_platform
+                    str(platform.fg_platform.id)
+                    for platform in fetched_game.platforms
+                                                .prefetch_related("fg_platform")
+                                                .all()
+                    if platform.fg_platform
                 ]),
                 "games_for_selectbox": games,
                 "platforms_for_selectbox": platforms,
@@ -100,7 +105,7 @@ class FetchedGameAdmin(FGModelAdmin):
             })
 
             if fetched_game.fg_game:
-                platforms_list = [platform.id for platform in fetched_game.fg_game.platforms.all()]
+                platforms_list = [platform.id for platform in fetched_game.fg_game.platforms.only("id").all()]
                 context.update({
                     "existing_parent_game_id": "",
                     "existing_platform_ids": ",".join([str(platform_id) for platform_id in platforms_list]),
@@ -113,21 +118,27 @@ class FetchedGameAdmin(FGModelAdmin):
 
             return TemplateResponse(request, "game_import.html", context)
         else:
-            fetched_games = FetchedGame.objects.filter(id__in=selected_ids)
+            fetched_games = FetchedGame.objects  \
+                                       .filter(id__in=selected_ids)  \
+                                       .prefetch_related("platforms", "fg_game", "parent_game")
             fg_platform_ids = {
-                str(fetched_game.id): ",".join(
-                    [str(platform.fg_platform.id) for platform in fetched_game.platforms.all() if platform.fg_platform]
-                )
+                str(fetched_game.id): ",".join([
+                    str(platform.fg_platform.id)
+                    for platform in fetched_game.platforms
+                                                .prefetch_related("fg_platform")
+                                                .all()
+                    if platform.fg_platform
+                ])
                 for fetched_game in fetched_games
             }
             # we'll have to iterate both games and platforms and django templates don't allow array item access,
             # so build a list of tuples which can be easily iterated
-            fetched_games_with_plaforms = [
+            fetched_games_with_platforms = [
                 (fetched_game, fg_platform_ids[str(fetched_game.id)],) for fetched_game in fetched_games
             ]
 
             context.update({
-                "fetched_games_with_plaforms": fetched_games_with_plaforms,
+                "fetched_games_with_platforms": fetched_games_with_platforms,
                 "admin_constants": admin_constants,
             })
             return TemplateResponse(request, "game_import_batch.html", context)
@@ -209,7 +220,9 @@ class FetchedGameAdmin(FGModelAdmin):
 
 
 class FetchedPlatformAdmin(FGModelAdmin):
-    list_display = ["name", "fg_platform", hyperlink_source_url, "last_modified_date", "source_id", "hidden"]
+    list_display = [
+        "name", "fg_platform", hyperlink_fg_platform, hyperlink_source_url, "last_modified_date", "source_id", "hidden"
+    ]
     list_filter = ["last_modified_date", HiddenByDefaultFilter, "source_id"]
     search_fields = ["name"]
     readonly_fields = ["last_modified_date", "change_hash"]
@@ -247,7 +260,9 @@ class FetchedPlatformAdmin(FGModelAdmin):
             return TemplateResponse(request, "platform_import.html", context)
         else:
             context.update({
-                "fetched_platforms": FetchedPlatform.objects.filter(id__in=selected_ids),
+                "fetched_platforms": FetchedPlatform.objects
+                                                    .filter(id__in=selected_ids)
+                                                    .prefetch_related("fg_platform"),
                 "admin_constants": admin_constants,
             })
             return TemplateResponse(request, "platform_import_batch.html", context)

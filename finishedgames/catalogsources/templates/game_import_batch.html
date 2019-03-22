@@ -34,10 +34,26 @@
         {% csrf_token %}
 
         <ul>
-            {% for fetched_game, platforms in fetched_games_with_plaforms %}
+            {% for fetched_game, platforms in fetched_games_with_platforms %}
                 <li>
                     {% if fetched_game.fg_game %}<span class="changelink" title="Main catalog Game update"></span>{% else %}<span class="addlink" title="New main catalog Game"></span>{% endif %}
-                    <strong>{{ fetched_game.name }}</strong>{% if fetched_game.fg_game %} → {{ fetched_game.fg_game.name }}{% endif %}
+                    <strong>{{ fetched_game.name }}</strong>
+                    (
+                        {% for platform in fetched_game.platforms.all %}
+                            {{ platform.name }}
+                            {% if not forloop.last %}, {% endif %}
+                        {% endfor %}
+                    )
+                    {% if fetched_game.fg_game %}
+                        → {{ fetched_game.fg_game.name }}
+                        (
+                            {% for destination_platform in fetched_game.fg_game.platforms.all %}
+                                {{ destination_platform.name }}
+                                {% if not forloop.last %}, {% endif %}
+                            {% endfor %}
+                        )
+                    {% endif %}
+
                     <input type="hidden" name="fetched_game_id" value="{{ fetched_game.id }}">
                     <input type="hidden" name="fg_game_id" value="{% if fetched_game.fg_game %}{{ fetched_game.fg_game.id }}{% else %}{{ admin_constants.NO_GAME }}{% endif %}">
                     <input type="hidden" name="name" value="{{ fetched_game.name }}">

@@ -1,6 +1,7 @@
+import json
 import time
 
-from typing import Tuple
+from typing import (Dict, Tuple)
 
 
 def check_rate_limit(
@@ -42,3 +43,15 @@ def check_rate_limit(
         token_bucket -= 1.0
 
     return (token_bucket, current_timestamp, can_pass)
+
+
+def platforms_json_fetch_to_file(json_data: Dict, source_id: str, offset: int) -> None:
+    filename = "platforms_{}_{}_{}.json".format(source_id, offset, int(time.time()))
+    with open(filename, "w") as file:
+        file.write(json.dumps(json_data, indent=2))
+
+
+def games_json_fetch_to_file(json_data: Dict, source_id: str, platform_id: int, offset: int) -> None:
+    filename = "games_{}_{}_{}_{}.json".format(source_id, platform_id, offset, int(time.time()))
+    with open(filename, "w") as file:
+        file.write(json.dumps(json_data, indent=2))

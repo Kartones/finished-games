@@ -8,7 +8,7 @@ from django.core.management.color import Style
 import requests
 
 from catalogsources.adapters.base_adapter import BaseAdapter
-from catalogsources.adapters.helpers import check_rate_limit
+from catalogsources.adapters.helpers import (check_rate_limit, games_json_fetch_to_file, platforms_json_fetch_to_file)
 from catalogsources.models import (FetchedGame, FetchedPlatform)
 from finishedgames import constants
 
@@ -116,6 +116,11 @@ class GiantBombAdapter(BaseAdapter):
         if self.errored:
             return []
 
+        if settings.DEBUG:
+            platforms_json_fetch_to_file(
+                json_data=self.last_request_data, source_id=self.source_id(), offset=self.offset
+            )
+
         self.next_offset += self.last_request_data["number_of_page_results"]
         self.total_results = self.last_request_data["number_of_total_results"]
         fetched_platforms = self._results_to_platform_entities(self.last_request_data["results"])
@@ -151,6 +156,12 @@ class GiantBombAdapter(BaseAdapter):
 
         if self.errored:
             return []
+
+        if settings.DEBUG:
+            games_json_fetch_to_file(
+                json_data=self.last_request_data, source_id=self.source_id(), platform_id=platform_id,
+                offset=self.offset
+            )
 
         self.next_offset += self.last_request_data["number_of_page_results"]
         self.total_results = self.last_request_data["number_of_total_results"]
