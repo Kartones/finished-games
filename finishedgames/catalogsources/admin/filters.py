@@ -28,7 +28,9 @@ class CustomPlatformsFilter(admin.SimpleListFilter):
             )
 
     def queryset(self, request: HttpRequest, queryset: QuerySet) -> QuerySet:
-        return queryset.filter(hidden=False)
+        if self.value():
+            queryset = queryset.filter(platforms__id=self.value())
+        return queryset
 
 
 # By default, hidden items won't show
@@ -53,6 +55,8 @@ class HiddenByDefaultFilter(admin.SimpleListFilter):
             }
 
     def queryset(self, request: HttpRequest, queryset: QuerySet) -> QuerySet:
+        if self.value() == "all":
+            return queryset.filter(hidden__in=[True, False])
         if self.value() in (None, "False"):
             return queryset.filter(hidden=False)
         elif self.value() == "True":
