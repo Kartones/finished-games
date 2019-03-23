@@ -4,6 +4,7 @@ from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
+from django.db.models.functions import Lower
 from django.http import (Http404, HttpResponse, HttpRequest)
 from django.shortcuts import (get_object_or_404, redirect, render)
 from django.utils.decorators import method_decorator
@@ -97,6 +98,7 @@ def catalog(request: HttpRequest, username: str) -> HttpResponse:
         "currently_playing_games_count": currently_playing_games_count,
         "finished_games_count": finished_games_count,
         "finished_games_progress": finished_games_progress,
+        "pending_games_count": user_games_count - finished_games_count,
         "progress_class": _progress_bar_class(finished_games_progress),
         "wishlisted_games_count": wishlisted_games_count
     }
@@ -111,7 +113,7 @@ def platforms(request: HttpRequest, username: str) -> HttpResponse:
     # trying to use ORM's distinct() causes an extra query and always leaves usergame.id
     user_platform_ids = [user_game.platform_id for user_game in user_games]
     user_platform_ids = sorted(set(user_platform_ids))  # remove duplicates
-    user_platforms = Platform.objects.filter(id__in=user_platform_ids).order_by("name")
+    user_platforms = Platform.objects.filter(id__in=user_platform_ids).order_by(Lower("name"))
 
     context = {
         "viewed_user": viewed_user,
@@ -188,8 +190,8 @@ def add_game(request: HttpRequest, username: str) -> HttpResponse:
             except ValidationError as error:
                 error_message = str(error)
 
-    games = Game.objects.only("id", "name").order_by("name")
-    platforms = Platform.objects.only("id", "name").order_by("name")
+    games = Game.objects.only("id", "name").order_by(Lower("name"))
+    platforms = Platform.objects.only("id", "name").order_by(Lower("name"))
 
     context = {
         "games": games,
@@ -309,6 +311,39 @@ class GamesByPlatformView(View):
         }
 
         return render(request, "user/games_by_platform.html", context)
+
+
+class GamesPendingView(View):
+
+    @method_decorator(viewed_user)
+    @method_decorator(authenticated_user_games)
+    def get(self, request: HttpRequest, username: str, *args: Any, **kwargs: Any) -> HttpResponse:
+        viewed_user = kwargs["viewed_user"]
+        if not viewed_user:
+            raise Http404("Invalid URL")
+
+        sort_by = request.GET.get("sort_by", constants.SORT_BY_GAME_NAME)
+        try:
+            order_by = constants.SORT_FIELDS_MAPPING[sort_by]
+        except KeyError:
+            order_by = constants.SORT_FIELDS_MAPPING[constants.SORT_BY_GAME_NAME]
+
+        pending_games = UserGame.objects.filter(user=viewed_user) \
+                                        .exclude(year_finished__isnull=False) \
+                                        .order_by(*order_by) \
+                                        .select_related("game", "platform")
+
+        context = {
+            "viewed_user": viewed_user,
+            "pending_games": pending_games,
+            "pending_games_count": len(pending_games),
+            "constants": constants,
+            "sort_by": sort_by,
+            "authenticated_user_catalog": kwargs["authenticated_user_catalog"],
+            "next_url": request.path,
+        }
+
+        return render(request, "user/pending_games.html", context)
 
 
 class GamesFinishedView(View):

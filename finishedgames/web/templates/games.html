@@ -1,34 +1,24 @@
 {% extends "base_with_menu.html" %}
 
-{% block title %}All games - {{ block.super }}{% endblock title %}
+{% block title %}Games - {{ block.super }}{% endblock title %}
 
 {% block content %}
 
-<h2>All games</h2>
+<p>
+    <h3>Choose starting letter/symbol to display games:</h3>
+</p>
+<p class="character-filter">
+    {% for character in letters %}
+      <a href="{% url 'games_filtered_by_starting_character' character %}">{{ character.upper }}</a>
+      {% if not forloop.last %} - {% endif %}
+    {% endfor %}
+    <br />
+    {% for character in digits %}
+      <a href="{% url 'games_filtered_by_starting_character' character %}">{{ character.upper }}</a>
+      -
+    {% endfor %}
+    <a href="{% url 'games_filtered_by_starting_character' non_alphanumeric_constant %}">#</a>
+</p>
 
-<table class="nes-table is-bordered">
-    <thead>
-        <tr>
-            <th>Name</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for game in games %}
-            <tr>
-                <td>{{ game.name }}</td>
-                <td><a class="nes-btn is-primary" href="{% url "game_details" game.id %}">Details</a></td>
-            </tr>
-        {% endfor %}
-    </tbody>
-</table>
-
-<section class="nes-container">
-    <div>
-        <p>
-            <strong>{{ games_count }}</strong> games.</a>
-        </p>
-    </div>
-</section>
 
 {% endblock content %}

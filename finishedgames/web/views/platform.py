@@ -1,3 +1,4 @@
+from django.db.models.functions import Lower
 from django.http import (HttpResponse, HttpRequest)
 from django.shortcuts import (get_object_or_404, render)
 
@@ -18,7 +19,7 @@ def platform_details(request: HttpRequest, platform_id: int) -> HttpResponse:
 def platforms(request: HttpRequest) -> HttpResponse:
     platforms = Platform.objects \
                         .only("id", "name") \
-                        .order_by("name") \
+                        .order_by(Lower("name")) \
                         .all()
     platforms_count = len(platforms)
 

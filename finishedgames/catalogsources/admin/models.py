@@ -45,7 +45,7 @@ class FetchedGameAdmin(FGModelAdmin):
             # Only from same source
             if request._current_object:
                 kwargs["queryset"] = kwargs["queryset"].filter(source_id=request._current_object.source_id)
-            kwargs["queryset"] = kwargs["queryset"].order_by("name")
+            kwargs["queryset"] = kwargs["queryset"].order_by(Lower("name"))
         return super().formfield_for_manytomany(db_field, request, **kwargs)
 
     def formfield_for_foreignkey(self, db_field: Field, request: HttpRequest, **kwargs: Any) -> Form_Field:

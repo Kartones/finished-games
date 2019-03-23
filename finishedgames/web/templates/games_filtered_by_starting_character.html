@@ -1,0 +1,44 @@
+{% extends "base_with_menu.html" %}
+
+{% block title %}
+{% if character == non_alphanumeric_constant %}
+    Games starting with non-alphanumeric
+{% else %}
+    Games starting with '{{ character.upper }}'
+{% endif %}
+- {{ block.super }}{% endblock title %}
+
+{% block content %}
+
+{% if character == non_alphanumeric_constant %}
+    <h2>Games starting with non-alphanumeric</h2>
+{% else %}
+    <h2>Games starting with '{{ character.upper }}'</h2>
+{% endif %}
+
+<table class="nes-table is-bordered">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for game in games %}
+            <tr>
+                <td>{{ game.name }}</td>
+                <td><a class="nes-btn is-primary" href="{% url "game_details" game.id %}">Details</a></td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<section class="nes-container">
+    <div>
+        <p>
+            <strong>{{ games_count }}</strong> games.</a>
+        </p>
+    </div>
+</section>
+
+{% endblock content %}

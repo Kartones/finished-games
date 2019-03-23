@@ -12,6 +12,10 @@ urlpatterns = [
 
     path("games/", game.games, name="games"),
     path("games/<int:game_id>/", game.GameDetailsView.as_view(), name="game_details"),
+    path(
+        "games/starting-with/<str:character>/", game.GamesStartingWithCharacterView.as_view(),
+        name="games_filtered_by_starting_character"
+    ),
 
     path("platforms/", platform.platforms, name="platforms"),
     path("platforms/<int:platform_id>/", platform.platform_details, name="platform_details"),
@@ -29,6 +33,7 @@ urlpatterns = [
         name="user_currently_playing_games"
     ),
     path("users/<slug:username>/games/finished/", user.GamesFinishedView.as_view(), name="user_finished_games"),
+    path("users/<slug:username>/games/pending/", user.GamesPendingView.as_view(), name="user_pending_games"),
     path("users/<slug:username>/games/wishlisted/", user.GamesWishlistedView.as_view(), name="user_wishlisted_games"),
     path(
         "users/<slug:username>/platforms/<int:platform_id>/games/",

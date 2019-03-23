@@ -88,3 +88,8 @@ ul.buttons-list {
 ul.buttons-list li {
     display: inline;
 }
+
+p.character-filter {
+    text-align: center;
+    font-size: 1.5em;
+}
