@@ -121,6 +121,9 @@ STATICFILES_DIRS = [
 # Directory from which you’d serve statics in production
 # STATIC_ROOT = "/code/finishedgames/statics/"
 
+# Disable default maximum of GET/POST fields allowed, else massive imports will fail
+DATA_UPLOAD_MAX_NUMBER_FIELDS = None
+
 # Custom Finished Games settings
 
 LATEST_VIDEOGAMES_DISPLAY_COUNT = 10

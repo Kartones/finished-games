@@ -29,9 +29,22 @@
             Note that if the destination Platform does not exist, it will be created, but <strong>if exists all imported fields will override existing values</strong>.</p>
     </div>
 
+    <hr />
+
+
     <form action="{% url 'admin:platform_import_batch' %}" method="post">
         {% csrf_token %}
 
+        <p>
+            <h3>Choose fields to import:</h3>
+            <input type="checkbox" name="fields" value="name" checked>Name<br />
+            <input type="checkbox" name="fields" value="shortname" checked>Shortname<br />
+            <input type="checkbox" name="fields" value="publish_date" checked>Publish Date<br />
+        </p>
+
+        <hr />
+
+        <h3>Items that will be imported:</h3>
         <ul>
             {% for fetched_platform in fetched_platforms %}
                 <li>

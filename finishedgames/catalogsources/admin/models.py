@@ -195,6 +195,8 @@ class FetchedGameAdmin(FGModelAdmin):
         source_display_names = request.POST.getlist("source_display_name")
         source_urls = request.POST.getlist("source_url")
 
+        update_fields_filter = request.POST.getlist("fields")
+
         imports_ok = []  # type: List[str]
         imports_ko = []  # type: List[str]
 
@@ -220,6 +222,7 @@ class FetchedGameAdmin(FGModelAdmin):
                     parent_game_id=parent_game_id,
                     source_display_name=source_display_names[index],
                     source_url=source_urls[index],
+                    update_fields_filter=update_fields_filter
                 )
                 imports_ok.append(name)
             except GameImportSaveError as error:
@@ -333,6 +336,8 @@ class FetchedPlatformAdmin(FGModelAdmin):
         shortnames = request.POST.getlist("shortname")
         publish_date_strings = request.POST.getlist("publish_date")
 
+        update_fields_filter = request.POST.getlist("fields")
+
         imports_ok = []  # type: List[str]
         imports_ko = []  # type: List[str]
 
@@ -348,7 +353,8 @@ class FetchedPlatformAdmin(FGModelAdmin):
                     shortname=shortnames[index],
                     publish_date_string=publish_date_strings[index],
                     fetched_platform_id=fetched_platform_ids[index],
-                    platform_id=platform_id
+                    platform_id=platform_id,
+                    update_fields_filter=update_fields_filter
                 )
                 imports_ok.append(name)
             except PlatformImportSaveError as error:

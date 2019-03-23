@@ -33,6 +33,18 @@
     <form action="{% url 'admin:game_import_batch' %}" method="post">
         {% csrf_token %}
 
+        <p>
+            <h3>Choose fields to import:</h3>
+            <input type="checkbox" name="fields" value="name" checked>Name<br />
+            <input type="checkbox" name="fields" value="publish_date" checked>Publish Date<br />
+            <input type="checkbox" name="fields" value="platforms" checked>Platforms<br />
+            <input type="checkbox" name="fields" value="dlc_or_expansion" checked>DLC/Expansion<br />
+            <input type="checkbox" name="fields" value="parent_game" checked>Parent Game<br />
+        </p>
+
+        <hr />
+
+        <h3>Items that will be imported:</h3>
         <ul>
             {% for fetched_game, platforms in fetched_games_with_platforms %}
                 <li>
