@@ -67,7 +67,7 @@
                     {% endif %}
 
                     <input type="hidden" name="fetched_game_id" value="{{ fetched_game.id }}">
-                    <input type="hidden" name="fg_game_id" value="{% if fetched_game.fg_game %}{{ fetched_game.fg_game.id }}{% else %}{{ admin_constants.NO_GAME }}{% endif %}">
+                    <input type="hidden" name="fg_game_id" value="{% if fetched_game.fg_game %}{{ fetched_game.fg_game.id }}{% else %}{{ constants.NO_GAME }}{% endif %}">
                     <input type="hidden" name="name" value="{{ fetched_game.name }}">
                     <input type="hidden" name="publish_date" value="{{ fetched_game.publish_date }}">
                     <input type="hidden" name="dlc_or_expansion" value="{% if fetched_game.dlc_or_expansion %}true{% else %}false{% endif %}">
@@ -75,7 +75,7 @@
                     {% if fetched_game.parent_game and fetched_game.parent_game.fg_game %}
                         <input type="hidden" name="parent_game_id" value="{{ fetched_game.parent_game.fg_game.id }}">
                     {% else %}
-                        <input type="hidden" name="parent_game_id" value="{{ admin_constants.NO_GAME }}">
+                        <input type="hidden" name="parent_game_id" value="{{ constants.NO_GAME }}">
                     {% endif %}
                     <input type="hidden" name="source_display_name" value="{{ source_display_name }}">
                     <input type="hidden" name="source_url" value="{{ fetched_game.source_url }}">

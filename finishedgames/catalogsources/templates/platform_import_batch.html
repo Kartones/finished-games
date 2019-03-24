@@ -51,7 +51,7 @@
                     {% if fetched_platform.fg_platform %}<span class="changelink" title="Main catalog Platform update"></span>{% else %}<span class="addlink" title="New main catalog Platform"></span>{% endif %}
                     <strong>{{ fetched_platform.name }}</strong>{% if fetched_platform.fg_platform %} → {{ fetched_platform.fg_platform.name }}{% endif %}
                     <input type="hidden" name="fetched_platform_id" value="{{ fetched_platform.id }}">
-                    <input type="hidden" name="fg_platform_id" value="{% if fetched_platform.fg_platform %}{{ fetched_platform.fg_platform.id }}{% else %}{{ admin_constants.NO_PLATFORM }}{% endif %}">
+                    <input type="hidden" name="fg_platform_id" value="{% if fetched_platform.fg_platform %}{{ fetched_platform.fg_platform.id }}{% else %}{{ constants.NO_PLATFORM }}{% endif %}">
                     <input type="hidden" name="name" value="{{ fetched_platform.name }}">
                     <input type="hidden" name="shortname" value="{{ fetched_platform.shortname }}">
                     <input type="hidden" name="publish_date" value="{{ fetched_platform.publish_date }}">
