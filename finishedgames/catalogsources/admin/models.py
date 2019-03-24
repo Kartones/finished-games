@@ -9,7 +9,6 @@ from django.forms.fields import Field as Form_Field
 from django.template.response import TemplateResponse
 from django.urls import (path, reverse)
 
-from catalogsources.admin import constants as admin_constants
 from catalogsources.admin.actions import (hide_fetched_items, import_fetched_items)
 from catalogsources.admin.decorators import (hyperlink_fg_game, hyperlink_fg_platform, hyperlink_source_url)
 from catalogsources.admin.filters import (CustomPlatformsFilter, HiddenByDefaultFilter)
@@ -83,7 +82,7 @@ class FetchedGameAdmin(FGModelAdmin):
             "model_class_name": FetchedGame.__name__,
         })
 
-        if request.GET["ids"] == "*":
+        if request.GET["ids"] == constants.ALL_IDS:
             import_all_games = True
         else:
             import_all_games = False
@@ -157,7 +156,7 @@ class FetchedGameAdmin(FGModelAdmin):
             context.update({
                 "fetched_games_with_platforms": fetched_games_with_platforms,
                 "count_items_to_import": len(fetched_games_with_platforms),
-                "admin_constants": admin_constants,
+                "constants": constants,
                 "source_display_name":
                     settings.CATALOG_SOURCES_ADAPTERS[fetched_games[0].source_id][constants.ADAPTER_DISPLAY_NAME],
             })
@@ -203,11 +202,11 @@ class FetchedGameAdmin(FGModelAdmin):
         for index in range(len(names)):
             try:
                 name = names[index]
-                if int(fg_game_ids[index]) != admin_constants.NO_GAME:
+                if int(fg_game_ids[index]) != constants.NO_GAME:
                     game_id = fg_game_ids[index]
                 else:
                     game_id = None
-                if int(parent_game_ids[index]) != admin_constants.NO_GAME:
+                if int(parent_game_ids[index]) != constants.NO_GAME:
                     parent_game_id = parent_game_ids[index]
                 else:
                     parent_game_id = None
@@ -281,7 +280,7 @@ class FetchedPlatformAdmin(FGModelAdmin):
             "model_class_name": FetchedPlatform.__name__,
         })
 
-        if request.GET["ids"] == "*":
+        if request.GET["ids"] == constants.ALL_IDS:
             import_all_platforms = True
         else:
             import_all_platforms = False
@@ -308,7 +307,7 @@ class FetchedPlatformAdmin(FGModelAdmin):
             context.update({
                 "fetched_platforms": fetched_platforms,
                 "count_items_to_import": len(fetched_platforms),
-                "admin_constants": admin_constants,
+                "constants": constants,
             })
             return TemplateResponse(request, "platform_import_batch.html", context)
 
@@ -344,7 +343,7 @@ class FetchedPlatformAdmin(FGModelAdmin):
         for index in range(len(names)):
             try:
                 name = names[index]
-                if int(fg_platform_ids[index]) != admin_constants.NO_PLATFORM:
+                if int(fg_platform_ids[index]) != constants.NO_PLATFORM:
                     platform_id = fg_platform_ids[index]
                 else:
                     platform_id = None

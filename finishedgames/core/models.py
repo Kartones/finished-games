@@ -48,6 +48,10 @@ class Game(BaseGame):
     urls = models.CharField("URLs", max_length=2000, blank=True, default="")
 
     @property
+    def platforms_list(self) -> str:
+        return ", ".join([platform.shortname for platform in self.platforms.all()])
+
+    @property
     def urls_dict(self) -> Dict[str, str]:
         _urls_dict = {}  # type: Dict[str, str]
 
