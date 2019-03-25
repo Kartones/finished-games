@@ -14,7 +14,7 @@ class Command(BaseCommand):
         pass
 
     def handle(self, *args: Any, **options: Dict) -> None:
-        games = Game.objects \
+        games = Game.objects  \
                     .filter(urls="")
 
         host = settings.ALLOWED_HOSTS[-1]
