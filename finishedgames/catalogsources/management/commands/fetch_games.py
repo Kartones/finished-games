@@ -2,7 +2,7 @@ from typing import (Any, cast, Dict, List, Tuple)
 
 from django.core.management.base import (BaseCommand, CommandParser)
 
-from catalogsources.management.helpers import (source_class_from_id, TimeProfiler, wait_if_needed)
+from catalogsources.management.helpers import (clean_game_name, source_class_from_id, TimeProfiler, wait_if_needed)
 from catalogsources.models import (FetchedGame, FetchedPlatform)
 
 
@@ -66,6 +66,8 @@ class Command(BaseCommand):
 
         for (game, platforms) in results:
             self.stdout.write("{}:".format(game.source_game_id), ending="")
+
+            game.name = clean_game_name(game.name)
 
             try:
                 existing_game = FetchedGame.objects.get(

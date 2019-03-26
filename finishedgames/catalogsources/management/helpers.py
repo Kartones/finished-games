@@ -18,6 +18,10 @@ def source_class_from_id(source_id: str) -> Type[BaseAdapter]:
     raise ValueError("Unknown source id '{}'".format(source_id))
 
 
+def clean_game_name(name: str) -> str:
+    return name.strip(" _!-:")
+
+
 class TimeProfiler:
     def __init__(self, use_performance_counter=False):
         self.use_performance_counter = use_performance_counter
