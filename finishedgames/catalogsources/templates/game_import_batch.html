@@ -46,7 +46,7 @@
 
         <h3>Items that will be imported:</h3>
         <ul>
-            {% for fetched_game, platforms in fetched_games_with_platforms %}
+            {% for fetched_game, platforms, source_display_name in fetched_games_with_platforms %}
                 <li>
                     {% if fetched_game.fg_game %}<span class="changelink" title="Main catalog Game update"></span>{% else %}<span class="addlink" title="New main catalog Game"></span>{% endif %}
                     <strong>{{ fetched_game.name }}</strong>

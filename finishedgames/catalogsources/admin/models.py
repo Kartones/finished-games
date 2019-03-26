@@ -70,6 +70,12 @@ class FetchedGameAdmin(FGModelAdmin):
 
     def import_setup_view(self, request: HttpRequest) -> TemplateResponse:
         context = self.admin_site.each_context(request)
+
+        source_display_names = {
+            key: settings.CATALOG_SOURCES_ADAPTERS[key][constants.ADAPTER_DISPLAY_NAME]
+            for key in settings.CATALOG_SOURCES_ADAPTERS.keys()
+        }
+
         context.update({
             "title": "Import fetched game into main catalog",
             "opts": {
@@ -80,6 +86,7 @@ class FetchedGameAdmin(FGModelAdmin):
                 },
             },
             "model_class_name": FetchedGame.__name__,
+
         })
 
         if request.GET["ids"] == constants.ALL_IDS:
@@ -95,8 +102,6 @@ class FetchedGameAdmin(FGModelAdmin):
             platforms = Platform.objects.only("id", "name").all()
 
             context.update({
-                "source_display_name":
-                    settings.CATALOG_SOURCES_ADAPTERS[fetched_game.source_id][constants.ADAPTER_DISPLAY_NAME],
                 "fetched_game": fetched_game,
                 "fg_plaform_ids": ",".join([
                     str(platform.fg_platform.id)
@@ -110,6 +115,7 @@ class FetchedGameAdmin(FGModelAdmin):
                 "existing_parent_game_id": "",
                 "existing_platform_ids": "",
                 "existing_platform_ids_list": [],
+                "source_display_name": source_display_names[fetched_game.source_id],
             })
 
             if fetched_game.fg_game:
@@ -147,18 +153,16 @@ class FetchedGameAdmin(FGModelAdmin):
                 ])
                 for fetched_game in fetched_games
             }
-            # we'll have to iterate both games and platforms and django templates don't allow array item access,
-            # so build a list of tuples which can be easily iterated
-            fetched_games_with_platforms = [
-                (fetched_game, fg_platform_ids[str(fetched_game.id)],) for fetched_game in fetched_games
+            # django templates don't allow array item access, so build a list of tuples which can be easily iterated
+            fetched_games_data = [
+                (fetched_game, fg_platform_ids[str(fetched_game.id)], source_display_names[fetched_game.source_id])
+                for fetched_game in fetched_games
             ]
 
             context.update({
-                "fetched_games_with_platforms": fetched_games_with_platforms,
-                "count_items_to_import": len(fetched_games_with_platforms),
+                "fetched_games_with_platforms": fetched_games_data,
+                "count_items_to_import": len(fetched_games_data),
                 "constants": constants,
-                "source_display_name":
-                    settings.CATALOG_SOURCES_ADAPTERS[fetched_games[0].source_id][constants.ADAPTER_DISPLAY_NAME],
             })
             return TemplateResponse(request, "game_import_batch.html", context)
 

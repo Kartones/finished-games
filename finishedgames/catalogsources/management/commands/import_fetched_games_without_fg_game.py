@@ -26,11 +26,10 @@ class Command(BaseCommand):
 
         self.stdout.write("> Going to import {} new Fetched Games:".format(self.style.WARNING(str(len(fetched_games)))))
 
-        # using list(fetched_games) to force ORM to cache the query (index access would query again)
-        # see: https://docs.djangoproject.com/en/2.1/topics/db/queries/#caching-and-querysets
-        if len(list(fetched_games)) > 0:
-            source_display_name = \
-                settings.CATALOG_SOURCES_ADAPTERS[fetched_games[0].source_id][constants.ADAPTER_DISPLAY_NAME]
+        source_display_names = {
+            key: settings.CATALOG_SOURCES_ADAPTERS[key][constants.ADAPTER_DISPLAY_NAME]
+            for key in settings.CATALOG_SOURCES_ADAPTERS.keys()
+        }
 
         for fetched_game in fetched_games:
             self.stdout.write("{} ({}) ".format(fetched_game.name, fetched_game.id), ending="")
@@ -51,7 +50,7 @@ class Command(BaseCommand):
                     fetched_game_id=fetched_game.id,
                     game_id=None,
                     parent_game_id=None,
-                    source_display_name=source_display_name,
+                    source_display_name=source_display_names[fetched_game.source_id],
                     source_url=fetched_game.source_url
                 )
             except GameImportSaveError as error:
