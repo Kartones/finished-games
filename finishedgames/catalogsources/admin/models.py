@@ -103,13 +103,13 @@ class FetchedGameAdmin(FGModelAdmin):
 
             context.update({
                 "fetched_game": fetched_game,
-                "fg_plaform_ids": ",".join([
+                "fg_plaform_ids": ",".join((
                     str(platform.fg_platform.id)
                     for platform in fetched_game.platforms
                                                 .prefetch_related("fg_platform")
                                                 .all()
                     if platform.fg_platform
-                ]),
+                )),
                 "games_for_selectbox": games,
                 "platforms_for_selectbox": platforms,
                 "existing_parent_game_id": "",
@@ -122,7 +122,7 @@ class FetchedGameAdmin(FGModelAdmin):
                 platforms_list = [platform.id for platform in fetched_game.fg_game.platforms.only("id").all()]
                 context.update({
                     "existing_parent_game_id": "",
-                    "existing_platform_ids": ",".join([str(platform_id) for platform_id in platforms_list]),
+                    "existing_platform_ids": ",".join((str(platform_id) for platform_id in platforms_list)),
                     "existing_platform_ids_list": platforms_list,
                 })
                 if fetched_game.fg_game.parent_game:
@@ -144,13 +144,13 @@ class FetchedGameAdmin(FGModelAdmin):
                                            .filter(id__in=selected_ids)  \
                                            .prefetch_related("platforms", "fg_game", "parent_game")
             fg_platform_ids = {
-                str(fetched_game.id): ",".join([
+                str(fetched_game.id): ",".join((
                     str(platform.fg_platform.id)
                     for platform in fetched_game.platforms
                                                 .prefetch_related("fg_platform")
                                                 .all()
                     if platform.fg_platform
-                ])
+                ))
                 for fetched_game in fetched_games
             }
             # django templates don't allow array item access, so build a list of tuples which can be easily iterated
@@ -203,9 +203,8 @@ class FetchedGameAdmin(FGModelAdmin):
         imports_ok = []  # type: List[str]
         imports_ko = []  # type: List[str]
 
-        for index in range(len(names)):
+        for index, name in enumerate(names):
             try:
-                name = names[index]
                 if int(fg_game_ids[index]) != constants.NO_GAME:
                     game_id = fg_game_ids[index]
                 else:
@@ -344,9 +343,8 @@ class FetchedPlatformAdmin(FGModelAdmin):
         imports_ok = []  # type: List[str]
         imports_ko = []  # type: List[str]
 
-        for index in range(len(names)):
+        for index, name in enumerate(names):
             try:
-                name = names[index]
                 if int(fg_platform_ids[index]) != constants.NO_PLATFORM:
                     platform_id = fg_platform_ids[index]
                 else:

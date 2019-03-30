@@ -77,23 +77,23 @@ class GameForm(ModelForm):
         super().clean()
 
         # If a game is DLC:
-        if "dlc_or_expansion" in self.cleaned_data and self.cleaned_data["dlc_or_expansion"]:
-            if "parent_game" not in self.cleaned_data or not self.cleaned_data["parent_game"]:
+        if self.cleaned_data.get("dlc_or_expansion", False):
+            if not self.cleaned_data.get("parent_game", None):
                 raise ValidationError({"parent_game": "A Game DLC must specify a parent game"})
             if self.cleaned_data["parent_game"].dlc_or_expansion:
                 raise ValidationError({"parent_game": "A Game DLC cannot have as parent another game DLC"})
 
             # platforms should be a subset of parent platforms
-            new_game_platforms = sorted([
+            new_game_platforms = sorted((
                 item.id
                 for item in self.cleaned_data["platforms"].all()
                 if item in self.cleaned_data["parent_game"].platforms.all()
-            ])
-            parent_game_platforms = sorted([item.id for item in self.cleaned_data["platforms"].all()])
+            ))
+            parent_game_platforms = sorted((item.id for item in self.cleaned_data["platforms"].all()))
             if not new_game_platforms == parent_game_platforms:
                 raise ValidationError({
                     "platforms": "Game DLC must be available on subset or all of parent game platforms: '{}'".format(
-                        "','".join([platform.name for platform in self.cleaned_data["parent_game"].platforms.all()])
+                        "','".join((platform.name for platform in self.cleaned_data["parent_game"].platforms.all()))
                     )
                 })
 

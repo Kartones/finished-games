@@ -39,7 +39,7 @@ class FetchedGame(BaseGame):
     def _get_fields_for_hash(self) -> str:
         # Cannot use many to many relations until entity has an id
         if self.id:
-            platforms = ",".join([str(platform.id) for platform in self.platforms.all()])
+            platforms = ",".join((str(platform.id) for platform in self.platforms.all()))
         else:
             platforms = ""
 

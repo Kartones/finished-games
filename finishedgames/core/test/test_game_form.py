@@ -109,7 +109,7 @@ class GameFormTests(TestCase):
         # subset = superset
         game_data = {
             "name": "an irrelevant name",
-            "platforms": [platform.id for platform in game_1.platforms.all()],
+            "platforms": (platform.id for platform in game_1.platforms.all()),
             "publish_date": datetime.now().year,
             "dlc_or_expansion": True,
             "parent_game": game_1.id,

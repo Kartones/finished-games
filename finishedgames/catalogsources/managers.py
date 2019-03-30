@@ -30,6 +30,7 @@ class ImportManager():
 
         include_all_fields = not game_id or update_fields_filter is None
 
+        # cast is like a NOP outside type checking
         if include_all_fields or "name" in cast(List[str], update_fields_filter):
             game.name = clean_game_name(name)
         if include_all_fields or "publish_date" in cast(List[str], update_fields_filter):
@@ -79,6 +80,7 @@ class ImportManager():
 
         include_all_fields = not platform_id or update_fields_filter is None
 
+        # cast is like a NOP outside type checking
         if include_all_fields or "name" in cast(List[str], update_fields_filter):
             platform.name = name
         if include_all_fields or "shortname" in cast(List[str], update_fields_filter):

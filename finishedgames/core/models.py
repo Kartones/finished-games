@@ -49,7 +49,7 @@ class Game(BaseGame):
 
     @property
     def platforms_list(self) -> str:
-        return ", ".join([platform.shortname for platform in self.platforms.all()])
+        return ", ".join((platform.shortname for platform in self.platforms.all()))
 
     @property
     def urls_dict(self) -> Dict[str, str]:
@@ -67,7 +67,7 @@ class Game(BaseGame):
         _urls_dict[display_name] = url
 
         self.urls = URLS_ITEMS_GLUE.join(
-            ["{}{}{}".format(key, URLS_KEY_VALUE_GLUE, _urls_dict[key]) for key in _urls_dict.keys()]
+            ("{}{}{}".format(key, URLS_KEY_VALUE_GLUE, _urls_dict[key]) for key in _urls_dict.keys())
         )
 
     def __str__(self) -> str:
@@ -110,7 +110,7 @@ class UserGame(BaseUserGame):
                 "platform": "'{}'  not available in platform '{}'. Available platforms: '{}'".format(
                     self.game.name,
                     self.platform.name,
-                    "','".join([platform.name for platform in game_platforms])
+                    "','".join((platform.name for platform in game_platforms))
                     )
                 })
 
@@ -127,7 +127,7 @@ class WishlistedUserGame(BaseUserGame):
                 "platform": "'{}'  not available in platform '{}'. Available platforms: '{}'".format(
                     self.game.name,
                     self.platform.name,
-                    "','".join([platform.name for platform in game_platforms])
+                    "','".join((platform.name for platform in game_platforms))
                     )
                 })
 
