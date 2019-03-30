@@ -61,3 +61,55 @@ class HiddenByDefaultFilter(admin.SimpleListFilter):
             return queryset.filter(hidden=False)
         elif self.value() == "True":
             return queryset.filter(hidden=True)
+
+
+class NotImportedFetchedGames(admin.SimpleListFilter):
+    title = "Not imported"
+    parameter_name = "fg_game"
+
+    def lookups(self, request: HttpRequest, model_admin: admin.ModelAdmin) -> Tuple:
+        return (
+            (None, _("All")),
+            ("True", _("True")),
+            ("False", _("False")),
+        )
+
+    def choices(self, changelist: ChangeList) -> Generator:
+        for lookup, title in self.lookup_choices:
+            yield {
+                "selected": self.value() == lookup,
+                "query_string": changelist.get_query_string({self.parameter_name: lookup}, []),
+                "display": title,
+            }
+
+    def queryset(self, request: HttpRequest, queryset: QuerySet) -> QuerySet:
+        if self.value() == "True":
+            return queryset.filter(fg_game__isnull=True)
+        elif self.value() == "False":
+            return queryset.filter(fg_game__isnull=False)
+
+
+class NotImportedFetchedPlatforms(admin.SimpleListFilter):
+    title = "Not imported"
+    parameter_name = "fg_platform"
+
+    def lookups(self, request: HttpRequest, model_admin: admin.ModelAdmin) -> Tuple:
+        return (
+            (None, _("All")),
+            ("True", _("True")),
+            ("False", _("False")),
+        )
+
+    def choices(self, changelist: ChangeList) -> Generator:
+        for lookup, title in self.lookup_choices:
+            yield {
+                "selected": self.value() == lookup,
+                "query_string": changelist.get_query_string({self.parameter_name: lookup}, []),
+                "display": title,
+            }
+
+    def queryset(self, request: HttpRequest, queryset: QuerySet) -> QuerySet:
+        if self.value() == "True":
+            return queryset.filter(fg_platform__isnull=True)
+        elif self.value() == "False":
+            return queryset.filter(fg_platform__isnull=False)

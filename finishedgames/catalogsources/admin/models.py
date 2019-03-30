@@ -11,7 +11,8 @@ from django.urls import (path, reverse)
 
 from catalogsources.admin.actions import (hide_fetched_items, import_fetched_items)
 from catalogsources.admin.decorators import (hyperlink_fg_game, hyperlink_fg_platform, hyperlink_source_url)
-from catalogsources.admin.filters import (CustomPlatformsFilter, HiddenByDefaultFilter)
+from catalogsources.admin.filters import (
+    CustomPlatformsFilter, HiddenByDefaultFilter, NotImportedFetchedGames, NotImportedFetchedPlatforms)
 from catalogsources.apps import CatalogSourcesConfig
 from catalogsources.managers import (GameImportSaveError, ImportManager, PlatformImportSaveError)
 from catalogsources.models import (FetchedGame, FetchedPlatform)
@@ -22,10 +23,13 @@ from finishedgames import constants
 
 class FetchedGameAdmin(FGModelAdmin):
     list_display = [
-        "name", "dlc_or_expansion", "fg_game", hyperlink_fg_game, hyperlink_source_url, "last_modified_date",
-        "source_id", "hidden"
+        "name", hyperlink_fg_game, "platforms_list", "dlc_or_expansion", hyperlink_source_url,
+        "last_modified_date", "source_id", "hidden"
     ]
-    list_filter = ["last_modified_date", HiddenByDefaultFilter, "source_id", CustomPlatformsFilter, "dlc_or_expansion"]
+    list_filter = [
+        "last_modified_date", HiddenByDefaultFilter, NotImportedFetchedGames, "source_id", CustomPlatformsFilter,
+        "dlc_or_expansion"
+    ]
     search_fields = ["name"]
     readonly_fields = ["last_modified_date", "change_hash"]
     ordering = ["-last_modified_date", "source_id", "name"]
@@ -252,9 +256,9 @@ class FetchedGameAdmin(FGModelAdmin):
 
 class FetchedPlatformAdmin(FGModelAdmin):
     list_display = [
-        "name", "fg_platform", hyperlink_fg_platform, hyperlink_source_url, "last_modified_date", "source_id", "hidden"
+        "name", hyperlink_fg_platform, hyperlink_source_url, "last_modified_date", "source_id", "hidden"
     ]
-    list_filter = ["last_modified_date", HiddenByDefaultFilter, "source_id"]
+    list_filter = ["last_modified_date", HiddenByDefaultFilter, NotImportedFetchedPlatforms, "source_id"]
     search_fields = ["name"]
     readonly_fields = ["last_modified_date", "change_hash"]
     ordering = ["-last_modified_date", "source_id", "name"]

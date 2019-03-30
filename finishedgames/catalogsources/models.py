@@ -23,6 +23,10 @@ class FetchedGame(BaseGame):
     platforms = models.ManyToManyField("FetchedPlatform")
     parent_game = models.ForeignKey("FetchedGame", on_delete=models.CASCADE, null=True, default=None, blank=True)
 
+    @property
+    def platforms_list(self) -> str:
+        return ", ".join((platform.shortname for platform in self.platforms.all()))
+
     def save(self, *args: Any, **kwargs: Any) -> None:
         new_changes_hash = self._get_changes_hash()
         if new_changes_hash != self.change_hash:
