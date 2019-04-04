@@ -1,9 +1,8 @@
-# pytest-django is currently incompatible with pytest 4.2
-# see: https://github.com/pytest-dev/pytest-django/issues/698
-pytest==4.1.1
+pytest
 flake8
-mypy
+mypy>=0.7
 django-debug-toolbar
-pytest-django
+# Older versions were incompatible with pytest 4.2
+pytest-django>=3.4.8
 coverage
 pytest-cov

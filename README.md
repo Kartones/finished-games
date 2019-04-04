@@ -52,7 +52,9 @@ The Docker Python image is already compatible with variable type hints (>= 3.6),
 
 ## Setup
 
-This project requires `Python >= 3.5`, `Docker` and `Docker Compose` to be built (only Python to run). Python package requirements are specified in the corresponding `requirements.txt` and `requirements-dev.txt` files. These packages are installed inside the containers in development and testing.
+This project requires `Docker` and `Docker Compose` to be built (only Python to run). Python required version is minimum `3.5`, but the Docker container is built with `3.7`. Django version is `2.2` so anyway you need Python >= 3.5.
+
+Python package requirements are specified in the corresponding `requirements.txt` and `requirements-dev.txt` files. These packages are installed inside the containers in development and testing.
 
 Most requirements are not version-pinned on purpose, if a build fails due to some new version breaking change it will be triaged and updated accordingly.
 
