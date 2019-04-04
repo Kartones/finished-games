@@ -1,11 +1,11 @@
 import json
-import time
+from time import time
 
-from typing import (Dict, Tuple)
+from typing import (Any, Dict, Tuple)
 
 
 def check_rate_limit(
-    max_tokens: int, time_window: int, token_bucket: float, last_check_timestamp: float
+    max_tokens: int, time_window: int, token_bucket: float, last_check_timestamp: float, time: Any = time
 ) -> Tuple[float, float, bool]:
     """
     Token bucket algorithm implementation as rate limit.
@@ -26,7 +26,7 @@ def check_rate_limit(
     """
     max_tokens_float = float(max_tokens)
 
-    current_timestamp = time.time()
+    current_timestamp = time()
     time_passed = current_timestamp - last_check_timestamp
 
     # 1st call will generate a huge tokens increment, and waiting long would also create many tokens
@@ -46,12 +46,12 @@ def check_rate_limit(
 
 
 def platforms_json_fetch_to_file(json_data: Dict, source_id: str, offset: int) -> None:
-    filename = "platforms_{}_{}_{}.json".format(source_id, offset, int(time.time()))
+    filename = "platforms_{}_{}_{}.json".format(source_id, offset, int(time()))
     with open(filename, "w") as file:
         file.write(json.dumps(json_data, indent=2))
 
 
 def games_json_fetch_to_file(json_data: Dict, source_id: str, platform_id: int, offset: int) -> None:
-    filename = "games_{}_{}_{}_{}.json".format(source_id, platform_id, offset, int(time.time()))
+    filename = "games_{}_{}_{}_{}.json".format(source_id, platform_id, offset, int(time()))
     with open(filename, "w") as file:
         file.write(json.dumps(json_data, indent=2))
