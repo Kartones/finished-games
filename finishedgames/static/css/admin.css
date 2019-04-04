@@ -6,3 +6,8 @@
 .submit-row input.default {
     float: none;
 }
+
+span.warning {
+    padding-left: 16px;
+    background: url(../img/icon-alert.svg) 0 0px no-repeat;
+}
