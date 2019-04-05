@@ -1,6 +1,6 @@
 from typing import (cast, List, Optional)
 
-from catalogsources.management.helpers import clean_game_name
+from catalogsources.helpers import clean_string_field
 from catalogsources.models import (FetchedGame, FetchedPlatform)
 from core.models import (Game, Platform)
 
@@ -32,7 +32,7 @@ class ImportManager():
 
         # cast is like a NOP outside type checking
         if include_all_fields or "name" in cast(List[str], update_fields_filter):
-            game.name = clean_game_name(name)
+            game.name = clean_string_field(name)
         if include_all_fields or "publish_date" in cast(List[str], update_fields_filter):
             game.publish_date = publish_date_string
         if include_all_fields or "dlc_or_expansion" in cast(List[str], update_fields_filter):
@@ -82,9 +82,9 @@ class ImportManager():
 
         # cast is like a NOP outside type checking
         if include_all_fields or "name" in cast(List[str], update_fields_filter):
-            platform.name = name
+            platform.name = clean_string_field(name)
         if include_all_fields or "shortname" in cast(List[str], update_fields_filter):
-            platform.shortname = shortname
+            platform.shortname = clean_string_field(shortname)
         if include_all_fields or "publish_date" in cast(List[str], update_fields_filter):
             platform.publish_date = publish_date_string
 

@@ -3,7 +3,7 @@ from typing import (Any, Dict, List, Union)
 from django.core.management.base import (BaseCommand, CommandParser)
 from django.db.utils import IntegrityError
 
-from catalogsources.management.helpers import clean_game_name
+from catalogsources.helpers import clean_string_field
 from catalogsources.models import FetchedGame
 from core.models import Game
 
@@ -22,7 +22,7 @@ class Command(BaseCommand):
         count = 0
         self.stdout.write(self.style.WARNING("> Going to sanitize {} {}".format(len(games), model_name)))
         for game in games:
-            game.name = clean_game_name(game.name)
+            game.name = clean_string_field(game.name)
             try:
                 game.save()
             except IntegrityError as error:

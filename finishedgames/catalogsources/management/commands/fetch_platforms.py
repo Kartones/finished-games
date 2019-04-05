@@ -2,6 +2,7 @@ from typing import (Any, Dict, List)
 
 from django.core.management.base import (BaseCommand, CommandParser)
 
+from catalogsources.helpers import clean_string_field
 from catalogsources.management.helpers import (source_class_from_id, TimeProfiler, wait_if_needed)
 from catalogsources.models import FetchedPlatform
 
@@ -49,6 +50,9 @@ class Command(BaseCommand):
 
         for platform in results:
             self.stdout.write("{}:".format(platform.source_platform_id), ending="")
+
+            platform.name = clean_string_field(platform.name)
+            platform.shortname = clean_string_field(platform.shortname)
 
             try:
                 existing_platform = FetchedPlatform.objects.get(
