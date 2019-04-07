@@ -34,130 +34,136 @@
         </button>
     </form>
 
-    {% if item_generic_id in authenticated_user_catalog.games %}
-        <form action="{% url 'user_currently_playing_games' user.get_username %}"
-              onsubmit="sendAction(this, ['{{ constants.FORM_ACTION_PLAYING }}{{ item_generic_id }}']); return false;"
-              id="{{ constants.FORM_ACTION_REMOVE_PLAYING }}{{ item_generic_id }}"
-              style="{% if item_generic_id not in authenticated_user_catalog.currently_playing %}display:none{% endif %}">
-            {% csrf_token %}
-            <input type="hidden" name="_method" value="{{ constants.FORM_METHOD_DELETE }}" />
-            <input type="hidden" name="user" value="{{ user.id }}" />
-            <input type="hidden" name="game" value="{{ game_id }}" />
-            <input type="hidden" name="platform" value="{{ platform_id }}" />
-            {% if viewed_user and viewed_user != user %}
-                <input type="hidden" name="viewed_username" value="{{ viewed_user.get_username }}" />
-            {% endif %}
-            <button class="nes-btn is-primary" type="submit" title="Remove from currently playing">
-                <i class="nes-pixel-art snes-jp-logo is-empty" title="Remove from currently playing"></i>
-            </button>
-        </form>
+    <form action="{% url 'user_currently_playing_games' user.get_username %}"
+          onsubmit="sendAction(this, ['{{ constants.FORM_ACTION_PLAYING }}{{ item_generic_id }}']); return false;"
+          id="{{ constants.FORM_ACTION_REMOVE_PLAYING }}{{ item_generic_id }}"
+          style="{% if item_generic_id not in authenticated_user_catalog.games or item_generic_id not in authenticated_user_catalog.currently_playing %}display:none{% endif %}">
+        {% csrf_token %}
+        <input type="hidden" name="_method" value="{{ constants.FORM_METHOD_DELETE }}" />
+        <input type="hidden" name="user" value="{{ user.id }}" />
+        <input type="hidden" name="game" value="{{ game_id }}" />
+        <input type="hidden" name="platform" value="{{ platform_id }}" />
+        {% if viewed_user and viewed_user != user %}
+            <input type="hidden" name="viewed_username" value="{{ viewed_user.get_username }}" />
+        {% endif %}
+        <button class="nes-btn is-primary" type="submit" title="Remove from currently playing">
+            <i class="nes-pixel-art snes-jp-logo is-empty" title="Remove from currently playing"></i>
+        </button>
+    </form>
 
-        <form action="{% url 'user_currently_playing_games' user.get_username %}"
-              onsubmit="sendAction(this, ['{{ constants.FORM_ACTION_REMOVE_PLAYING }}{{ item_generic_id }}', '{{ constants.FORM_ACTION_NOT_OWNED }}{{ item_generic_id }}'], ['{{ constants.FORM_ACTION_REMOVE_NOT_OWNED }}{{ item_generic_id }}']); return false;"
-              id="{{ constants.FORM_ACTION_PLAYING }}{{ item_generic_id }}"
-              style="{% if item_generic_id in authenticated_user_catalog.currently_playing %}display:none{% endif %}">
-            {% csrf_token %}
-            <input type="hidden" name="user" value="{{ user.id }}" />
-            <input type="hidden" name="game" value="{{ game_id }}" />
-            <input type="hidden" name="platform" value="{{ platform_id }}" />
-            {% if viewed_user and viewed_user != user %}
-                <input type="hidden" name="viewed_username" value="{{ viewed_user.get_username }}" />
-            {% endif %}
-            <button class="nes-btn" type="submit" title="Mark as currently playing">
-                <i class="nes-pixel-art snes-jp-logo" title="Mark as currently playing"></i>
-            </button>
-        </form>
+    <form action="{% url 'user_currently_playing_games' user.get_username %}"
+          onsubmit="sendAction(this, ['{{ constants.FORM_ACTION_REMOVE_PLAYING }}{{ item_generic_id }}', '{{ constants.FORM_ACTION_NOT_OWNED }}{{ item_generic_id }}'], ['{{ constants.FORM_ACTION_REMOVE_NOT_OWNED }}{{ item_generic_id }}']); return false;"
+          id="{{ constants.FORM_ACTION_PLAYING }}{{ item_generic_id }}"
+          style="{% if item_generic_id not in authenticated_user_catalog.games or item_generic_id in authenticated_user_catalog.currently_playing %}display:none{% endif %}">
+        {% csrf_token %}
+        <input type="hidden" name="user" value="{{ user.id }}" />
+        <input type="hidden" name="game" value="{{ game_id }}" />
+        <input type="hidden" name="platform" value="{{ platform_id }}" />
+        {% if viewed_user and viewed_user != user %}
+            <input type="hidden" name="viewed_username" value="{{ viewed_user.get_username }}" />
+        {% endif %}
+        <button class="nes-btn" type="submit" title="Mark as currently playing">
+            <i class="nes-pixel-art snes-jp-logo" title="Mark as currently playing"></i>
+        </button>
+    </form>
 
-        <form action="{% url 'user_finished_games' user.get_username %}"
-              onsubmit="sendAction(this, ['{{ constants.FORM_ACTION_FINISHED }}{{ item_generic_id }}']); return false;"
-              id="{{ constants.FORM_ACTION_REMOVE_FINISHED }}{{ item_generic_id }}"
-              style="{% if item_generic_id not in authenticated_user_catalog.finished %}display:none{% endif %}">
-            {% csrf_token %}
-            <input type="hidden" name="_method" value="{{ constants.FORM_METHOD_DELETE }}" />
-            <input type="hidden" name="user" value="{{ user.id }}" />
-            <input type="hidden" name="game" value="{{ game_id }}" />
-            <input type="hidden" name="platform" value="{{ platform_id }}" />
-            {% if viewed_user and viewed_user != user %}
-                <input type="hidden" name="viewed_username" value="{{ viewed_user.get_username }}" />
-            {% endif %}
-            <button class="nes-btn is-primary" type="submit" title="Remove from finished games">
-                <i class="nes-icon trophy is-empty" title="Remove from finished games"></i>
-            </button>
-        </form>
+    <form action="{% url 'user_finished_games' user.get_username %}"
+          onsubmit="sendAction(this, ['{{ constants.FORM_ACTION_FINISHED }}{{ item_generic_id }}']); return false;"
+          id="{{ constants.FORM_ACTION_REMOVE_FINISHED }}{{ item_generic_id }}"
+          style="{% if item_generic_id not in authenticated_user_catalog.games or item_generic_id not in authenticated_user_catalog.finished %}display:none{% endif %}">
+        {% csrf_token %}
+        <input type="hidden" name="_method" value="{{ constants.FORM_METHOD_DELETE }}" />
+        <input type="hidden" name="user" value="{{ user.id }}" />
+        <input type="hidden" name="game" value="{{ game_id }}" />
+        <input type="hidden" name="platform" value="{{ platform_id }}" />
+        {% if viewed_user and viewed_user != user %}
+            <input type="hidden" name="viewed_username" value="{{ viewed_user.get_username }}" />
+        {% endif %}
+        <button class="nes-btn is-primary" type="submit" title="Remove from finished games">
+            <i class="nes-icon trophy is-empty" title="Remove from finished games"></i>
+        </button>
+    </form>
 
-        <form action="{% url 'user_finished_games' user.get_username %}"
-              onsubmit="sendAction(this, ['{{ constants.FORM_ACTION_REMOVE_FINISHED }}{{ item_generic_id }}']); return false;"
-              id="{{ constants.FORM_ACTION_FINISHED }}{{ item_generic_id }}"
-              style="{% if item_generic_id in authenticated_user_catalog.finished %}display:none{% endif %}">
-            {% csrf_token %}
-            <input type="hidden" name="user" value="{{ user.id }}" />
-            <input type="hidden" name="game" value="{{ game_id }}" />
-            <input type="hidden" name="platform" value="{{ platform_id }}" />
-            {% if viewed_user and viewed_user != user %}
-                <input type="hidden" name="viewed_username" value="{{ viewed_user.get_username }}" />
-            {% endif %}
-            <button class="nes-btn" type="submit" title="Mark as finished game">
-                <i class="nes-icon trophy" title="Mark as finished game"></i>
-            </button>
-        </form>
+    <form action="{% url 'user_finished_games' user.get_username %}"
+            onsubmit="sendAction(this, ['{{ constants.FORM_ACTION_REMOVE_FINISHED }}{{ item_generic_id }}']); return false;"
+            id="{{ constants.FORM_ACTION_FINISHED }}{{ item_generic_id }}"
+            style="{% if item_generic_id not in authenticated_user_catalog.games or item_generic_id in authenticated_user_catalog.finished %}display:none{% endif %}">
+        {% csrf_token %}
+        <input type="hidden" name="user" value="{{ user.id }}" />
+        <input type="hidden" name="game" value="{{ game_id }}" />
+        <input type="hidden" name="platform" value="{{ platform_id }}" />
+        {% if viewed_user and viewed_user != user %}
+            <input type="hidden" name="viewed_username" value="{{ viewed_user.get_username }}" />
+        {% endif %}
+        <button class="nes-btn" type="submit" title="Mark as finished game">
+            <i class="nes-icon trophy" title="Mark as finished game"></i>
+        </button>
+    </form>
 
-        <form action="{% url 'user_no_longer_owned_games' user.get_username %}"
-              onsubmit="sendAction(this, ['{{ constants.FORM_ACTION_NOT_OWNED }}{{ item_generic_id }}']); return false;"
-              id="{{ constants.FORM_ACTION_REMOVE_NOT_OWNED }}{{ item_generic_id }}"
-              style="{% if item_generic_id not in authenticated_user_catalog.not_owned %}display:none{% endif %}">
-                {% csrf_token %}
-            <input type="hidden" name="_method" value="{{ constants.FORM_METHOD_DELETE }}" />
-            <input type="hidden" name="user" value="{{ user.id }}" />
-            <input type="hidden" name="game" value="{{ game_id }}" />
-            <input type="hidden" name="platform" value="{{ platform_id }}" />
-            {% if viewed_user and viewed_user != user %}
-                <input type="hidden" name="viewed_username" value="{{ viewed_user.get_username }}" />
-            {% endif %}
-            <button class="nes-btn is-primary" type="submit" title="Remove no longer owned mark">
-                <i class="nes-pixel-art snes-jp-logo is-disabled" title="Remove no longer owned mark"></i>
-            </button>
-        </form>
-
-        <form action="{% url 'user_no_longer_owned_games' user.get_username %}"
-              onsubmit="sendAction(this, ['{{ constants.FORM_ACTION_REMOVE_NOT_OWNED }}{{ item_generic_id }}', '{{ constants.FORM_ACTION_PLAYING }}{{ item_generic_id }}'], ['{{ constants.FORM_ACTION_REMOVE_PLAYING }}{{ item_generic_id }}']); return false;"
-              id="{{ constants.FORM_ACTION_NOT_OWNED }}{{ item_generic_id }}"
-              style="{% if item_generic_id in authenticated_user_catalog.not_owned %}display:none{% endif %}">
+    <form action="{% url 'user_no_longer_owned_games' user.get_username %}"
+            onsubmit="sendAction(this, ['{{ constants.FORM_ACTION_NOT_OWNED }}{{ item_generic_id }}']); return false;"
+            id="{{ constants.FORM_ACTION_REMOVE_NOT_OWNED }}{{ item_generic_id }}"
+            style="{% if item_generic_id not in authenticated_user_catalog.games or item_generic_id not in authenticated_user_catalog.not_owned %}display:none{% endif %}">
             {% csrf_token %}
-            <input type="hidden" name="user" value="{{ user.id }}" />
-            <input type="hidden" name="game" value="{{ game_id }}" />
-            <input type="hidden" name="platform" value="{{ platform_id }}" />
-            {% if viewed_user and viewed_user != user %}
-                <input type="hidden" name="viewed_username" value="{{ viewed_user.get_username }}" />
-            {% endif %}
-            <button class="nes-btn" type="submit" title="Mark as no longer owned">
-                <i class="nes-pixel-art snes-jp-logo is-disabled" title="Mark as no longer owned"></i>
-            </button>
-        </form>
+        <input type="hidden" name="_method" value="{{ constants.FORM_METHOD_DELETE }}" />
+        <input type="hidden" name="user" value="{{ user.id }}" />
+        <input type="hidden" name="game" value="{{ game_id }}" />
+        <input type="hidden" name="platform" value="{{ platform_id }}" />
+        {% if viewed_user and viewed_user != user %}
+            <input type="hidden" name="viewed_username" value="{{ viewed_user.get_username }}" />
+        {% endif %}
+        <button class="nes-btn is-primary" type="submit" title="Remove no longer owned mark">
+            <i class="nes-pixel-art snes-jp-logo is-disabled" title="Remove no longer owned mark"></i>
+        </button>
+    </form>
 
+    <form action="{% url 'user_no_longer_owned_games' user.get_username %}"
+            onsubmit="sendAction(this, ['{{ constants.FORM_ACTION_REMOVE_NOT_OWNED }}{{ item_generic_id }}', '{{ constants.FORM_ACTION_PLAYING }}{{ item_generic_id }}'], ['{{ constants.FORM_ACTION_REMOVE_PLAYING }}{{ item_generic_id }}']); return false;"
+            id="{{ constants.FORM_ACTION_NOT_OWNED }}{{ item_generic_id }}"
+            style="{% if item_generic_id not in authenticated_user_catalog.games or item_generic_id in authenticated_user_catalog.not_owned %}display:none{% endif %}">
+        {% csrf_token %}
+        <input type="hidden" name="user" value="{{ user.id }}" />
+        <input type="hidden" name="game" value="{{ game_id }}" />
+        <input type="hidden" name="platform" value="{{ platform_id }}" />
+        {% if viewed_user and viewed_user != user %}
+            <input type="hidden" name="viewed_username" value="{{ viewed_user.get_username }}" />
+        {% endif %}
+        <button class="nes-btn" type="submit" title="Mark as no longer owned">
+            <i class="nes-pixel-art snes-jp-logo is-disabled" title="Mark as no longer owned"></i>
+        </button>
+    </form>
 
-        <form action="{% url 'user_games' user.get_username %}" method="post">
+    <form action="{% url 'user_games' user.get_username %}"
+          onsubmit="sendAction(this, ['{{ constants.FROM_ACTION_ADD_TO_CATALOG }}{{ item_generic_id }}', '{{ constants.FORM_ACTION_WISHLIST }}{{ item_generic_id }}'], ['{{ constants.FORM_ACTION_PLAYING }}{{ item_generic_id }}', '{{ constants.FORM_ACTION_REMOVE_PLAYING }}{{ item_generic_id }}', '{{ constants.FORM_ACTION_FINISHED }}{{ item_generic_id }}', '{{ constants.FORM_ACTION_REMOVE_FINISHED }}{{ item_generic_id }}', '{{ constants.FORM_ACTION_NOT_OWNED }}{{ item_generic_id }}', '{{ constants.FORM_ACTION_REMOVE_NOT_OWNED }}{{ item_generic_id }}']); return false;"
+          id="{{ constants.FROM_ACTION_REMOVE_FROM_CATALOG }}{{ item_generic_id }}"
+          style="{% if item_generic_id not in authenticated_user_catalog.games %}display:none{% endif %}">
             {% csrf_token %}
-            <input type="hidden" name="action" value="{{ constants.FORM_METHOD_DELETE }}" />
-            <input type="hidden" name="user" value="{{ user.id }}" />
-            <input type="hidden" name="game" value="{{ game_id }}" />
-            <input type="hidden" name="platform" value="{{ platform_id }}" />
-            {% if viewed_user and viewed_user != user %}
-                <input type="hidden" name="viewed_username" value="{{ viewed_user.get_username }}" />
-            {% endif %}
-            <input type="hidden" name="next" value="{{ next_url }}" />
-            <button class="nes-btn is-error" type="submit" title="Remove from your catalog"><i class="nes-icon star is-empty" title="Remove from your catalog"></i></button>
-        </form>
-    {% else %}
-        <form action="{% url 'user_games' user.get_username %}" method="post">
-            {% csrf_token %}
-            <input type="hidden" name="user" value="{{ user.id }}" />
-            <input type="hidden" name="game" value="{{ game_id }}" />
-            <input type="hidden" name="platform" value="{{ platform_id }}" />
-            {% if viewed_user and viewed_user != user %}
-                <input type="hidden" name="viewed_username" value="{{ viewed_user.get_username }}" />
-            {% endif %}
-            <input type="hidden" name="next" value="{{ next_url }}" />
-            <button class="nes-btn" type="submit" title="Add to your catalog"><i class="nes-icon star" title="Add to your catalog"></i></button>
-        </form>
-    {% endif %}
+        <input type="hidden" name="_method" value="{{ constants.FORM_METHOD_DELETE }}" />
+        <input type="hidden" name="user" value="{{ user.id }}" />
+        <input type="hidden" name="game" value="{{ game_id }}" />
+        <input type="hidden" name="platform" value="{{ platform_id }}" />
+        {% if viewed_user and viewed_user != user %}
+            <input type="hidden" name="viewed_username" value="{{ viewed_user.get_username }}" />
+        {% endif %}
+        <button class="nes-btn is-error" type="submit" title="Remove from your catalog">
+            <i class="nes-icon star is-empty" title="Remove from your catalog"></i>
+        </button>
+    </form>
+
+    <form action="{% url 'user_games' user.get_username %}"
+          onsubmit="sendAction(this, ['{{ constants.FROM_ACTION_REMOVE_FROM_CATALOG }}{{ item_generic_id }}', '{{ constants.FORM_ACTION_PLAYING }}{{ item_generic_id }}', '{{ constants.FORM_ACTION_FINISHED }}{{ item_generic_id }}', '{{ constants.FORM_ACTION_NOT_OWNED }}{{ item_generic_id }}'], ['{{ constants.FORM_ACTION_REMOVE_NOT_OWNED }}{{ item_generic_id }}', '{{ constants.FORM_ACTION_REMOVE_WISHLIST }}{{ item_generic_id }}', '{{ constants.FORM_ACTION_WISHLIST }}{{ item_generic_id }}']); return false;"
+          id="{{ constants.FROM_ACTION_ADD_TO_CATALOG }}{{ item_generic_id }}"
+          style="{% if item_generic_id in authenticated_user_catalog.games %}display:none{% endif %}">
+        {% csrf_token %}
+        <input type="hidden" name="user" value="{{ user.id }}" />
+        <input type="hidden" name="game" value="{{ game_id }}" />
+        <input type="hidden" name="platform" value="{{ platform_id }}" />
+        {% if viewed_user and viewed_user != user %}
+            <input type="hidden" name="viewed_username" value="{{ viewed_user.get_username }}" />
+        {% endif %}
+        <button class="nes-btn" type="submit" title="Add to your catalog">
+            <i class="nes-icon star" title="Add to your catalog"></i>
+        </button>
+    </form>
+
 </td>

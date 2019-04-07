@@ -14,9 +14,7 @@ function sendAction(form, actionsToDisplayDivIds, actionsToHideDivIds = []) {
                 div = document.getElementById(divId);
                 div.style.display = "block";
             }
-            console.log(actionsToHideDivIds);
             for (let divId of actionsToHideDivIds) {
-                console.log(divId);
                 div = document.getElementById(divId);
                 div.style.display = "none";
             }
