@@ -10,9 +10,6 @@
         <input type="hidden" name="user" value="{{ user.id }}" />
         <input type="hidden" name="game" value="{{ game_id }}" />
         <input type="hidden" name="platform" value="{{ platform_id }}" />
-        {% if viewed_user and viewed_user != user %}
-            <input type="hidden" name="viewed_username" value="{{ viewed_user.get_username }}" />
-        {% endif %}
         <button class="nes-btn is-error" title="Remove from your wishlist" type="submit">
             <i class="nes-icon heart is-empty" title="Remove from your wishlist"></i>
         </button>
@@ -26,9 +23,6 @@
         <input type="hidden" name="user" value="{{ user.id }}" />
         <input type="hidden" name="game" value="{{ game_id }}" />
         <input type="hidden" name="platform" value="{{ platform_id }}" />
-        {% if viewed_user and viewed_user != user %}
-            <input type="hidden" name="viewed_username" value="{{ viewed_user.get_username }}" />
-        {% endif %}
         <button class="nes-btn" title="Add to your wishlist" type="submit">
             <i class="nes-icon heart" title="Add to your wishlist"></i>
         </button>
@@ -43,9 +37,6 @@
         <input type="hidden" name="user" value="{{ user.id }}" />
         <input type="hidden" name="game" value="{{ game_id }}" />
         <input type="hidden" name="platform" value="{{ platform_id }}" />
-        {% if viewed_user and viewed_user != user %}
-            <input type="hidden" name="viewed_username" value="{{ viewed_user.get_username }}" />
-        {% endif %}
         <button class="nes-btn is-primary" type="submit" title="Remove from currently playing">
             <i class="nes-pixel-art snes-jp-logo is-empty" title="Remove from currently playing"></i>
         </button>
@@ -59,9 +50,6 @@
         <input type="hidden" name="user" value="{{ user.id }}" />
         <input type="hidden" name="game" value="{{ game_id }}" />
         <input type="hidden" name="platform" value="{{ platform_id }}" />
-        {% if viewed_user and viewed_user != user %}
-            <input type="hidden" name="viewed_username" value="{{ viewed_user.get_username }}" />
-        {% endif %}
         <button class="nes-btn" type="submit" title="Mark as currently playing">
             <i class="nes-pixel-art snes-jp-logo" title="Mark as currently playing"></i>
         </button>
@@ -76,9 +64,6 @@
         <input type="hidden" name="user" value="{{ user.id }}" />
         <input type="hidden" name="game" value="{{ game_id }}" />
         <input type="hidden" name="platform" value="{{ platform_id }}" />
-        {% if viewed_user and viewed_user != user %}
-            <input type="hidden" name="viewed_username" value="{{ viewed_user.get_username }}" />
-        {% endif %}
         <button class="nes-btn is-primary" type="submit" title="Remove from finished games">
             <i class="nes-icon trophy is-empty" title="Remove from finished games"></i>
         </button>
@@ -92,9 +77,6 @@
         <input type="hidden" name="user" value="{{ user.id }}" />
         <input type="hidden" name="game" value="{{ game_id }}" />
         <input type="hidden" name="platform" value="{{ platform_id }}" />
-        {% if viewed_user and viewed_user != user %}
-            <input type="hidden" name="viewed_username" value="{{ viewed_user.get_username }}" />
-        {% endif %}
         <button class="nes-btn" type="submit" title="Mark as finished game">
             <i class="nes-icon trophy" title="Mark as finished game"></i>
         </button>
@@ -109,9 +91,6 @@
         <input type="hidden" name="user" value="{{ user.id }}" />
         <input type="hidden" name="game" value="{{ game_id }}" />
         <input type="hidden" name="platform" value="{{ platform_id }}" />
-        {% if viewed_user and viewed_user != user %}
-            <input type="hidden" name="viewed_username" value="{{ viewed_user.get_username }}" />
-        {% endif %}
         <button class="nes-btn is-primary" type="submit" title="Remove no longer owned mark">
             <i class="nes-pixel-art snes-jp-logo is-disabled" title="Remove no longer owned mark"></i>
         </button>
@@ -125,9 +104,6 @@
         <input type="hidden" name="user" value="{{ user.id }}" />
         <input type="hidden" name="game" value="{{ game_id }}" />
         <input type="hidden" name="platform" value="{{ platform_id }}" />
-        {% if viewed_user and viewed_user != user %}
-            <input type="hidden" name="viewed_username" value="{{ viewed_user.get_username }}" />
-        {% endif %}
         <button class="nes-btn" type="submit" title="Mark as no longer owned">
             <i class="nes-pixel-art snes-jp-logo is-disabled" title="Mark as no longer owned"></i>
         </button>
@@ -142,9 +118,6 @@
         <input type="hidden" name="user" value="{{ user.id }}" />
         <input type="hidden" name="game" value="{{ game_id }}" />
         <input type="hidden" name="platform" value="{{ platform_id }}" />
-        {% if viewed_user and viewed_user != user %}
-            <input type="hidden" name="viewed_username" value="{{ viewed_user.get_username }}" />
-        {% endif %}
         <button class="nes-btn is-error" type="submit" title="Remove from your catalog">
             <i class="nes-icon star is-empty" title="Remove from your catalog"></i>
         </button>
@@ -158,9 +131,6 @@
         <input type="hidden" name="user" value="{{ user.id }}" />
         <input type="hidden" name="game" value="{{ game_id }}" />
         <input type="hidden" name="platform" value="{{ platform_id }}" />
-        {% if viewed_user and viewed_user != user %}
-            <input type="hidden" name="viewed_username" value="{{ viewed_user.get_username }}" />
-        {% endif %}
         <button class="nes-btn" type="submit" title="Add to your catalog">
             <i class="nes-icon star" title="Add to your catalog"></i>
         </button>
