@@ -1,5 +1,5 @@
 
-function sendAction(form, oppositeActiondivId) {
+function sendAction(form, actionsToDisplayDivIds, actionsToHideDivIds = []) {
     const xhr = new XMLHttpRequest();
 
     xhr.timeout = 10000; // ms
@@ -7,9 +7,19 @@ function sendAction(form, oppositeActiondivId) {
     xhr.onabort = errorFeedback;
     xhr.onerror = errorFeedback;
     xhr.onload = () => {
+        let div;
+
         if (xhr.status === 200) {
-            let oppositeActionDiv = document.getElementById(oppositeActiondivId);
-            oppositeActionDiv.style.display = "block";
+            for (let divId of actionsToDisplayDivIds) {
+                div = document.getElementById(divId);
+                div.style.display = "block";
+            }
+            console.log(actionsToHideDivIds);
+            for (let divId of actionsToHideDivIds) {
+                console.log(divId);
+                div = document.getElementById(divId);
+                div.style.display = "none";
+            }
             form.style.display = "none";
             successFeedback();
         } else {

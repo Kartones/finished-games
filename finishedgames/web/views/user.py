@@ -209,7 +209,7 @@ class NoLongerOwnedGamesView(View):
         if username != request.user.get_username() or request.method != "POST":
             raise Http404("Invalid URL")
 
-        if request.POST.get("action") == constants.FORM_METHOD_DELETE:
+        if request.POST.get("_method") == constants.FORM_METHOD_DELETE:
             CatalogManager.unmark_game_from_no_longer_owned(
                 user=request.user, game_id=int(request.POST["game"]), platform_id=int(request.POST["platform"])
             )
@@ -218,9 +218,7 @@ class NoLongerOwnedGamesView(View):
                 user=request.user, game_id=int(request.POST["game"]), platform_id=int(request.POST["platform"])
             )
 
-        redirect_location = request.POST.get("next", "user_games")
-        redirect_username = request.POST.get("viewed_username", username)
-        return redirect(redirect_location, username=redirect_username)
+        return HttpResponse()
 
 
 class GamesView(View):
