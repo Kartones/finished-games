@@ -6,7 +6,7 @@ from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.db.models.functions import Lower
 from django.http import (Http404, HttpResponse, HttpRequest)
-from django.shortcuts import (get_object_or_404, render)
+from django.shortcuts import (get_object_or_404, redirect, render)
 from django.utils.decorators import method_decorator
 from django.views import View
 from typing import (Any, Callable, Dict)  # NOQA: F401
