@@ -11,14 +11,18 @@ function sendAction(form, oppositeActiondivId) {
             let oppositeActionDiv = document.getElementById(oppositeActiondivId);
             oppositeActionDiv.style.display = "block";
             form.style.display = "none";
+            successFeedback();
         } else {
             errorFeedback();
         }
-
     };
 
     xhr.open("POST", form.action);
     xhr.send(new FormData(form));
+}
+
+function successFeedback() {
+
 }
 
 function errorFeedback() {
