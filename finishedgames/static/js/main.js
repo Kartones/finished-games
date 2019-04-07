@@ -1,6 +1,5 @@
 
-function sendAction(divId, oppositeActiondivId) {
-    const form = document.querySelector("#" + divId + " form");
+function sendAction(form, oppositeActiondivId) {
     const xhr = new XMLHttpRequest();
 
     xhr.timeout = 10000; // ms
@@ -11,7 +10,7 @@ function sendAction(divId, oppositeActiondivId) {
         if (xhr.status === 200) {
             let oppositeActionDiv = document.getElementById(oppositeActiondivId);
             oppositeActionDiv.style.display = "block";
-            document.getElementById(divId).style.display = "none";
+            form.style.display = "none";
         } else {
             errorFeedback();
         }

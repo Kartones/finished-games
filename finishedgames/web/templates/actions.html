@@ -1,30 +1,38 @@
 <td class="is-centered actions">
     <a name="{{ item_generic_id }}"></a>
-    <div id="{{ constants.FORM_ACTION_REMOVE_WISHLIST }}{{ item_generic_id }}" style="{% if item_generic_id not in authenticated_user_catalog.wishlisted %}display:none{% endif %}">
-        <form action="{% url 'user_wishlisted_games' user.get_username %}">
-            {% csrf_token %}
-            <input type="hidden" name="_method" value="{{ constants.FORM_METHOD_DELETE }}" />
-            <input type="hidden" name="user" value="{{ user.id }}" />
-            <input type="hidden" name="game" value="{{ game_id }}" />
-            <input type="hidden" name="platform" value="{{ platform_id }}" />
-            {% if viewed_user and viewed_user != user %}
-                <input type="hidden" name="viewed_username" value="{{ viewed_user.get_username }}" />
-            {% endif %}
-        </form>
-        <button class="nes-btn is-error" title="Remove from your wishlist" onclick="sendAction('rm_wishlist_{{ item_generic_id }}', 'wishlist_{{ item_generic_id }}')"><i class="nes-icon heart is-empty" title="Remove from your wishlist"></i></button>
-    </div>
-    <div id="{{ constants.FORM_ACTION_WISHLIST }}{{ item_generic_id }}" style="{% if item_generic_id in authenticated_user_catalog.games or item_generic_id in authenticated_user_catalog.wishlisted %}display:none{% endif %}">
-        <form action="{% url 'user_wishlisted_games' user.get_username %}">
-            {% csrf_token %}
-            <input type="hidden" name="user" value="{{ user.id }}" />
-            <input type="hidden" name="game" value="{{ game_id }}" />
-            <input type="hidden" name="platform" value="{{ platform_id }}" />
-            {% if viewed_user and viewed_user != user %}
-                <input type="hidden" name="viewed_username" value="{{ viewed_user.get_username }}" />
-            {% endif %}
-        </form>
-        <button class="nes-btn" title="Add to your wishlist" onclick="sendAction('wishlist_{{ item_generic_id }}', 'rm_wishlist_{{ item_generic_id }}')"><i class="nes-icon heart" title="Add to your wishlist"></i></button>
-    </div>
+
+    <form action="{% url 'user_wishlisted_games' user.get_username %}"
+          onsubmit="sendAction(this, '{{ constants.FORM_ACTION_WISHLIST }}{{ item_generic_id }}'); return false;"
+          id="{{ constants.FORM_ACTION_REMOVE_WISHLIST }}{{ item_generic_id }}"
+          style="{% if item_generic_id not in authenticated_user_catalog.wishlisted %}display:none{% endif %}">
+        {% csrf_token %}
+        <input type="hidden" name="_method" value="{{ constants.FORM_METHOD_DELETE }}" />
+        <input type="hidden" name="user" value="{{ user.id }}" />
+        <input type="hidden" name="game" value="{{ game_id }}" />
+        <input type="hidden" name="platform" value="{{ platform_id }}" />
+        {% if viewed_user and viewed_user != user %}
+            <input type="hidden" name="viewed_username" value="{{ viewed_user.get_username }}" />
+        {% endif %}
+        <button class="nes-btn is-error" title="Remove from your wishlist" type="submit">
+            <i class="nes-icon heart is-empty" title="Remove from your wishlist"></i>
+        </button>
+    </form>
+
+    <form action="{% url 'user_wishlisted_games' user.get_username %}"
+          onsubmit="sendAction(this, '{{ constants.FORM_ACTION_REMOVE_WISHLIST }}{{ item_generic_id }}'); return false;"
+          id="{{ constants.FORM_ACTION_WISHLIST }}{{ item_generic_id }}"
+          style="{% if item_generic_id in authenticated_user_catalog.games or item_generic_id in authenticated_user_catalog.wishlisted %}display:none{% endif %}">
+        {% csrf_token %}
+        <input type="hidden" name="user" value="{{ user.id }}" />
+        <input type="hidden" name="game" value="{{ game_id }}" />
+        <input type="hidden" name="platform" value="{{ platform_id }}" />
+        {% if viewed_user and viewed_user != user %}
+            <input type="hidden" name="viewed_username" value="{{ viewed_user.get_username }}" />
+        {% endif %}
+        <button class="nes-btn" title="Add to your wishlist" type="submit">
+            <i class="nes-icon heart" title="Add to your wishlist"></i>
+        </button>
+    </form>
 
     {% if item_generic_id in authenticated_user_catalog.games %}
         {% if item_generic_id in authenticated_user_catalog.currently_playing %}
