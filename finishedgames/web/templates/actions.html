@@ -1,20 +1,20 @@
 <td class="is-centered actions">
     <a name="{{ item_generic_id }}"></a>
-    {% if item_generic_id in authenticated_user_catalog.wishlisted %}
-        <form action="{% url 'user_wishlisted_games' user.get_username %}" method="post">
+    <div id="{{ constants.FORM_ACTION_REMOVE_WISHLIST }}{{ item_generic_id }}" style="{% if item_generic_id not in authenticated_user_catalog.wishlisted %}display:none{% endif %}">
+        <form action="{% url 'user_wishlisted_games' user.get_username %}">
             {% csrf_token %}
-            <input type="hidden" name="action" value="{{ constants.FORM_ACTION_DELETE }}" />
+            <input type="hidden" name="_method" value="{{ constants.FORM_METHOD_DELETE }}" />
             <input type="hidden" name="user" value="{{ user.id }}" />
             <input type="hidden" name="game" value="{{ game_id }}" />
             <input type="hidden" name="platform" value="{{ platform_id }}" />
             {% if viewed_user and viewed_user != user %}
                 <input type="hidden" name="viewed_username" value="{{ viewed_user.get_username }}" />
             {% endif %}
-            <input type="hidden" name="next" value="{{ next_url }}" />
-            <button class="nes-btn is-error" type="submit" title="Remove from your wishlist"><i class="nes-icon heart is-empty" title="Remove from your wishlist"></i></button>
         </form>
-    {% elif not item_generic_id in authenticated_user_catalog.games %}
-        <form action="{% url 'user_wishlisted_games' user.get_username %}" method="post">
+        <button class="nes-btn is-error" title="Remove from your wishlist" onclick="sendAction('rm_wishlist_{{ item_generic_id }}', 'wishlist_{{ item_generic_id }}')"><i class="nes-icon heart is-empty" title="Remove from your wishlist"></i></button>
+    </div>
+    <div id="{{ constants.FORM_ACTION_WISHLIST }}{{ item_generic_id }}" style="{% if item_generic_id in authenticated_user_catalog.games or item_generic_id in authenticated_user_catalog.wishlisted %}display:none{% endif %}">
+        <form action="{% url 'user_wishlisted_games' user.get_username %}">
             {% csrf_token %}
             <input type="hidden" name="user" value="{{ user.id }}" />
             <input type="hidden" name="game" value="{{ game_id }}" />
@@ -22,15 +22,15 @@
             {% if viewed_user and viewed_user != user %}
                 <input type="hidden" name="viewed_username" value="{{ viewed_user.get_username }}" />
             {% endif %}
-            <input type="hidden" name="next" value="{{ next_url }}" />
-            <button class="nes-btn" type="submit" title="Add to your wishlist"><i class="nes-icon heart" title="Add to your wishlist"></i></button>
         </form>
-    {% endif %}
+        <button class="nes-btn" title="Add to your wishlist" onclick="sendAction('wishlist_{{ item_generic_id }}', 'rm_wishlist_{{ item_generic_id }}')"><i class="nes-icon heart" title="Add to your wishlist"></i></button>
+    </div>
+
     {% if item_generic_id in authenticated_user_catalog.games %}
         {% if item_generic_id in authenticated_user_catalog.currently_playing %}
             <form action="{% url 'user_currently_playing_games' user.get_username %}" method="post">
                 {% csrf_token %}
-                <input type="hidden" name="action" value="{{ constants.FORM_ACTION_DELETE }}" />
+                <input type="hidden" name="action" value="{{ constants.FORM_METHOD_DELETE }}" />
                 <input type="hidden" name="user" value="{{ user.id }}" />
                 <input type="hidden" name="game" value="{{ game_id }}" />
                 <input type="hidden" name="platform" value="{{ platform_id }}" />
@@ -56,7 +56,7 @@
         {% if item_generic_id in authenticated_user_catalog.finished %}
             <form action="{% url 'user_finished_games' user.get_username %}" method="post">
                 {% csrf_token %}
-                <input type="hidden" name="action" value="{{ constants.FORM_ACTION_DELETE }}" />
+                <input type="hidden" name="action" value="{{ constants.FORM_METHOD_DELETE }}" />
                 <input type="hidden" name="user" value="{{ user.id }}" />
                 <input type="hidden" name="game" value="{{ game_id }}" />
                 <input type="hidden" name="platform" value="{{ platform_id }}" />
@@ -82,7 +82,7 @@
         {% if item_generic_id in authenticated_user_catalog.not_owned %}
             <form action="{% url 'user_no_longer_owned_games' user.get_username %}" method="post">
                 {% csrf_token %}
-                <input type="hidden" name="action" value="{{ constants.FORM_ACTION_DELETE }}" />
+                <input type="hidden" name="action" value="{{ constants.FORM_METHOD_DELETE }}" />
                 <input type="hidden" name="user" value="{{ user.id }}" />
                 <input type="hidden" name="game" value="{{ game_id }}" />
                 <input type="hidden" name="platform" value="{{ platform_id }}" />
@@ -107,7 +107,7 @@
         {% endif %}
         <form action="{% url 'user_games' user.get_username %}" method="post">
             {% csrf_token %}
-            <input type="hidden" name="action" value="{{ constants.FORM_ACTION_DELETE }}" />
+            <input type="hidden" name="action" value="{{ constants.FORM_METHOD_DELETE }}" />
             <input type="hidden" name="user" value="{{ user.id }}" />
             <input type="hidden" name="game" value="{{ game_id }}" />
             <input type="hidden" name="platform" value="{{ platform_id }}" />
