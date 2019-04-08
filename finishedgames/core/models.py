@@ -130,20 +130,3 @@ class WishlistedUserGame(BaseUserGame):
                     "','".join((platform.name for platform in game_platforms))
                     )
                 })
-
-
-# TODO: Use when adding data fields for the user, like an avatar (or fully remove)
-"""
-class UserData(models.Model):
-    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, db_index=True)
-    username_slug = models.CharField(
-        "Username slug (lowerc alphanum, '-', '_')",
-        max_length=100,
-        validators=[validate_slug],
-        unique=True,
-        db_index=True
-    )
-
-    def __str__(self) -> str:
-        return "{} ({})".format(self.user.get_username(), self.user.email)
-"""

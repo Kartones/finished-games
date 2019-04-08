@@ -3,7 +3,6 @@ from datetime import datetime
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import get_user_model
-from django.core.exceptions import ValidationError
 from django.db.models.functions import Lower
 from django.http import (Http404, HttpResponse, HttpRequest)
 from django.shortcuts import (get_object_or_404, render)
@@ -12,7 +11,7 @@ from django.views import View
 from typing import (Any, Callable, Dict)  # NOQA: F401
 
 from core.managers import CatalogManager
-from core.models import (Game, Platform, UserGame, WishlistedUserGame)
+from core.models import (Platform, UserGame, WishlistedUserGame)
 from web import constants
 from web.decorators import authenticated_user_games, viewed_user
 
@@ -162,44 +161,6 @@ def profile(request: HttpRequest, username: str) -> HttpResponse:
     context = {}  # type: Dict
 
     return render(request, "user/profile.html", context)
-
-
-@login_required
-def add_game(request: HttpRequest, username: str) -> HttpResponse:
-    if username != request.user.get_username():
-        raise Http404("Invalid URL")
-
-    success_message = ""
-    error_message = ""
-
-    if request.method == "POST":
-        if int(request.POST["user"]) != request.user.id:
-            error_message = "Can only add games to the current logged in user"
-        else:
-            # TODO: migrate to CatalogManager.add_game_to_catalog()
-            user_game = UserGame(
-                user_id=request.POST["user"],
-                game_id=request.POST["game"],
-                platform_id=request.POST["platform"],
-            )
-            try:
-                user_game.full_clean()
-                user_game.save()
-                success_message = "Game '{}' for '{}' added".format(user_game.game.name, user_game.platform.shortname)
-            except ValidationError as error:
-                error_message = str(error)
-
-    games = Game.objects.only("id", "name").order_by(Lower("name"))
-    platforms = Platform.objects.only("id", "name").order_by(Lower("name"))
-
-    context = {
-        "games": games,
-        "platforms": platforms,
-        "error_message": error_message,
-        "success_message": success_message
-    }
-
-    return render(request, "user/add_game.html", context)
 
 
 class NoLongerOwnedGamesView(View):
@@ -380,7 +341,6 @@ class GamesFinishedView(View):
         else:
             CatalogManager.mark_game_as_finished(
                 user=request.user, game_id=int(request.POST["game"]), platform_id=int(request.POST["platform"]),
-                # TODO: change to modal-supplied value
                 year_finished=datetime.now().year
             )
 

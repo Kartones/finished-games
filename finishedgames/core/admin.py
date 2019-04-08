@@ -1,9 +1,6 @@
 from typing import (Any, List)
 
 from django.contrib import admin
-# TODO: Use when adding data fields for the user, like an avatar (or fully remove)
-# from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
-# from django.contrib.auth.models import User
 from django.db.models.functions import Lower
 from django.forms import ModelForm
 from django.http import HttpRequest
@@ -17,25 +14,6 @@ class FGModelAdmin(admin.ModelAdmin):
         css = {
              'all': ('css/admin.css',)
         }
-
-
-# TODO: Use when adding data fields for the user, like an avatar (or fully remove)
-"""
-class UserDataAdmin(FGModelAdmin):
-    form = UserDataForm
-    list_display = ["user"]
-    list_filter = ["user"]
-    search_fields = ["user__username", "user__email"]
-
-    def get_ordering(self, request: HttpRequest) -> List[str]:
-        return ["-id"]
-
-
-class UserDataInline(admin.StackedInline):
-    model = UserData
-    can_delete = False
-    verbose_name_plural = 'user data'
-"""
 
 
 class UserGameAdmin(FGModelAdmin):
@@ -89,19 +67,7 @@ class WishlistedUserGameAdmin(FGModelAdmin):
         return form
 
 
-# TODO: Use when adding data fields for the user, like an avatar (or fully remove)
-"""
-class UserAdmin(BaseUserAdmin):
-    inlines = [UserDataInline]
-"""
-
-
-# TODO: Use when adding data fields for the user, like an avatar (or fully remove)
-# admin.site.unregister(User)
-# admin.site.register(User, UserAdmin)
 admin.site.register(Game, GameAdmin)
 admin.site.register(Platform, PlatformAdmin)
-# TODO: Use when adding data fields for the user, like an avatar (or fully remove)
-# admin.site.register(UserData, UserDataAdmin)
 admin.site.register(UserGame, UserGameAdmin)
 admin.site.register(WishlistedUserGame, WishlistedUserGameAdmin)

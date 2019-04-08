@@ -28,9 +28,6 @@ The user catalog main page:
 User games catalog filtered by platform:
 ![User catalog - games filtered by platform](finishedgames/doc/use_games_filtered_by_platform.png)
 
-Form to add an existing game to the user's catalog:
-![Form to add a game to the user catalog](finishedgames/doc/user_add_game_form.png)
-
 Django admin views to manage `Games` and `Platforms`:
 ![Game edit admin view](finishedgames/doc/game_edit.png)
 
@@ -77,9 +74,9 @@ To launch the website in development, just run:
 make run
 ```
 
-Once loaded the site will be available from [http://0.0.0.0:5000/](http://0.0.0.0:5000/) .
+Once loaded the site will be available from [http://0.0.0.0:5000/](http://0.0.0.0:5000/).
 
-Admin site is accessible from [http://0.0.0.0:5000/admin/](http://0.0.0.0:5000/admin/) .
+Admin site is accessible from [http://0.0.0.0:5000/admin/](http://0.0.0.0:5000/admin/).
 
 **NOTE:** Some data creation and management is done from the Admin site. One of the principles of this project is not repeating work already done or more easily done from the Django Admin.
 

@@ -6,15 +6,6 @@ from django.forms import (ModelForm, ValidationError)
 from core.models import (Game, Platform)
 
 
-# TODO: Use when adding data fields for the user, like an avatar (or fully remove)
-"""
-class UserDataForm(ModelForm):
-    class Meta:
-        model = UserData
-        fields = "__all__"
-"""
-
-
 class PlatformForm(ModelForm):
     class Meta:
         model = Platform
