@@ -6,7 +6,7 @@ from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.db.models.functions import Lower
 from django.http import (Http404, HttpResponse, HttpRequest)
-from django.shortcuts import (get_object_or_404, redirect, render)
+from django.shortcuts import (get_object_or_404, render)
 from django.utils.decorators import method_decorator
 from django.views import View
 from typing import (Any, Callable, Dict)  # NOQA: F401
@@ -142,7 +142,6 @@ def user_games_by_platform(request: HttpRequest, username: str, platform_id: int
         finished_games_progress = 0
 
     context = {
-        "viewed_user": viewed_user,
         "platform": platform,
         "user_games": user_games,
         "games_count": games_count,
@@ -209,7 +208,7 @@ class NoLongerOwnedGamesView(View):
         if username != request.user.get_username() or request.method != "POST":
             raise Http404("Invalid URL")
 
-        if request.POST.get("action") == constants.FORM_ACTION_DELETE:
+        if request.POST.get("_method") == constants.FORM_METHOD_DELETE:
             CatalogManager.unmark_game_from_no_longer_owned(
                 user=request.user, game_id=int(request.POST["game"]), platform_id=int(request.POST["platform"])
             )
@@ -218,9 +217,7 @@ class NoLongerOwnedGamesView(View):
                 user=request.user, game_id=int(request.POST["game"]), platform_id=int(request.POST["platform"])
             )
 
-        redirect_location = request.POST.get("next", "user_games")
-        redirect_username = request.POST.get("viewed_username", username)
-        return redirect(redirect_location, username=redirect_username)
+        return HttpResponse()
 
 
 class GamesView(View):
@@ -250,7 +247,6 @@ class GamesView(View):
             "constants": constants,
             "sort_by": sort_by,
             "authenticated_user_catalog": kwargs["authenticated_user_catalog"],
-            "next_url": request.path,
         }
 
         return render(request, "user/games.html", context)
@@ -259,7 +255,7 @@ class GamesView(View):
         if username != request.user.get_username() or request.method != "POST":
             raise Http404("Invalid URL")
 
-        if request.POST.get("action") == constants.FORM_ACTION_DELETE:
+        if request.POST.get("_method") == constants.FORM_METHOD_DELETE:
             CatalogManager.remove_game_from_catalog(
                 user=request.user, game_id=int(request.POST["game"]), platform_id=int(request.POST["platform"])
             )
@@ -269,9 +265,7 @@ class GamesView(View):
                 platform_id=int(request.POST["platform"])
             )
 
-        redirect_location = request.POST.get("next", "user_games")
-        redirect_username = request.POST.get("viewed_username", username)
-        return redirect(redirect_location, username=redirect_username)
+        return HttpResponse()
 
 
 class GamesByPlatformView(View):
@@ -307,7 +301,6 @@ class GamesByPlatformView(View):
             "finished_games_progress": finished_games_progress,
             "progress_class": _progress_bar_class(finished_games_progress),
             "authenticated_user_catalog": kwargs["authenticated_user_catalog"],
-            "next_url": request.path,
         }
 
         return render(request, "user/games_by_platform.html", context)
@@ -340,7 +333,6 @@ class GamesPendingView(View):
             "constants": constants,
             "sort_by": sort_by,
             "authenticated_user_catalog": kwargs["authenticated_user_catalog"],
-            "next_url": request.path,
         }
 
         return render(request, "user/pending_games.html", context)
@@ -373,7 +365,6 @@ class GamesFinishedView(View):
             "constants": constants,
             "sort_by": sort_by,
             "authenticated_user_catalog": kwargs["authenticated_user_catalog"],
-            "next_url": request.path,
         }
 
         return render(request, "user/finished_games.html", context)
@@ -382,7 +373,7 @@ class GamesFinishedView(View):
         if username != request.user.get_username() or request.method != "POST":
             raise Http404("Invalid URL")
 
-        if request.POST.get("action") == constants.FORM_ACTION_DELETE:
+        if request.POST.get("_method") == constants.FORM_METHOD_DELETE:
             CatalogManager.unmark_game_from_finished(
                 user=request.user, game_id=int(request.POST["game"]), platform_id=int(request.POST["platform"])
             )
@@ -393,9 +384,7 @@ class GamesFinishedView(View):
                 year_finished=datetime.now().year
             )
 
-        redirect_location = request.POST.get("next", "user_finished_games")
-        redirect_username = request.POST.get("viewed_username", username)
-        return redirect(redirect_location, username=redirect_username)
+        return HttpResponse()
 
 
 class GamesCurrentlyPlayingView(View):
@@ -425,7 +414,6 @@ class GamesCurrentlyPlayingView(View):
             "constants": constants,
             "sort_by": sort_by,
             "authenticated_user_catalog": kwargs["authenticated_user_catalog"],
-            "next_url": request.path,
         }
 
         return render(request, "user/currently_playing_games.html", context)
@@ -434,7 +422,7 @@ class GamesCurrentlyPlayingView(View):
         if username != request.user.get_username() or request.method != "POST":
             raise Http404("Invalid URL")
 
-        if request.POST.get("action") == constants.FORM_ACTION_DELETE:
+        if request.POST.get("_method") == constants.FORM_METHOD_DELETE:
             CatalogManager.unmark_game_from_currently_playing(
                 user=request.user, game_id=int(request.POST["game"]), platform_id=int(request.POST["platform"])
             )
@@ -443,9 +431,7 @@ class GamesCurrentlyPlayingView(View):
                 user=request.user, game_id=int(request.POST["game"]), platform_id=int(request.POST["platform"])
             )
 
-        redirect_location = request.POST.get("next", "user_currently_playing_games")
-        redirect_username = request.POST.get("viewed_username", username)
-        return redirect(redirect_location, username=redirect_username)
+        return HttpResponse()
 
 
 class GamesWishlistedView(View):
@@ -475,7 +461,6 @@ class GamesWishlistedView(View):
             "constants": constants,
             "sort_by": sort_by,
             "authenticated_user_catalog": kwargs["authenticated_user_catalog"],
-            "next_url": request.path,
         }
 
         return render(request, "user/wishlisted_games.html", context)
@@ -484,7 +469,7 @@ class GamesWishlistedView(View):
         if username != request.user.get_username() or request.method != "POST":
             raise Http404("Invalid URL")
 
-        if request.POST.get("action") == constants.FORM_ACTION_DELETE:
+        if request.POST.get("_method") == constants.FORM_METHOD_DELETE:
             CatalogManager.remove_game_from_wishlisted(
                 user=request.user, game_id=int(request.POST["game"]), platform_id=int(request.POST["platform"])
             )
@@ -494,6 +479,4 @@ class GamesWishlistedView(View):
                 platform_id=int(request.POST["platform"])
             )
 
-        redirect_location = request.POST.get("next", "user_wishlisted_games")
-        redirect_username = request.POST.get("viewed_username", username)
-        return redirect(redirect_location, username=redirect_username)
+        return HttpResponse()

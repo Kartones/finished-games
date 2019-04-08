@@ -39,7 +39,7 @@
                     {{ item.platform.shortname }}
                 </td>
                 {% if user.is_authenticated %}
-                    {% render_actions user viewed_user item.game.id item.platform.id next_url authenticated_user_catalog %}
+                    {% render_actions user item.game.id item.platform.id authenticated_user_catalog %}
                 {% endif %}
             </tr>
         {% endfor %}

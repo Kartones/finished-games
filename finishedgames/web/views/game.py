@@ -22,7 +22,6 @@ class GameDetailsView(View):
         context = {
             "game": game,
             "authenticated_user_catalog": kwargs["authenticated_user_catalog"],
-            "next_url": request.path,
         }
         return render(request, "game_details.html", context)
 
@@ -45,7 +44,6 @@ class GamesByPlatformView(View):
             "games": games,
             "games_count": games_count,
             "authenticated_user_catalog": kwargs["authenticated_user_catalog"],
-            "next_url": request.path,
         }
         return render(request, "games_by_platform.html", context)
 

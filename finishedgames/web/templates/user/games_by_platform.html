@@ -26,7 +26,7 @@
                     <i class="nes-pixel-art snes-jp-logo is-disabled" title="No longer owned"></i>{% endif %}
                 </td>
                 {% if user.is_authenticated %}
-                    {% render_actions user viewed_user item.game.id platform.id next_url authenticated_user_catalog %}
+                    {% render_actions user item.game.id platform.id authenticated_user_catalog %}
                 {% endif %}
             </tr>
         {% endfor %}
