@@ -142,7 +142,6 @@ def user_games_by_platform(request: HttpRequest, username: str, platform_id: int
         finished_games_progress = 0
 
     context = {
-        "viewed_user": viewed_user,
         "platform": platform,
         "user_games": user_games,
         "games_count": games_count,
@@ -248,7 +247,6 @@ class GamesView(View):
             "constants": constants,
             "sort_by": sort_by,
             "authenticated_user_catalog": kwargs["authenticated_user_catalog"],
-            "next_url": request.path,
         }
 
         return render(request, "user/games.html", context)
@@ -303,7 +301,6 @@ class GamesByPlatformView(View):
             "finished_games_progress": finished_games_progress,
             "progress_class": _progress_bar_class(finished_games_progress),
             "authenticated_user_catalog": kwargs["authenticated_user_catalog"],
-            "next_url": request.path,
         }
 
         return render(request, "user/games_by_platform.html", context)
@@ -336,7 +333,6 @@ class GamesPendingView(View):
             "constants": constants,
             "sort_by": sort_by,
             "authenticated_user_catalog": kwargs["authenticated_user_catalog"],
-            "next_url": request.path,
         }
 
         return render(request, "user/pending_games.html", context)
@@ -369,7 +365,6 @@ class GamesFinishedView(View):
             "constants": constants,
             "sort_by": sort_by,
             "authenticated_user_catalog": kwargs["authenticated_user_catalog"],
-            "next_url": request.path,
         }
 
         return render(request, "user/finished_games.html", context)
@@ -419,7 +414,6 @@ class GamesCurrentlyPlayingView(View):
             "constants": constants,
             "sort_by": sort_by,
             "authenticated_user_catalog": kwargs["authenticated_user_catalog"],
-            "next_url": request.path,
         }
 
         return render(request, "user/currently_playing_games.html", context)
@@ -467,7 +461,6 @@ class GamesWishlistedView(View):
             "constants": constants,
             "sort_by": sort_by,
             "authenticated_user_catalog": kwargs["authenticated_user_catalog"],
-            "next_url": request.path,
         }
 
         return render(request, "user/wishlisted_games.html", context)

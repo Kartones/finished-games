@@ -1,5 +1,4 @@
 <td class="is-centered actions">
-    <a name="{{ item_generic_id }}"></a>
 
     <form action="{% url 'user_wishlisted_games' user.get_username %}"
           onsubmit="sendAction(this, ['{{ constants.FORM_ACTION_WISHLIST }}{{ item_generic_id }}']); return false;"

@@ -1,4 +1,4 @@
-from typing import (Dict, Optional)
+from typing import Dict
 
 from django import template
 from django.conf import settings
@@ -16,21 +16,13 @@ def generic_id(game_id: int, platform_id: int) -> str:
 
 @register.inclusion_tag("actions.html")
 def render_actions(
-    user: settings.AUTH_USER_MODEL,
-    viewed_user: Optional[settings.AUTH_USER_MODEL],
-    game_id: int,
-    platform_id: int,
-    next_url: str,
-    authenticated_user_catalog: Dict,
+    user: settings.AUTH_USER_MODEL, game_id: int, platform_id: int, authenticated_user_catalog: Dict
 ) -> Dict:
-    gen_id = generic_id(game_id, platform_id)
     return {
         "user": user,
-        "viewed_user": viewed_user,
         "game_id": game_id,
         "platform_id": platform_id,
-        "item_generic_id": gen_id,
-        "next_url": "{}#{}".format(next_url, gen_id),
+        "item_generic_id": generic_id(game_id, platform_id),
         "authenticated_user_catalog": authenticated_user_catalog,
         "constants": constants,
     }

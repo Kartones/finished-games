@@ -30,9 +30,9 @@ function sendAction(form, actionsToDisplayDivIds, actionsToHideDivIds = []) {
 }
 
 function successFeedback() {
-
 }
 
 function errorFeedback() {
     console.log("ERROR");
+    alert("There was an error trying to save your action, please try again.");
 }
