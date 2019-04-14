@@ -19,10 +19,7 @@ Homepage:
 Game details:
 ![Game details](finishedgames/doc/game_details.png)
 
-A user public profile:
-![User public profile](finishedgames/doc/user_public_profile.png)
-
-The user catalog main page:
+A user catalog page:
 ![User catalog](finishedgames/doc/user_catalog.png)
 
 User games catalog filtered by platform:
@@ -188,21 +185,17 @@ Also remember that you need to [setup the statics](https://docs.djangoproject.co
 
 ## Roadmap
 
-Note that the second MVP means a radical departure from the current one, so, if tackling it, a release tag will be created before embarking in the second phase (it can be useful as a "django starter kit").
-
-**Warning**: Until reaching end of MVP 1.1, all code, UI and DB schemas are subject to change. Then upon starting MVP 2 until its "ready" state again, expect heavy changes and no guaranteed backwards compatibility.
-
 ### ☑️  MVP 1
 
-Django only version, either without javascript or minimal one just to be able to use the site. Main goal is to have the system working and usable by users. Data ingestion either manually (through Django-admin) or via scripts (and probably Django commands).
+Initial minimal Django version. Main goal was to have the system working, usable by users, and a single source of script-based data ingestion. Proven to be of use and easily extensible.
 
 ### MVP 1.1
 
-Adding CircleCI integration (free for public repos), bugfixes and some additions like wishlisting games and removing games from wishlist or from the user catalog. Plus probably data ingestion from at least two sources (I am the "most interested user" and I have and have played a lot of games!)
+Adding CircleCI integration (free for public repos), bugfixes and some additions like wishlisting games and removing games from wishlist or from the user catalog. Data ingestion should be solid, and have at least two sources.
 
-### MVP 2 (Optional)
+### MVP 2
 
-Throw away Django templates and transform existing views into a REST-like API, then create a separate project for the frontend to be built as an SPA using React (but keeping current design).
+Game covers, user avatars, some 3rd party API integrations to fetch your games from them (Steam, etc.), export profile...
 
 ## License
 

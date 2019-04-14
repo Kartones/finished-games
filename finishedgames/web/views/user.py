@@ -1,6 +1,5 @@
 from datetime import datetime
 
-from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import get_user_model
 from django.db.models.functions import Lower
@@ -36,38 +35,6 @@ def users(request: HttpRequest) -> HttpResponse:
     }
 
     return render(request, "user/users.html", context)
-
-
-def public_profile(request: HttpRequest, username: str) -> HttpResponse:
-    viewed_user = get_object_or_404(get_user_model(), username=username)
-
-    latest_added_games = UserGame.objects \
-                                 .filter(user=viewed_user) \
-                                 .prefetch_related("game", "platform") \
-                                 .order_by("-id")[:settings.LATEST_VIDEOGAMES_DISPLAY_COUNT]
-    currently_playing_games = UserGame.objects \
-                                      .filter(user=viewed_user, currently_playing=True) \
-                                      .prefetch_related("game", "platform") \
-                                      .order_by("-id")[:settings.LATEST_VIDEOGAMES_DISPLAY_COUNT]
-    latest_finished_games = UserGame.objects \
-                                    .filter(user=viewed_user) \
-                                    .exclude(year_finished__isnull=True) \
-                                    .prefetch_related("game", "platform") \
-                                    .order_by("-year_finished", "-id")[:settings.LATEST_VIDEOGAMES_DISPLAY_COUNT]
-    latest_wishlisted_games = WishlistedUserGame.objects \
-                                                .filter(user=viewed_user) \
-                                                .prefetch_related("game", "platform") \
-                                                .order_by("game__name", "-id")[:settings.LATEST_VIDEOGAMES_DISPLAY_COUNT]  # NOQA E501
-
-    context = {
-        "viewed_user": viewed_user,
-        "latest_user_games": latest_added_games,
-        "currently_playing_items": currently_playing_games,
-        "latest_finished_items": latest_finished_games,
-        "latest_wishlisted_items": latest_wishlisted_games,
-    }
-
-    return render(request, "user/public_profile.html", context)
 
 
 def catalog(request: HttpRequest, username: str) -> HttpResponse:
@@ -178,7 +145,7 @@ class NoLongerOwnedGamesView(View):
                 user=request.user, game_id=int(request.POST["game"]), platform_id=int(request.POST["platform"])
             )
 
-        return HttpResponse()
+        return HttpResponse(status=204)
 
 
 class GamesView(View):
@@ -226,7 +193,7 @@ class GamesView(View):
                 platform_id=int(request.POST["platform"])
             )
 
-        return HttpResponse()
+        return HttpResponse(status=204)
 
 
 class GamesByPlatformView(View):
@@ -344,7 +311,7 @@ class GamesFinishedView(View):
                 year_finished=datetime.now().year
             )
 
-        return HttpResponse()
+        return HttpResponse(status=204)
 
 
 class GamesCurrentlyPlayingView(View):
@@ -391,7 +358,7 @@ class GamesCurrentlyPlayingView(View):
                 user=request.user, game_id=int(request.POST["game"]), platform_id=int(request.POST["platform"])
             )
 
-        return HttpResponse()
+        return HttpResponse(status=204)
 
 
 class GamesWishlistedView(View):
@@ -439,4 +406,4 @@ class GamesWishlistedView(View):
                 platform_id=int(request.POST["platform"])
             )
 
-        return HttpResponse()
+        return HttpResponse(status=204)

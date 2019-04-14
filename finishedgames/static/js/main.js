@@ -9,7 +9,7 @@ function sendAction(form, actionsToDisplayDivIds, actionsToHideDivIds = []) {
     xhr.onload = () => {
         let div;
 
-        if (xhr.status === 200) {
+        if (xhr.status === 200 || xhr.status === 204) {
             for (let divId of actionsToDisplayDivIds) {
                 div = document.getElementById(divId);
                 div.style.display = "block";

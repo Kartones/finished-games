@@ -19,7 +19,7 @@
         {% for registered_user in users %}
             <tr>
                 <td>{{ registered_user.get_username.capitalize }}</td>
-                <td><a class="nes-btn is-primary" href="{% url "user_public_profile" registered_user.get_username %}">Profile</a></td>
+                <td><a class="nes-btn is-primary" href="{% url 'user_catalog' registered_user.get_username %}">View Catalog</a></td>
             </tr>
         {% endfor %}
     </tbody>

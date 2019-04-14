@@ -32,6 +32,6 @@
     </tbody>
 </table>
 
-<p><strong>{{ games_count }}</strong> games for <strong>{{ platform.name }}</strong>.</p>
+<p><strong>{{ games_count }}</strong> game{{ games_count|pluralize }} for <strong>{{ platform.name }}</strong>.</p>
 
 {% endblock content %}
