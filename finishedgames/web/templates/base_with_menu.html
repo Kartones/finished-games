@@ -1,5 +1,7 @@
 {% extends "base.html" %}
 
+{% load static %}
+
 {% block menu %}
     <section class="nes-container menu">
         <div>
@@ -17,3 +19,15 @@
         </div>
     </section>
 {% endblock menu %}
+
+{% block footer %}
+    {% if user.is_authenticated %}
+        <script type="text/javascript" src="{% static 'js/main.js' %}?v=20190416"></script>
+        <div id="feedback" class="feedback nes-balloon from-right">
+            <span class="feedback-error">
+                There was an error<br/>
+                trying to apply your action
+            </span>
+        </div>
+    {% endif %}
+{% endblock footer %}

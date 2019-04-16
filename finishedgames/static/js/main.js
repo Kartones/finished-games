@@ -1,3 +1,4 @@
+let feedbackTimeoutID;
 
 function sendAction(form, actionsToDisplayDivIds, actionsToHideDivIds = []) {
     const xhr = new XMLHttpRequest();
@@ -29,10 +30,17 @@ function sendAction(form, actionsToDisplayDivIds, actionsToHideDivIds = []) {
     xhr.send(new FormData(form));
 }
 
+function hideFeedback() {
+    feedbackDiv = document.getElementById("feedback");
+    feedbackDiv.style.display = "none";
+    clearInterval(feedbackTimeoutID);
+}
+
 function successFeedback() {
 }
 
 function errorFeedback() {
-    console.log("ERROR");
-    alert("There was an error trying to save your action, please try again.");
+    feedbackDiv = document.getElementById("feedback");
+    feedbackDiv.style.display = "block";
+    feedbackTimeoutID = setInterval(hideFeedback, 8000);
 }
