@@ -3,7 +3,7 @@ let feedbackTimeoutID;
 function sendAction(form, actionsToDisplayDivIds, actionsToHideDivIds = []) {
     const xhr = new XMLHttpRequest();
 
-    xhr.timeout = 10000; // ms
+    xhr.timeout = 10000;
     xhr.ontimeout = errorFeedback;
     xhr.onabort = errorFeedback;
     xhr.onerror = errorFeedback;
@@ -20,12 +20,10 @@ function sendAction(form, actionsToDisplayDivIds, actionsToHideDivIds = []) {
                 div.style.display = "none";
             }
             form.style.display = "none";
-            successFeedback();
         } else {
             errorFeedback();
         }
     };
-
     xhr.open("POST", form.action);
     xhr.send(new FormData(form));
 }
@@ -34,9 +32,6 @@ function hideFeedback() {
     feedbackDiv = document.getElementById("feedback");
     feedbackDiv.style.display = "none";
     clearInterval(feedbackTimeoutID);
-}
-
-function successFeedback() {
 }
 
 function errorFeedback() {
