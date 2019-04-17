@@ -35,6 +35,10 @@ class BaseAdapter(ABC):
     def set_offset(self, offset: int) -> None:
         pass
 
+    @abstractmethod
+    def batch_size(self) -> int:
+        pass
+
     @staticmethod
     @abstractmethod
     def source_id() -> str:

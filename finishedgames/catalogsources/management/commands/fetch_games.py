@@ -40,6 +40,10 @@ class Command(BaseCommand):
             exit(1)
 
         with adapter_class(stdout=self.stdout, stdout_color_style=self.style) as adapter:
+            self.stdout.write(self.style.WARNING("> Initial Offset:{}  Batch size:{}".format(
+                initial_offset, adapter.batch_size()
+            )))
+
             if initial_offset > 0:
                 adapter.set_offset(initial_offset)
             for platform_id in platforms:

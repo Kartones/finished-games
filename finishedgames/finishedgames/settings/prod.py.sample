@@ -38,6 +38,7 @@ CATALOG_SOURCES_ADAPTERS = {
         constants.ADAPTER_REQUESTS_PER_HOUR: <amount_per_hour>,
         constants.ADAPTER_WAIT_SECONDS_WHEN_RATE_LIMITED: <wait_seconds>,  # value = 3600 / ADAPTER_REQUESTS_PER_HOUR,
         constants.ADAPTER_DISPLAY_NAME: "<nice_display_name>",
+        constants.ADAPTER_BATCH_SIZE: 100,
     }
 }
 

@@ -58,6 +58,7 @@ class GiantBombAdapter(BaseAdapter):
         self.time_window = 3600  # X requests allowed in Y seconds
         self.token_bucket = self.max_requests_per_time_window  # start with bucket full of tokens
         self.last_check_timestamp = 0.0
+        self._batch_size = cast(int, settings.CATALOG_SOURCES_ADAPTERS[self.SOURCE_ID][constants.ADAPTER_BATCH_SIZE])
 
         self.offset = 0
         self.next_offset = 0
@@ -89,13 +90,16 @@ class GiantBombAdapter(BaseAdapter):
     def set_offset(self, offset: int) -> None:
         self.next_offset = max(0, offset)
 
+    def batch_size(self) -> int:
+        return self._batch_size
+
     @rate_limit
     def fetch_platforms_block(self) -> List[FetchedPlatform]:
         self.offset = self.next_offset
 
-        # Limit is implicitly 100
-        request = requests.get("https://www.giantbomb.com/api/platforms/?api_key={api_key}&format=json&offset={offset}&field_list=id,name,release_date,site_detail_url".format(   # NOQA: E501
-            api_key=self.api_key, offset=self.offset),
+        request = requests.get("https://www.giantbomb.com/api/platforms/?api_key={api_key}&format=json&limit={limit}&offset={offset}&field_list=id,name,release_date,site_detail_url".format(   # NOQA: E501
+                api_key=self.api_key, offset=self.offset, limit=self._batch_size
+            ),
             headers={
                 "user-agent": settings.CATALOG_SOURCES_ADAPTER_USER_AGENT
             }
@@ -110,9 +114,9 @@ class GiantBombAdapter(BaseAdapter):
         else:
             self.errored = True
             self.stdout.write(self.stdout_style.ERROR(
-                "{code}: {error}.\nInfo: S:{status_code} O:{offset} NO:{next_offset} T:{total_results}".format(
+                "{code}: {error}.\nInfo: S:{status_code} O:{offset} NO:{next_offset} T:{total_results} L:{limit}".format(  # NOQA: E501
                     code=request.status_code, error=request.text, status_code=request.status_code, offset=self.offset,
-                    next_offset=self.next_offset, total_results=self.total_results)
+                    next_offset=self.next_offset, total_results=self.total_results, limit=self._batch_size)
             ))
 
         if self.errored:
@@ -135,8 +139,8 @@ class GiantBombAdapter(BaseAdapter):
 
         # Limit is implicitly 100
         # `platforms` parameter is actually a single platform id filter
-        url = "https://www.giantbomb.com/api/games/?api_key={api_key}&format=json&offset={offset}&platforms={platform}&field_list=id,name,aliases,platforms,original_release_date,releases,dlcs,site_detail_url".format(   # NOQA: E501
-            api_key=self.api_key, offset=self.offset, platform=platform_id
+        url = "https://www.giantbomb.com/api/games/?api_key={api_key}&format=json&limit={limit}&offset={offset}&platforms={platform}&field_list=id,name,aliases,platforms,original_release_date,releases,dlcs,site_detail_url".format(   # NOQA: E501
+            api_key=self.api_key, offset=self.offset, platform=platform_id, limit=self._batch_size
         )
         request = requests.get(url, headers={
             "user-agent": settings.CATALOG_SOURCES_ADAPTER_USER_AGENT
@@ -151,9 +155,9 @@ class GiantBombAdapter(BaseAdapter):
         else:
             self.errored = True
             self.stdout.write(self.stdout_style.ERROR(
-                "{code}: {error}.\nInfo: S:{status_code} O:{offset} NO:{next_offset} T:{total_results}".format(
+                "{code}: {error}.\nInfo: S:{status_code} O:{offset} NO:{next_offset} T:{total_results} L:{limit}".format(  # NOQA: E501
                     code=request.status_code, error=request.text, status_code=request.status_code, offset=self.offset,
-                    next_offset=self.next_offset, total_results=self.total_results)
+                    next_offset=self.next_offset, total_results=self.total_results, limit=self._batch_size)
             ))
 
         if self.errored:
