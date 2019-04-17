@@ -12,13 +12,18 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser: CommandParser) -> None:
         parser.add_argument("source", type=str)
+        # NOTE: Offset only applies to 1st platform to fetch games from, remaining ones will start at offset 0
+        parser.add_argument("offset", type=int)
         parser.add_argument("platforms", nargs="+", type=int)
 
     def handle(self, *args: Any, **options: Dict) -> None:
         self._display_legend()
-        self._fetch_source(source_id=cast(str, options["source"]), platforms=cast(List[int], options["platforms"]))
+        self._fetch_source(
+            source_id=cast(str, options["source"]), platforms=cast(List[int], options["platforms"]),
+            initial_offset=cast(int, options["offset"])
+        )
 
-    def _fetch_source(self, source_id: str, platforms: List[int]) -> None:
+    def _fetch_source(self, source_id: str, platforms: List[int], initial_offset=0) -> None:
         had_errors = False
         self.stdout.write(self.style.WARNING(
             "> Started fetching games from '{source}' and source platform ids: {platforms}".format(
@@ -35,6 +40,8 @@ class Command(BaseCommand):
             exit(1)
 
         with adapter_class(stdout=self.stdout, stdout_color_style=self.style) as adapter:
+            if initial_offset > 0:
+                adapter.set_offset(initial_offset)
             for platform_id in platforms:
                 # For now at least, if fails gathering a platform, try with next one
                 while adapter.has_more_items() and not had_errors:

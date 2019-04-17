@@ -68,7 +68,6 @@ class GiantBombAdapter(BaseAdapter):
 
     def __enter__(self) -> "GiantBombAdapter":
         self.fetching = True
-        self.reset()
 
         return self
 
@@ -86,6 +85,9 @@ class GiantBombAdapter(BaseAdapter):
     @staticmethod
     def source_id() -> str:
         return GiantBombAdapter.SOURCE_ID
+
+    def set_offset(self, offset: int) -> None:
+        self.next_offset = max(0, offset)
 
     @rate_limit
     def fetch_platforms_block(self) -> List[FetchedPlatform]:
