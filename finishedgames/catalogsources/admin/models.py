@@ -31,6 +31,7 @@ class FetchedGameAdmin(FetchedGameAdminViewsMixin, FGModelAdmin):
     readonly_fields = ["last_modified_date", "change_hash"]
     ordering = ["-last_modified_date", "source_id", "name"]
     actions = [hide_fetched_items, import_fetched_items]
+    autocomplete_fields = ["fg_game", "parent_game"]
 
     def get_form(self, request: HttpRequest, obj: Optional[FetchedGame] = None, **kwargs: Any) -> ModelForm:
         # just save obj reference for future processing in Inline
