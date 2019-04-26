@@ -38,10 +38,6 @@ Also, [navigating to the help](https://finishedgames.kartones.net/help/) quickly
 
 Javascript uses features from ES2015 and assumes a modern browser, which means: not outdated Firefox, Chrome, Safari or Edge. Internet Explorer and other older browsers are not supported.
 
-Not all functionality is yet implemented, expect missing basic features until reaching MVP 1.1.
-
-There is a roadmap but for now internal, I do plan to make the site fully usable without needing to rely on django-admin, I'll eventually add an autocomplete textfield for selecting the game and/or platform, and other basic features, all before considering MVP 1.1 done.
-
 The Docker Python image is already compatible with variable type hints (>= 3.6), but as many OS still come with as much as 3.5, like Ubuntu, keeping variable type annotations as comments for now so they run with Python 3.5.
 
 ## Setup
