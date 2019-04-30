@@ -107,3 +107,7 @@ p.character-filter {
 .feedback span.feedback-error {
     color: #a51a1c;
 }
+
+a:hover {
+    text-decoration: none;
+}
