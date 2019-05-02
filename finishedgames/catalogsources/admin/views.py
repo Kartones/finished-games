@@ -6,6 +6,7 @@ from django.http import (HttpRequest, HttpResponseRedirect)
 from django.template.response import TemplateResponse
 from django.urls import reverse
 
+from catalogsources.admin.forms import SingleFetchedPlatformImportForm
 from catalogsources.apps import CatalogSourcesConfig
 from catalogsources.managers import (GameImportSaveError, ImportManager, PlatformImportSaveError)
 from catalogsources.models import (FetchedGame, FetchedPlatform)
@@ -218,6 +219,40 @@ class FetchedPlatformAdminViewsMixin(FGModelAdmin):
         else:
             import_all_platforms = False
             selected_ids = list(map(int, request.GET["ids"].split(",")))
+
+        # TODO: new code
+        if not import_all_platforms and len(selected_ids) == 1:
+            fetched_platform = FetchedPlatform.objects.get(id=selected_ids[0])
+            is_fetched_platform_linked = fetched_platform.fg_platform is not None
+
+            # Initial data does not equal "existing data", but as this form will never be sent and changed fields
+            # won't be calculated, it is fine
+            initial_fetched_form_data = {
+                "fetched_name": fetched_platform.name,
+                "fetched_shortname": fetched_platform.shortname,
+                "fetched_publish_date": fetched_platform.publish_date,
+                "source_id": fetched_platform.source_id,
+                "source_platform_id": fetched_platform.source_platform_id,
+                "source_url": fetched_platform.source_url,
+                "hidden": fetched_platform.hidden,
+                "last_modified_date": fetched_platform.last_modified_date,
+            }
+
+            if is_fetched_platform_linked:
+                initial_fetched_form_data.update({
+                    "fg_platform_id": fetched_platform.fg_platform.id,
+                    "fg_platform_name": fetched_platform.fg_platform.name,
+                })
+
+            fetched_platform_form = SingleFetchedPlatformImportForm(initial=initial_fetched_form_data)
+
+            context.update({
+                "fetched_platform_form": fetched_platform_form,
+                "is_fetched_platform_linked": is_fetched_platform_linked,
+            })
+            return TemplateResponse(request, "single_platform_import_form.html", context)
+
+        # -----
 
         if not import_all_platforms and len(selected_ids) == 1:
             context.update({
