@@ -72,13 +72,13 @@
                             {{ fetched_platform_form.fetched_name.errors }}
                             {{ fetched_platform_form.fetched_name.label_tag }}
                             <div class="with-copy-btn">
-                                <div class="readonly" id="{{ fetched_platform_form.fetched_name.html_name }}">
+                                <div class="readonly" id="id_{{ fetched_platform_form.fetched_name.html_name }}">
                                     <span>{{fetched_platform_form.fetched_name.value}}</span>
                                 </div>
-                                <input id="id_{{ fetched_platform_form.fetched_name.html_name }}"
-                                    data-source="{{ fetched_platform_form.fetched_name.html_name }}"
-                                    data-destination="name" onclick="copyField(this)" type="button" value="➤"
-                                    class="btn-operation" title="Copy value">
+                                <input id="{{ fetched_platform_form.fetched_name.html_name }}"
+                                    data-source="id_{{ fetched_platform_form.fetched_name.html_name }}"
+                                    data-destination="id_{{ platform_form.name.html_name }}" onclick="copyField(this)"
+                                    type="button" value="➤" class="btn-operation" title="Copy value">
                             </div>
                         </div>
                     </div>
@@ -87,19 +87,142 @@
                             {{ fetched_platform_form.fetched_shortname.errors }}
                             {{ fetched_platform_form.fetched_shortname.label_tag }}
                             <div class="with-copy-btn">
-                                <div class="readonly" id="{{ fetched_platform_form.fetched_shortname.html_name }}">
+                                <div class="readonly" id="id_{{ fetched_platform_form.fetched_shortname.html_name }}">
                                     <span>{{fetched_platform_form.fetched_shortname.value}}</span>
                                 </div>
-                                <input id="id_{{ fetched_platform_form.fetched_shortname.html_name }}"
-                                    data-source="{{ fetched_platform_form.fetched_shortname.html_name }}"
-                                    data-destination="shortname" onclick="copyField(this)" type="button" value="➤"
-                                    class="btn-operation" title="Copy value">
+                                <input id="{{ fetched_platform_form.fetched_shortname.html_name }}"
+                                    data-source="id_{{ fetched_platform_form.fetched_shortname.html_name }}"
+                                    data-destination="id_{{ platform_form.shortname.html_name }}"
+                                    onclick="copyField(this)" type="button" value="➤" class="btn-operation"
+                                    title="Copy value">
                             </div>
                         </div>
                     </div>
-
-
+                    <div class="form-row">
+                        <div>
+                            {{ fetched_platform_form.fetched_publish_date.errors }}
+                            {{ fetched_platform_form.fetched_publish_date.label_tag }}
+                            <div class="with-copy-btn">
+                                <div class="readonly" id="id_{{ fetched_platform_form.fetched_publish_date.html_name }}">
+                                    <span>{{ fetched_platform_form.fetched_publish_date.value }}</span>
+                                </div>
+                                <input id="{{ fetched_platform_form.fetched_publish_date.html_name }}"
+                                    data-source="id_{{ fetched_platform_form.fetched_publish_date.html_name }}"
+                                    data-destination="id_{{ platform_form.publish_date.html_name }}"
+                                    onclick="copyField(this)" type="button" value="➤" class="btn-operation"
+                                    title="Copy value">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div>
+                            {{ fetched_platform_form.source_id.label_tag }}
+                            <div id="id_{{ fetched_platform_form.source_id.html_name }}" class="readonly">
+                                {{ fetched_platform_form.source_id.value }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div>
+                            {{ fetched_platform_form.source_platform_id.label_tag }}
+                            <div id="id_{{ fetched_platform_form.source_platform_id.html_name }}" class="readonly">
+                                {{ fetched_platform_form.source_platform_id.value }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div>
+                            {{ fetched_platform_form.source_url.label_tag }}
+                            <div id="id_{{ fetched_platform_form.fetched_publish_date.html_name }}" class="readonly">
+                                <a class="uri-field" href="{{ fetched_platform_form.source_url.value }}"
+                                    target="_blank">{{ fetched_platform_form.source_url.value }}</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div>
+                            <label>Mapped to Platform:</label>
+                            <div class="readonly">
+                                {% if is_fetched_platform_linked %}
+                                    <a href="/admin/core/platform/{{ fetched_platform_form.fg_platform_id.value }}/change/">{{ fetched_platform_form.fg_platform_name.value }}</a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        {{ fetched_platform_form.hidden.label_tag }}
+                        <div id="id_{{ fetched_platform_form.hidden.html_name }}" class="readonly">
+                            {{ fetched_platform_form.hidden.value }}
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div>
+                            {{ fetched_platform_form.last_modified_date.label_tag }}
+                            <div id="id_{{ fetched_platform_form.last_modified_date.html_name }}" class="readonly">
+                                {{ fetched_platform_form.last_modified_date.value }}
+                            </div>
+                        </div>
+                    </div>
                 </fieldset>
+            </div>
+        </div>
+    </form>
+
+    <form action="#" method="post">
+        <div class="form-content">
+            <div id="existing-platform">
+                {% csrf_token %}
+                <input type="hidden" name="{{ platform_form.platform_id.html_name }}"
+                    value="{{ platform_form.platform_id.value }}">
+                <input type="hidden" name="fetched_platform_id" value="{{ platform_form.fetched_platform_id.value }}">
+                <div>
+                    <fieldset class="module aligned">
+                        <h3>
+                            Destination Platform
+                            {% if is_fetched_platform_linked %}
+                                - <span class="changelink">Modifying existing Platform</span>
+                            {% else %}
+                                - <span class="addlink">Adding new Platform</span>
+                            {% endif %}
+                        </h3>
+
+                        <div class="form-row">
+                            <div>
+                                {{ platform_form.name.label_tag }}
+                                <input id="id_{{ platform_form.name.html_name }}" type="text"
+                                    name="{{ platform_form.name.html_name }}" value="{{ platform_form.name.value }}"
+                                    class="vTextField" maxlength="100" required>
+                                <input data-target="id_{{ platform_form.name.html_name }}"
+                                    data-original="{{ platform_form.name.value }}" onclick="revertField(this)"
+                                    type="button" value="↺" class="btn-operation" title="Reset to original value">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div>
+                                {{ platform_form.shortname.label_tag }}
+                                <input id="id_{{ platform_form.shortname.html_name }}" type="text"
+                                    name="{{ platform_form.shortname.html_name }}"
+                                    value="{{ platform_form.shortname.value }}" class="vTextField" maxlength="100"
+                                    required>
+                                <input data-target="id_{{ platform_form.shortname.html_name }}"
+                                    data-original="{{ platform_form.shortname.value }}" onclick="revertField(this)"
+                                    type="button" value="↺" class="btn-operation" title="Reset to original value">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div>
+                                {{ platform_form.publish_date.label_tag }}
+                                <input id="id_{{ platform_form.publish_date.html_name }}" type="number"
+                                    name="{{ platform_form.publish_date.html_name }}"
+                                    value="{{ platform_form.publish_date.value }}" class="vIntegerField" required>
+                                <input data-target="id_{{ platform_form.publish_date.html_name }}"
+                                    data-original="{{ platform_form.publish_date.value }}" onclick="revertField(this)"
+                                    type="button" value="↺" class="btn-operation" title="Reset to original value">
+                            </div>
+                        </div>
+
+                    </fieldset>
+                </div>
             </div>
         </div>
     </form>
