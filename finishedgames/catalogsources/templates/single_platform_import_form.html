@@ -60,16 +60,16 @@
 {% block content %}
 
 <div id="content-main">
+    <div class="form-content">
 
-    <form action="#" method="post">
-        <div class="form-content">
+        <form action="#" method="post">
             <div id="imported-platform">
                 <fieldset class="module aligned">
-                    <h3>Source Fetched Platform  <input onclick="copyAllFields(this, 'imported-platform')" type="button" value="➤" class="btn-operation" title="Copy all values"></h3>
+                    <h3>Source Fetched Platform  <input onclick="copyAllFields(this, 'imported-platform')" type="button"
+                        value="➤" class="btn-operation" title="Copy all values"></h3>
 
                     <div class="form-row">
                         <div>
-                            {{ fetched_platform_form.fetched_name.errors }}
                             {{ fetched_platform_form.fetched_name.label_tag }}
                             <div class="with-copy-btn">
                                 <div class="readonly" id="id_{{ fetched_platform_form.fetched_name.html_name }}">
@@ -84,7 +84,6 @@
                     </div>
                     <div class="form-row">
                         <div>
-                            {{ fetched_platform_form.fetched_shortname.errors }}
                             {{ fetched_platform_form.fetched_shortname.label_tag }}
                             <div class="with-copy-btn">
                                 <div class="readonly" id="id_{{ fetched_platform_form.fetched_shortname.html_name }}">
@@ -100,10 +99,10 @@
                     </div>
                     <div class="form-row">
                         <div>
-                            {{ fetched_platform_form.fetched_publish_date.errors }}
                             {{ fetched_platform_form.fetched_publish_date.label_tag }}
                             <div class="with-copy-btn">
-                                <div class="readonly" id="id_{{ fetched_platform_form.fetched_publish_date.html_name }}">
+                                <div class="readonly"
+                                    id="id_{{ fetched_platform_form.fetched_publish_date.html_name }}">
                                     <span>{{ fetched_platform_form.fetched_publish_date.value }}</span>
                                 </div>
                                 <input id="{{ fetched_platform_form.fetched_publish_date.html_name }}"
@@ -165,11 +164,9 @@
                     </div>
                 </fieldset>
             </div>
-        </div>
-    </form>
+        </form>
 
-    <form action="#" method="post">
-        <div class="form-content">
+        <form action="{% url 'admin:platform_import' %}" method="post">
             <div id="existing-platform">
                 {% csrf_token %}
                 <input type="hidden" name="{{ platform_form.platform_id.html_name }}"
@@ -224,9 +221,13 @@
                     </fieldset>
                 </div>
             </div>
-        </div>
-    </form>
 
+            <div class="submit-row">
+                <input type="submit" value="Save" class="default" name="_save">
+            </div>
+        </form>
+
+    </div>
 </div>
 
 {% include "import_js.html" %}

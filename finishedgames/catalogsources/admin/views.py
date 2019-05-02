@@ -1,8 +1,8 @@
-from typing import (Dict, List)
+from typing import List
 
 from django.conf import settings
 from django.db.models.functions import Lower
-from django.http import (HttpRequest, HttpResponseRedirect)
+from django.http import (Http404, HttpRequest, HttpResponseRedirect)
 from django.template.response import TemplateResponse
 from django.urls import reverse
 
@@ -220,7 +220,6 @@ class FetchedPlatformAdminViewsMixin(FGModelAdmin):
             import_all_platforms = False
             selected_ids = list(map(int, request.GET["ids"].split(",")))
 
-        # TODO: new code
         if not import_all_platforms and len(selected_ids) == 1:
             fetched_platform = FetchedPlatform.objects.get(id=selected_ids[0])
             is_fetched_platform_linked = fetched_platform.fg_platform is not None
@@ -261,15 +260,8 @@ class FetchedPlatformAdminViewsMixin(FGModelAdmin):
                 "platform_form": platform_form,
                 "is_fetched_platform_linked": is_fetched_platform_linked,
             })
+
             return TemplateResponse(request, "single_platform_import_form.html", context)
-
-        # -----
-
-        if not import_all_platforms and len(selected_ids) == 1:
-            context.update({
-                "fetched_platform": FetchedPlatform.objects.get(id=selected_ids[0]),
-            })
-            return TemplateResponse(request, "platform_import.html", context)
         else:
             if import_all_platforms:
                 hidden_filter = request.GET.get("hidden", "False")
@@ -291,21 +283,49 @@ class FetchedPlatformAdminViewsMixin(FGModelAdmin):
             return TemplateResponse(request, "platform_import_batch.html", context)
 
     def import_view(self, request: HttpRequest) -> HttpResponseRedirect:
-        name = request.POST["name"]
-        try:
-            ImportManager.import_fetched_platform(
-                name=name,
-                shortname=request.POST["shortname"],
-                publish_date_string=request.POST["publish_date"],
-                fetched_platform_id=request.POST["fetched_platform_id"],
-                platform_id=request.POST["id"]
-            )
-        except PlatformImportSaveError as error:
-            self.message_user(request, "Error importing Fetched Platform '{}': {}".format(name, error), level="error")
-            return HttpResponseRedirect(reverse("admin:catalogsources_fetchedplatform_changelist"))
+        if request.method == "POST":
+            platform_form = SinglePlatformImportForm(request.POST)
 
-        self.message_user(request, "Fetched Platform '{}' imported successfully".format(name))
-        return HttpResponseRedirect(reverse("admin:catalogsources_fetchedplatform_changelist"))
+            if platform_form.is_valid():
+                name = platform_form.cleaned_data["name"]
+                try:
+                    ImportManager.import_fetched_platform(
+                        name=name,
+                        shortname=platform_form.cleaned_data["shortname"],
+                        publish_date_string=platform_form.cleaned_data["publish_date"],
+                        fetched_platform_id=platform_form.cleaned_data["fetched_platform_id"],
+                        platform_id=platform_form.cleaned_data["platform_id"]
+                    )
+                except PlatformImportSaveError as error:
+                    self.message_user(
+                        request, "Error importing Fetched Platform '{}': {}".format(name, error), level="error"
+                    )
+                    return HttpResponseRedirect(reverse("admin:catalogsources_fetchedplatform_changelist"))
+
+                self.message_user(request, "Fetched Platform '{}' imported successfully".format(name))
+                return HttpResponseRedirect(reverse("admin:catalogsources_fetchedplatform_changelist"))
+            else:
+                non_field_errors = ", ".join([error for error in platform_form.non_field_errors()])
+                field_errors = ", ".join([
+                    "Field '{field}': {errors}".format(
+                        field=field.label,
+                        errors=",".join(field.errors)
+                    ) for field in platform_form if field.errors
+                ])
+                if non_field_errors:
+                    non_field_errors = "{}, ".format(non_field_errors)
+
+                self.message_user(
+                    request, "Errors importing Fetched Platform '{platform}': {errors} {field_errors}".format(
+                        platform=request.POST["name"],
+                        errors=non_field_errors,
+                        field_errors=field_errors
+                    ),
+                    level="error"
+                )
+                return HttpResponseRedirect(reverse("admin:catalogsources_fetchedplatform_changelist"))
+        else:
+            raise Http404("Invalid URL")
 
     def import_batch_view(self, request: HttpRequest) -> HttpResponseRedirect:
         fetched_platform_ids = request.POST.getlist("fetched_platform_id")
