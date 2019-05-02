@@ -8,29 +8,46 @@
 
 <h2>{{ platform.name }} games</h2>
 
-<table class="nes-table is-bordered">
-    <thead>
-        <tr>
-            <th>Name</th>
+{% if cant_display_so_many_games %}
 
-            {% if user.is_authenticated %}
-                <th>Actions</th>
-            {% endif %}
-        </tr>
-    </thead>
-    <tbody>
-        {% for game in games %}
+    <p>
+        <div class="nes-container is-centered is-dark with-title">
+            <p class="title">Can't display games list</p>
+            <p>
+                This platform has too many games to list them all at once.<br/><br/>
+                Soon there will be a better interface with paginated loading of items (so you can have them fast and no matter how many there are) and search capabilities.<br/><br/>
+                Meanwhile, you can instead search by game title and then see the platforms it's available on.
+            </p>
+        </div>
+    </p>
+
+{% else %}
+
+    <table class="nes-table is-bordered">
+        <thead>
             <tr>
-                <td>
-                    <a href="{% url "game_details" game.id %}">{{ game.name }}</a>
-                </td>
+                <th>Name</th>
+
                 {% if user.is_authenticated %}
-                    {% render_actions user game.id platform.id authenticated_user_catalog %}
+                    <th>Actions</th>
                 {% endif %}
             </tr>
-        {% endfor %}
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+            {% for game in games %}
+                <tr>
+                    <td>
+                        <a href="{% url "game_details" game.id %}">{{ game.name }}</a>
+                    </td>
+                    {% if user.is_authenticated %}
+                        {% render_actions user game.id platform.id authenticated_user_catalog %}
+                    {% endif %}
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+{% endif %}
 
 <p><strong>{{ games_count }}</strong> game{{ games_count|pluralize }} for <strong>{{ platform.name }}</strong>.</p>
 

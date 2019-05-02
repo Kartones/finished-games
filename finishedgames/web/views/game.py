@@ -1,6 +1,7 @@
 import string
 from typing import Any
 
+from django.conf import settings
 from django.db.models.functions import Lower
 from django.http import (HttpResponse, HttpResponseRedirect, HttpRequest)
 from django.shortcuts import (get_object_or_404, render)
@@ -32,19 +33,30 @@ class GamesByPlatformView(View):
     def get(self, request: HttpRequest, platform_id: int, *args: Any, **kwargs: Any) -> HttpResponse:
         platform = get_object_or_404(Platform, pk=platform_id)
 
-        games = Game.objects  \
-                    .only("id", "name")  \
-                    .filter(platforms__id=platform_id)  \
-                    .order_by(Lower("name"))  \
-                    .all()
-        games_count = len(games)
+        games_count = Game.objects  \
+                          .filter(platforms__id=platform_id)  \
+                          .count()
 
-        context = {
-            "platform": platform,
-            "games": games,
-            "games_count": games_count,
-            "authenticated_user_catalog": kwargs["authenticated_user_catalog"],
-        }
+        if games_count > settings.MAXIMUM_GAMES_PER_PLATFORM_NON_PAGED:
+            context = {
+                "platform": platform,
+                "games_count": games_count,
+                "cant_display_so_many_games": True,
+            }
+        else:
+            games = Game.objects  \
+                        .only("id", "name")  \
+                        .filter(platforms__id=platform_id)  \
+                        .order_by(Lower("name"))  \
+                        .all()
+
+            context = {
+                "platform": platform,
+                "games": games,
+                "games_count": games_count,
+                "authenticated_user_catalog": kwargs["authenticated_user_catalog"],
+            }
+
         return render(request, "games_by_platform.html", context)
 
 
