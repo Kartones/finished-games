@@ -1,9 +1,11 @@
-from typing import (Any, List)
+from typing import (Any, cast, List)
 
 from django.contrib import admin
 from django.db.models.functions import Lower
 from django.forms import ModelForm
 from django.http import HttpRequest
+from django.utils.html import format_html_join
+from django.utils.safestring import mark_safe
 
 from core.forms import (GameForm, PlatformForm)
 from core.models import (Game, Platform, UserGame, WishlistedUserGame)
@@ -20,6 +22,7 @@ class UserGameAdmin(FGModelAdmin):
     list_display = ["game", "user", "platform", "currently_playing", "year_finished", "no_longer_owned"]
     list_filter = ["user__username", "platform", "currently_playing", "year_finished", "no_longer_owned"]
     search_fields = ["game__name"]
+    autocomplete_fields = ["user", "game"]
 
     def get_ordering(self, request: HttpRequest) -> List[str]:
         return [Lower("user__username"), "-id"]
@@ -43,11 +46,22 @@ class GameAdmin(FGModelAdmin):
     fieldsets = [
         ("Basic Info", {"fields": ["name", "platforms", "publish_date"]}),
         ("DLCs & Expansions", {"fields": ["dlc_or_expansion", "parent_game"]}),
-        ("Advanced (don't touch if you don't know what you're doing)", {"fields": ["urls"]}),
+        ("Advanced", {"fields": ["urls_list", "urls"]}),
     ]
     list_display = ["name", "platforms_list", "dlc_or_expansion", "parent_game"]
     list_filter = ["dlc_or_expansion", "platforms"]
     search_fields = ["name"]
+    autocomplete_fields = ["parent_game"]
+
+    readonly_fields = ('urls_list',)
+
+    def urls_list(self, instance: FGModelAdmin) -> str:
+        return cast(str, format_html_join(
+            mark_safe("<br>"),
+            "{}: <a href='{}' target='_blank'>{}</a>",
+            ((name, url, url) for name, url in instance.urls_dict.items()),
+        ))
+    urls_list.short_description = "URLs list"  # type:ignore # NOQA: E305
 
     def get_ordering(self, request: HttpRequest) -> List[str]:
         return ["-id"]
@@ -57,6 +71,7 @@ class WishlistedUserGameAdmin(FGModelAdmin):
     list_display = ("game", "user", "platform")
     list_filter = ["user__username", "platform"]
     search_fields = ["game__name"]
+    autocomplete_fields = ["user", "game"]
 
     def get_ordering(self, request: HttpRequest) -> List[str]:
         return [Lower("user__username"), "-id"]
