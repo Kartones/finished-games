@@ -14,8 +14,8 @@ from catalogsources.admin.filters import (
 )
 from catalogsources.admin.views import (FetchedGameAdminViewsMixin, FetchedPlatformAdminViewsMixin)
 from catalogsources.models import (FetchedGame, FetchedPlatform)
-from core.admin import FGModelAdmin
 from core.models import Game
+from web.admin import FGModelAdmin
 
 
 class FetchedGameAdmin(FetchedGameAdminViewsMixin, FGModelAdmin):

@@ -9,9 +9,9 @@ from django.urls import reverse
 from catalogsources.apps import CatalogSourcesConfig
 from catalogsources.managers import (GameImportSaveError, ImportManager, PlatformImportSaveError)
 from catalogsources.models import (FetchedGame, FetchedPlatform)
-from core.admin import FGModelAdmin
 from core.models import (Game, Platform)
 from finishedgames import constants
+from web.admin import FGModelAdmin
 
 
 class FetchedGameAdminViewsMixin(FGModelAdmin):

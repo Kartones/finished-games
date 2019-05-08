@@ -3,8 +3,8 @@ from typing import cast
 from django.urls import reverse
 from django.utils.html import format_html
 
-from core.admin import FGModelAdmin
 from catalogsources.models import (FetchedGame, FetchedPlatform)
+from web.admin import FGModelAdmin
 
 
 # Decorator to render source urls as hyperlinks on the listing pages
