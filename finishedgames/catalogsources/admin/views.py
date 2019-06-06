@@ -6,7 +6,9 @@ from django.http import (Http404, HttpRequest, HttpResponseRedirect)
 from django.template.response import TemplateResponse
 from django.urls import reverse
 
-from catalogsources.admin.forms import (SingleFetchedPlatformImportForm, SinglePlatformImportForm)
+from catalogsources.admin.forms import (
+    SingleFetchedGameImportForm, SingleFetchedPlatformImportForm, SinglePlatformImportForm
+)
 from catalogsources.apps import CatalogSourcesConfig
 from catalogsources.managers import (GameImportSaveError, ImportManager, PlatformImportSaveError)
 from catalogsources.models import (FetchedGame, FetchedPlatform)
@@ -46,6 +48,64 @@ class FetchedGameAdminViewsMixin(FGModelAdmin):
 
         if not import_all_games and len(selected_ids) == 1:
             fetched_game = FetchedGame.objects.get(id=selected_ids[0])
+            fg_game_platforms = fetched_game.platforms.all()
+
+            is_fetched_game_linked = fetched_game.fg_game is not None
+            has_parent_game = fetched_game.parent_game is not None
+            is_parent_fetched_game_imported = bool(has_parent_game and fetched_game.parent_game.fg_game)
+
+            initial_fetched_form_data = {
+                "fetched_name": fetched_game.name,
+                "fetched_publish_date": fetched_game.publish_date,
+                "fg_platform_ids": ",".join(
+                    [str(platform.id) for platform in fg_game_platforms]
+                ),
+                "fg_platforms": "",
+                "dlc_or_expansion": fetched_game.dlc_or_expansion,
+                "source_id": fetched_game.source_id,
+                "source_game_id": fetched_game.source_game_id,
+                "source_url": fetched_game.source_url,
+
+                "hidden": fetched_game.hidden,
+                "last_modified_date": fetched_game.last_modified_date,
+            }
+
+            if is_fetched_game_linked:
+                initial_fetched_form_data.update({
+                    "fg_game_id": fetched_game.fg_game.id,
+                    "fg_game_name": fetched_game.fg_game.name,
+                })
+
+            if has_parent_game:
+                initial_fetched_form_data.update({
+                    "fetched_parent_game_name": fetched_game.parent_game.name
+                })
+
+            if is_parent_fetched_game_imported:
+                initial_fetched_form_data.update({
+                    "parent_game_fg_game_id": fetched_game.parent_game.fg_game.id
+                })
+
+            for platform in fg_game_platforms:
+                if platform.fg_platform:
+                    initial_fetched_form_data["fg_platforms"] = initial_fetched_form_data["fg_platforms"] + \
+                        "<strong>{}</strong><br />".format(platform.name)
+                else:
+                    initial_fetched_form_data["fg_platforms"] = initial_fetched_form_data["fg_platforms"] + \
+                        "<span class=\"unavailable\">{}</span><br />".format(platform.name)
+
+            fetched_game_form = SingleFetchedGameImportForm(initial=initial_fetched_form_data)
+
+            context.update({
+                "fetched_game_form": fetched_game_form,
+                "is_fetched_game_linked": is_fetched_game_linked,
+                "has_parent_game": has_parent_game,
+                "is_parent_fetched_game_imported": is_parent_fetched_game_imported,
+            })
+
+            return TemplateResponse(request, "single_game_import_form.html", context)
+
+            # ------------
 
             games = Game.objects.only("id", "name").order_by(Lower("name"))
             platforms = Platform.objects.only("id", "name").all()
