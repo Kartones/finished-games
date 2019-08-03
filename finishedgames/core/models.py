@@ -111,8 +111,8 @@ class UserGame(BaseUserGame):
                     self.game.name,
                     self.platform.name,
                     "','".join((platform.name for platform in game_platforms))
-                    )
-                })
+                )
+            })
 
 
 class WishlistedUserGame(BaseUserGame):
@@ -128,5 +128,5 @@ class WishlistedUserGame(BaseUserGame):
                     self.game.name,
                     self.platform.name,
                     "','".join((platform.name for platform in game_platforms))
-                    )
-                })
+                )
+            })

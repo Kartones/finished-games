@@ -48,12 +48,12 @@ run: build
 # remove -s flag if there is noise, but initially is handy for print() statements while building tests
 test: build
 	set -o pipefail; \
-	$(COMPOSE_CMD) pytest -s
+	$(COMPOSE_CMD) pytest -n auto -s
 
 # opening html file currently only works on Linux
 coverage: build
 	set -o pipefail; \
-	$(COMPOSE_CMD) pytest --cov-report html:../cov_html --cov=. --cov-config .coveragerc; \
+	$(COMPOSE_CMD) pytest -n auto --cov-report html:../cov_html --cov=. --cov-config .coveragerc; \
 	xdg-open cov_html/index.html
 
 statics: build

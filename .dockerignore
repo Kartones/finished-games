@@ -6,5 +6,4 @@ LICENSE
 Makefile
 README.md
 mypy.ini
-pytest.ini
 */doc/*

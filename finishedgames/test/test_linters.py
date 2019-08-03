@@ -5,6 +5,11 @@ import sys
 SOURCE_FOLDER = "."
 
 
+"""
+Both pytest-mypy and pytest-flake8 exist, but need more fiddling with config files than this test-based linting
+"""
+
+
 def test_flake8_compliance() -> None:
     flake8_binary = subprocess.check_output("which flake8",
                                             shell=True,
