@@ -169,9 +169,8 @@
         <form action="{% url 'admin:platform_import' %}" method="post">
             <div id="existing-platform">
                 {% csrf_token %}
-                <input type="hidden" name="{{ platform_form.platform_id.html_name }}"
-                    value="{{ platform_form.platform_id.value }}">
-                <input type="hidden" name="fetched_platform_id" value="{{ platform_form.fetched_platform_id.value }}">
+                {{ platform_form.platform_id }}
+                {{ platform_form.fetched_platform_id }}
                 <div>
                     <fieldset class="module aligned">
                         <h3>
@@ -186,9 +185,7 @@
                         <div class="form-row">
                             <div>
                                 {{ platform_form.name.label_tag }}
-                                <input id="id_{{ platform_form.name.html_name }}" type="text"
-                                    name="{{ platform_form.name.html_name }}" value="{{ platform_form.name.value }}"
-                                    class="vTextField" maxlength="100" required>
+                                {{ platform_form.name }}
                                 <input data-target="id_{{ platform_form.name.html_name }}"
                                     data-original="{{ platform_form.name.value }}" onclick="revertField(this)"
                                     type="button" value="↺" class="btn-operation" title="Reset to original value">
@@ -197,10 +194,7 @@
                         <div class="form-row">
                             <div>
                                 {{ platform_form.shortname.label_tag }}
-                                <input id="id_{{ platform_form.shortname.html_name }}" type="text"
-                                    name="{{ platform_form.shortname.html_name }}"
-                                    value="{{ platform_form.shortname.value }}" class="vTextField" maxlength="100"
-                                    required>
+                                {{ platform_form.shortname }}
                                 <input data-target="id_{{ platform_form.shortname.html_name }}"
                                     data-original="{{ platform_form.shortname.value }}" onclick="revertField(this)"
                                     type="button" value="↺" class="btn-operation" title="Reset to original value">
@@ -209,9 +203,7 @@
                         <div class="form-row">
                             <div>
                                 {{ platform_form.publish_date.label_tag }}
-                                <input id="id_{{ platform_form.publish_date.html_name }}" type="number"
-                                    name="{{ platform_form.publish_date.html_name }}"
-                                    value="{{ platform_form.publish_date.value }}" class="vIntegerField" required>
+                                {{ platform_form.publish_date }}
                                 <input data-target="id_{{ platform_form.publish_date.html_name }}"
                                     data-original="{{ platform_form.publish_date.value }}" onclick="revertField(this)"
                                     type="button" value="↺" class="btn-operation" title="Reset to original value">

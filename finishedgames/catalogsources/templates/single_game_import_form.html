@@ -238,9 +238,7 @@
                         <div class="form-row">
                             <div>
                                 {{ game_form.name.label_tag }}
-                                <input id="id_{{ game_form.name.html_name }}" type="text"
-                                    name="{{ game_form.name.html_name }}" value="{{ game_form.name.value }}"
-                                    class="vTextField" maxlength="100" required>
+                                {{ game_form.name }}
                                 <input data-target="id_{{ game_form.name.html_name }}"
                                     data-original="{{ game_form.name.value }}" onclick="revertField(this)"
                                     type="button" value="↺" class="btn-operation" title="Reset to original value">
@@ -249,9 +247,7 @@
                         <div class="form-row">
                             <div>
                                 {{ game_form.publish_date.label_tag }}
-                                <input id="id_{{ game_form.publish_date.html_name }}" type="number"
-                                    name="{{ game_form.publish_date.html_name }}"
-                                    value="{{ game_form.publish_date.value }}" class="vIntegerField" required>
+                                {{ game_form.publish_date }}
                                 <input data-target="id_{{ game_form.publish_date.html_name }}"
                                     data-original="{{ game_form.publish_date.value }}" onclick="revertField(this)"
                                     type="button" value="↺" class="btn-operation" title="Reset to original value">

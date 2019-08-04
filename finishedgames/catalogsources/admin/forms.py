@@ -30,14 +30,25 @@ class SingleFetchedPlatformImportForm(forms.Form):
 
 
 class SinglePlatformImportForm(forms.Form):
-    platform_id = forms.IntegerField()
-    name = forms.CharField(label="Name", max_length=100, initial="")
-    shortname = forms.CharField(label="Shortname", max_length=40, initial="")
+    fetched_platform_id = forms.IntegerField(widget=forms.HiddenInput)
+    platform_id = forms.IntegerField(required=False, widget=forms.HiddenInput)
+    name = forms.CharField(
+        label="Name",
+        max_length=100,
+        initial="",
+        widget=forms.TextInput(attrs={"size": "60", "class": "vTextField"})
+    )
+    shortname = forms.CharField(
+        label="Shortname",
+        max_length=40,
+        initial="",
+        widget=forms.TextInput(attrs={"size": "40", "class": "vTextField"})
+    )
     publish_date = forms.IntegerField(
         label="Year published",
         validators=[MinValueValidator(1970), MaxValueValidator(3000)],
+        widget=forms.NumberInput(attrs={"class": "vIntegerField"})
     )
-    fetched_platform_id = forms.IntegerField()
 
 
 class SingleFetchedGameImportForm(forms.Form):
@@ -69,10 +80,16 @@ class SingleFetchedGameImportForm(forms.Form):
 class SingleGameImportForm(forms.Form):
     fetched_game_id = forms.IntegerField(widget=forms.HiddenInput)
     game_id = forms.IntegerField(required=False, widget=forms.HiddenInput)
-    name = forms.CharField(label="Name", max_length=200, initial="")
+    name = forms.CharField(
+        label="Name",
+        max_length=200,
+        initial="",
+        widget=forms.TextInput(attrs={"size": "60", "class": "vTextField"})
+    )
     publish_date = forms.IntegerField(
         label="Year published",
         validators=[MinValueValidator(1970), MaxValueValidator(3000)],
+        widget=forms.NumberInput(attrs={"class": "vIntegerField"})
     )
     platforms = forms.ModelMultipleChoiceField(queryset=Platform.objects.order_by(Lower("name")))
     dlc_or_expansion = forms.BooleanField(label="DLC/Expansion", initial=False, required=False)
@@ -85,10 +102,10 @@ class SingleGameImportForm(forms.Form):
     source_display_name = forms.CharField(
         label="Source display name (for URL button)",
         max_length=255,
-        widget=forms.TextInput(attrs={"size": "30"}),
+        widget=forms.TextInput(attrs={"size": "30", "readonly": ""}),
     )
     source_url = forms.CharField(
         label="Source URL (will be added/updated to existing ones)",
         max_length=255,
-        widget=forms.TextInput(attrs={"size": "60"}),
+        widget=forms.TextInput(attrs={"size": "60", "readonly": ""}),
     )
