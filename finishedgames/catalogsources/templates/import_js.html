@@ -37,17 +37,22 @@
 
     function revertField(eventSource) {
         const targetNode = document.querySelector("#" + eventSource.dataset.target);
-
-        if (targetNode.type === "select-multiple") {
-            const originalValues = eventSource.dataset.original.split(",");
-            targetNode.value = "";
-            for (let option of targetNode.options) {
-                if (originalValues.includes(option.value)) {
-                    option.selected = true;
+        switch(targetNode.type) {
+            case "checkbox":
+                targetNode.checked = eventSource.dataset.original === "True";
+                break;
+            case "select-multiple":
+                const originalValues = eventSource.dataset.original.split(",");
+                targetNode.value = "";
+                for (let option of targetNode.options) {
+                    if (originalValues.includes(option.value)) {
+                        option.selected = true;
+                    }
                 }
-            }
-        } else {
-            targetNode.value = eventSource.dataset.original;
+                break;
+            default:
+                targetNode.value = eventSource.dataset.original;
+                break;
         }
     }
 </script>

@@ -1,5 +1,11 @@
 from django import forms
 from django.core.validators import (MaxValueValidator, MinValueValidator)
+from django.db.models.functions import Lower
+
+from core.models import (
+    Game,
+    Platform,
+)
 
 
 class SingleFetchedPlatformImportForm(forms.Form):
@@ -10,7 +16,9 @@ class SingleFetchedPlatformImportForm(forms.Form):
     fetched_name = forms.CharField(label="Name", max_length=100, disabled=True)
     fetched_shortname = forms.CharField(label="Shortname", max_length=40, disabled=True)
     fetched_publish_date = forms.IntegerField(
-        label="Year published", validators=[MinValueValidator(1970), MaxValueValidator(3000)], disabled=True
+        label="Year published",
+        validators=[MinValueValidator(1970), MaxValueValidator(3000)],
+        disabled=True,
     )
     source_id = forms.CharField(label="Source", max_length=50, disabled=True)
     source_platform_id = forms.CharField(label="Source platform identifier", max_length=50, disabled=True)
@@ -23,10 +31,11 @@ class SingleFetchedPlatformImportForm(forms.Form):
 
 class SinglePlatformImportForm(forms.Form):
     platform_id = forms.IntegerField()
-    name = forms.CharField(label="Name", max_length=100)
-    shortname = forms.CharField(label="Shortname", max_length=40)
+    name = forms.CharField(label="Name", max_length=100, initial="")
+    shortname = forms.CharField(label="Shortname", max_length=40, initial="")
     publish_date = forms.IntegerField(
-        label="Year published", validators=[MinValueValidator(1970), MaxValueValidator(3000)]
+        label="Year published",
+        validators=[MinValueValidator(1970), MaxValueValidator(3000)],
     )
     fetched_platform_id = forms.IntegerField()
 
@@ -38,11 +47,13 @@ class SingleFetchedGameImportForm(forms.Form):
     """
     fetched_name = forms.CharField(label="Name", max_length=200, disabled=True)
     fetched_publish_date = forms.IntegerField(
-        label="Year published", validators=[MinValueValidator(1970), MaxValueValidator(3000)], disabled=True
+        label="Year published",
+        validators=[MinValueValidator(1970), MaxValueValidator(3000)],
+        disabled=True,
     )
     fg_platform_ids = forms.CharField(label="Fetched Platform Ids", disabled=True)
     fg_platforms = forms.CharField(label="Fetched Platforms", disabled=True)
-    dlc_or_expansion = forms.BooleanField(label="DLC/Expansion", disabled=True)
+    fetched_dlc_or_expansion = forms.BooleanField(label="DLC/Expansion", disabled=True)
     source_id = forms.CharField(label="Source identifier", max_length=50, disabled=True)
     source_game_id = forms.CharField(label="Source game identifier", max_length=50, disabled=True)
     source_url = forms.CharField(label="Resource source URI", max_length=255, disabled=True)
@@ -53,3 +64,31 @@ class SingleFetchedGameImportForm(forms.Form):
     fg_game_name = forms.CharField(label="Mapped to Game", max_length=200, disabled=True)
     fetched_parent_game_name = forms.CharField(label="Parent Fetched Game", max_length=200, disabled=True)
     parent_game_fg_game_id = forms.IntegerField(disabled=True)
+
+
+class SingleGameImportForm(forms.Form):
+    fetched_game_id = forms.IntegerField(widget=forms.HiddenInput)
+    game_id = forms.IntegerField(required=False, widget=forms.HiddenInput)
+    name = forms.CharField(label="Name", max_length=200, initial="")
+    publish_date = forms.IntegerField(
+        label="Year published",
+        validators=[MinValueValidator(1970), MaxValueValidator(3000)],
+    )
+    platforms = forms.ModelMultipleChoiceField(queryset=Platform.objects.order_by(Lower("name")))
+    dlc_or_expansion = forms.BooleanField(label="DLC/Expansion", initial=False, required=False)
+    # TODO: Use https://django-autocomplete-light.readthedocs.io/en/master/tutorial.html
+    parent_game = forms.ModelChoiceField(
+        label="Parent game",
+        queryset=Game.objects.order_by(Lower("name")),
+        required=False,
+    )
+    source_display_name = forms.CharField(
+        label="Source display name (for URL button)",
+        max_length=255,
+        widget=forms.TextInput(attrs={"size": "30"}),
+    )
+    source_url = forms.CharField(
+        label="Source URL (will be added/updated to existing ones)",
+        max_length=255,
+        widget=forms.TextInput(attrs={"size": "60"}),
+    )

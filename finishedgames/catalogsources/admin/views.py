@@ -2,18 +2,31 @@ from typing import List
 
 from django.conf import settings
 from django.db.models.functions import Lower
-from django.http import (Http404, HttpRequest, HttpResponseRedirect)
+from django.http import (
+    Http404,
+    HttpRequest,
+    HttpResponseRedirect
+)
 from django.template.response import TemplateResponse
 from django.urls import reverse
 
 from catalogsources.admin.forms import (
-    SingleFetchedGameImportForm, SingleFetchedPlatformImportForm, SinglePlatformImportForm
+    SingleFetchedGameImportForm,
+    SingleFetchedPlatformImportForm,
+    SingleGameImportForm,
+    SinglePlatformImportForm
 )
 from catalogsources.apps import CatalogSourcesConfig
-from catalogsources.managers import (GameImportSaveError, ImportManager, PlatformImportSaveError)
-from catalogsources.models import (FetchedGame, FetchedPlatform)
+from catalogsources.managers import (
+    GameImportSaveError,
+    ImportManager,
+    PlatformImportSaveError
+)
+from catalogsources.models import (
+    FetchedGame,
+    FetchedPlatform
+)
 from core.admin import FGModelAdmin
-from core.models import (Game, Platform)
 from finishedgames import constants
 
 
@@ -48,32 +61,66 @@ class FetchedGameAdminViewsMixin(FGModelAdmin):
 
         if not import_all_games and len(selected_ids) == 1:
             fetched_game = FetchedGame.objects.get(id=selected_ids[0])
-            fg_game_platforms = fetched_game.platforms.all()
+            fg_game_platforms = fetched_game.platforms.order_by(Lower("name"))
+            fg_platform_ids = ",".join((
+                str(platform.fg_platform.id)
+                for platform in fg_game_platforms.prefetch_related("fg_platform")
+                if platform.fg_platform
+            ))
 
             is_fetched_game_linked = fetched_game.fg_game is not None
             has_parent_game = fetched_game.parent_game is not None
             is_parent_fetched_game_imported = bool(has_parent_game and fetched_game.parent_game.fg_game)
 
+            context.update({
+                "is_fetched_game_linked": is_fetched_game_linked,
+                "has_parent_game": has_parent_game,
+                "is_parent_fetched_game_imported": is_parent_fetched_game_imported,
+                "existing_platform_ids": "",
+            })
+
             initial_fetched_form_data = {
                 "fetched_name": fetched_game.name,
                 "fetched_publish_date": fetched_game.publish_date,
-                "fg_platform_ids": ",".join(
-                    [str(platform.id) for platform in fg_game_platforms]
-                ),
+                "fg_platform_ids": fg_platform_ids,
                 "fg_platforms": "",
-                "dlc_or_expansion": fetched_game.dlc_or_expansion,
+                "fetched_dlc_or_expansion": fetched_game.dlc_or_expansion,
                 "source_id": fetched_game.source_id,
                 "source_game_id": fetched_game.source_game_id,
                 "source_url": fetched_game.source_url,
-
                 "hidden": fetched_game.hidden,
                 "last_modified_date": fetched_game.last_modified_date,
             }
 
+            initial_form_data = {
+                "fetched_game_id": fetched_game.id,
+                "source_display_name": source_display_names[fetched_game.source_id],
+                "source_url": fetched_game.source_url,
+            }
+
             if is_fetched_game_linked:
+                platforms_list = [platform.id for platform in fetched_game.fg_game.platforms.only("id")]
+
+                if fetched_game.fg_game.parent_game is not None:
+                    initial_form_data.update({
+                        "parent_game": fetched_game.fg_game.parent_game.id,
+                    })
+
                 initial_fetched_form_data.update({
                     "fg_game_id": fetched_game.fg_game.id,
                     "fg_game_name": fetched_game.fg_game.name,
+                })
+
+                context.update({
+                    "existing_platform_ids": ",".join((str(platform_id) for platform_id in platforms_list)),
+                })
+
+                initial_form_data.update({
+                    "game_id": fetched_game.fg_game.id,
+                    "name": fetched_game.fg_game.name,
+                    "publish_date": fetched_game.fg_game.publish_date,
+                    "platforms": platforms_list,
+                    "dlc_or_expansion": fetched_game.fg_game.dlc_or_expansion,
                 })
 
             if has_parent_game:
@@ -95,51 +142,14 @@ class FetchedGameAdminViewsMixin(FGModelAdmin):
                         "<span class=\"unavailable\">{}</span><br />".format(platform.name)
 
             fetched_game_form = SingleFetchedGameImportForm(initial=initial_fetched_form_data)
+            game_form = SingleGameImportForm(initial=initial_form_data)
 
             context.update({
                 "fetched_game_form": fetched_game_form,
-                "is_fetched_game_linked": is_fetched_game_linked,
-                "has_parent_game": has_parent_game,
-                "is_parent_fetched_game_imported": is_parent_fetched_game_imported,
+                "game_form": game_form,
             })
 
             return TemplateResponse(request, "single_game_import_form.html", context)
-
-            # ------------
-
-            games = Game.objects.only("id", "name").order_by(Lower("name"))
-            platforms = Platform.objects.only("id", "name").all()
-
-            context.update({
-                "fetched_game": fetched_game,
-                "fg_plaform_ids": ",".join((
-                    str(platform.fg_platform.id)
-                    for platform in fetched_game.platforms
-                                                .prefetch_related("fg_platform")
-                                                .all()
-                    if platform.fg_platform
-                )),
-                "games_for_selectbox": games,
-                "platforms_for_selectbox": platforms,
-                "existing_parent_game_id": "",
-                "existing_platform_ids": "",
-                "existing_platform_ids_list": [],
-                "source_display_name": source_display_names[fetched_game.source_id],
-            })
-
-            if fetched_game.fg_game:
-                platforms_list = [platform.id for platform in fetched_game.fg_game.platforms.only("id").all()]
-                context.update({
-                    "existing_parent_game_id": "",
-                    "existing_platform_ids": ",".join((str(platform_id) for platform_id in platforms_list)),
-                    "existing_platform_ids_list": platforms_list,
-                })
-                if fetched_game.fg_game.parent_game:
-                    context.update({
-                        "existing_parent_game_id": fetched_game.fg_game.parent_game.id,
-                    })
-
-            return TemplateResponse(request, "game_import.html", context)
         else:
             if import_all_games:
                 hidden_filter = request.GET.get("hidden", "False")
@@ -152,7 +162,7 @@ class FetchedGameAdminViewsMixin(FGModelAdmin):
                 fetched_games = FetchedGame.objects  \
                                            .filter(id__in=selected_ids)  \
                                            .prefetch_related("platforms", "fg_game", "parent_game")
-            fg_platform_ids = {
+            fg_platform_ids_dict = {
                 str(fetched_game.id): ",".join((
                     str(platform.fg_platform.id)
                     for platform in fetched_game.platforms
@@ -164,7 +174,7 @@ class FetchedGameAdminViewsMixin(FGModelAdmin):
             }
             # django templates don't allow array item access, so build a list of tuples which can be easily iterated
             fetched_games_data = [
-                (fetched_game, fg_platform_ids[str(fetched_game.id)], source_display_names[fetched_game.source_id])
+                (fetched_game, fg_platform_ids_dict[str(fetched_game.id)], source_display_names[fetched_game.source_id])
                 for fetched_game in fetched_games
             ]
 
@@ -176,25 +186,56 @@ class FetchedGameAdminViewsMixin(FGModelAdmin):
             return TemplateResponse(request, "game_import_batch.html", context)
 
     def import_view(self, request: HttpRequest) -> HttpResponseRedirect:
-        name = request.POST["name"]
-        try:
-            ImportManager.import_fetched_game(
-                name=name,
-                publish_date_string=request.POST["publish_date"],
-                dlc_or_expansion=(request.POST.get("dlc_or_expansion") is not None),
-                platforms=request.POST.getlist("platforms"),
-                fetched_game_id=request.POST["fetched_game_id"],
-                game_id=request.POST["id"],
-                parent_game_id=request.POST["parent_game"],
-                source_display_name=request.POST["source_display_name"],
-                source_url=request.POST["source_url"]
-            )
-        except GameImportSaveError as error:
-            self.message_user(request, "Error importing Fetched Game '{}': {}".format(name, error), level="error")
-            return HttpResponseRedirect(reverse("admin:catalogsources_fetchedgame_changelist"))
+        if request.method == "POST":
+            game_form = SingleGameImportForm(request.POST)
 
-        self.message_user(request, "Fetched Game {} imported successfully".format(name))
-        return HttpResponseRedirect(reverse("admin:catalogsources_fetchedgame_changelist"))
+            if game_form.is_valid():
+                name = game_form.cleaned_data["name"]
+                has_parent_game = game_form.cleaned_data["parent_game"] is not None
+                try:
+                    ImportManager.import_fetched_game(
+                        name=name,
+                        publish_date_string=game_form.cleaned_data["publish_date"],
+                        dlc_or_expansion=game_form.cleaned_data["dlc_or_expansion"],
+                        platforms=game_form.cleaned_data["platforms"],
+                        fetched_game_id=game_form.cleaned_data["fetched_game_id"],
+                        game_id=game_form.cleaned_data["game_id"],
+                        parent_game_id=game_form.cleaned_data["parent_game"].id if has_parent_game else None,
+                        source_display_name=game_form.cleaned_data["source_display_name"],
+                        source_url=game_form.cleaned_data["source_url"]
+                    )
+                except GameImportSaveError as error:
+                    self.message_user(
+                        request,
+                        "Error importing Fetched Game '{}':{}".format(name, error),
+                        level="error"
+                    )
+                    return HttpResponseRedirect(reverse("admin:catalogsources_fetchedgame_changelist"))
+
+                self.message_user(request, "Fetched Game '{}' imported successfully".format(name))
+                return HttpResponseRedirect(reverse("admin:catalogsources_fetchedgame_changelist"))
+            else:
+                non_field_errors = ", ".join([error for error in game_form.non_field_errors()])
+                field_errors = ", ".join([
+                    "Field '{field}': {errors}".format(
+                        field=field.label,
+                        errors=",".join(field.errors)
+                    ) for field in game_form if field.errors
+                ])
+                if non_field_errors:
+                    non_field_errors = "{}, ".format(non_field_errors)
+
+                self.message_user(
+                    request, "Errors importing Fetched Game '{game}': {errors} {field_errors}".format(
+                        game=request.POST["name"],
+                        errors=non_field_errors,
+                        field_errors=field_errors
+                    ),
+                    level="error"
+                )
+                return HttpResponseRedirect(reverse("admin:catalogsources_fetchedgame_changelist"))
+        else:
+            raise Http404("Invalid URL")
 
     def import_batch_view(self, request: HttpRequest) -> HttpResponseRedirect:
         fetched_game_ids = request.POST.getlist("fetched_game_id")
@@ -260,6 +301,7 @@ class FetchedGameAdminViewsMixin(FGModelAdmin):
 
 
 class FetchedPlatformAdminViewsMixin(FGModelAdmin):
+
     def import_setup_view(self, request: HttpRequest) -> TemplateResponse:
         context = self.admin_site.each_context(request)
         context.update({
