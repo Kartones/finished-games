@@ -6,6 +6,7 @@ from core.models import (
     Game,
     Platform,
 )
+from catalogsources.admin.form_fields import SimpleArrayField
 
 
 class SingleFetchedPlatformImportForm(forms.Form):
@@ -49,6 +50,15 @@ class SinglePlatformImportForm(forms.Form):
         validators=[MinValueValidator(1970), MaxValueValidator(3000)],
         widget=forms.NumberInput(attrs={"class": "vIntegerField"})
     )
+
+
+class PlatformsImportForm(forms.Form):
+    fields = SimpleArrayField(forms.CharField(max_length=15))
+    fetched_platform_ids = SimpleArrayField(forms.IntegerField())
+    fg_platform_ids = SimpleArrayField(forms.IntegerField())
+    names = SimpleArrayField(forms.CharField(max_length=100))
+    shortnames = SimpleArrayField(forms.CharField(max_length=40))
+    publish_date_strings = SimpleArrayField(forms.CharField(max_length=4))
 
 
 class SingleFetchedGameImportForm(forms.Form):

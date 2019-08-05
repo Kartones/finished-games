@@ -1,5 +1,6 @@
 from typing import List
 
+from django.forms import Form
 from django.conf import settings
 from django.db.models.functions import Lower
 from django.http import (
@@ -11,6 +12,7 @@ from django.template.response import TemplateResponse
 from django.urls import reverse
 
 from catalogsources.admin.forms import (
+    PlatformsImportForm,
     SingleFetchedGameImportForm,
     SingleFetchedPlatformImportForm,
     SingleGameImportForm,
@@ -30,7 +32,34 @@ from core.admin import FGModelAdmin
 from finishedgames import constants
 
 
-class FetchedGameAdminViewsMixin(FGModelAdmin):
+class BaseFetchedModelAdmin(FGModelAdmin):
+
+    def redirect_to_import_errors(
+        self, form: Form, request: HttpRequest, capitalized_model_name: str, model_value: str, redirect_location: str
+    ) -> HttpResponseRedirect:
+        non_field_errors = ", ".join([error for error in form.non_field_errors()])
+        field_errors = ", ".join([
+            "Field '{field}': {errors}".format(
+                field=field.label,
+                errors=",".join(field.errors)
+            ) for field in form if field.errors
+        ])
+        if non_field_errors:
+            non_field_errors = "{}, ".format(non_field_errors)
+
+        self.message_user(
+            request, "Errors importing {model_name} '{model_value}': {errors} {field_errors}".format(
+                model_name=capitalized_model_name,
+                model_value=model_value,
+                errors=non_field_errors,
+                field_errors=field_errors
+            ),
+            level="error"
+        )
+        return HttpResponseRedirect(reverse(redirect_location))
+
+
+class FetchedGameAdminViewsMixin(BaseFetchedModelAdmin):
 
     def import_setup_view(self, request: HttpRequest) -> TemplateResponse:
         context = self.admin_site.each_context(request)
@@ -215,25 +244,13 @@ class FetchedGameAdminViewsMixin(FGModelAdmin):
                 self.message_user(request, "Fetched Game '{}' imported successfully".format(name))
                 return HttpResponseRedirect(reverse("admin:catalogsources_fetchedgame_changelist"))
             else:
-                non_field_errors = ", ".join([error for error in game_form.non_field_errors()])
-                field_errors = ", ".join([
-                    "Field '{field}': {errors}".format(
-                        field=field.label,
-                        errors=",".join(field.errors)
-                    ) for field in game_form if field.errors
-                ])
-                if non_field_errors:
-                    non_field_errors = "{}, ".format(non_field_errors)
-
-                self.message_user(
-                    request, "Errors importing Fetched Game '{game}': {errors} {field_errors}".format(
-                        game=request.POST["name"],
-                        errors=non_field_errors,
-                        field_errors=field_errors
-                    ),
-                    level="error"
+                return self.redirect_to_import_errors(
+                    form=game_form,
+                    request=request,
+                    capitalized_model_name="Fetched Game",
+                    model_value=request.POST["name"],
+                    redirect_location="admin:catalogsources_fetchedgame_changelist"
                 )
-                return HttpResponseRedirect(reverse("admin:catalogsources_fetchedgame_changelist"))
         else:
             raise Http404("Invalid URL")
 
@@ -300,7 +317,7 @@ class FetchedGameAdminViewsMixin(FGModelAdmin):
         return HttpResponseRedirect(reverse("admin:catalogsources_fetchedgame_changelist"))
 
 
-class FetchedPlatformAdminViewsMixin(FGModelAdmin):
+class FetchedPlatformAdminViewsMixin(BaseFetchedModelAdmin):
 
     def import_setup_view(self, request: HttpRequest) -> TemplateResponse:
         context = self.admin_site.each_context(request)
@@ -407,73 +424,75 @@ class FetchedPlatformAdminViewsMixin(FGModelAdmin):
                 self.message_user(request, "Fetched Platform '{}' imported successfully".format(name))
                 return HttpResponseRedirect(reverse("admin:catalogsources_fetchedplatform_changelist"))
             else:
-                non_field_errors = ", ".join([error for error in platform_form.non_field_errors()])
-                field_errors = ", ".join([
-                    "Field '{field}': {errors}".format(
-                        field=field.label,
-                        errors=",".join(field.errors)
-                    ) for field in platform_form if field.errors
-                ])
-                if non_field_errors:
-                    non_field_errors = "{}, ".format(non_field_errors)
-
-                self.message_user(
-                    request, "Errors importing Fetched Platform '{platform}': {errors} {field_errors}".format(
-                        platform=request.POST["name"],
-                        errors=non_field_errors,
-                        field_errors=field_errors
-                    ),
-                    level="error"
+                return self.redirect_to_import_errors(
+                    form=platform_form,
+                    request=request,
+                    capitalized_model_name="Fetched Platform",
+                    model_value=request.POST["name"],
+                    redirect_location="admin:catalogsources_fetchedplatform_changelist"
                 )
-                return HttpResponseRedirect(reverse("admin:catalogsources_fetchedplatform_changelist"))
         else:
             raise Http404("Invalid URL")
 
     def import_batch_view(self, request: HttpRequest) -> HttpResponseRedirect:
-        fetched_platform_ids = request.POST.getlist("fetched_platform_id")
-        fg_platform_ids = request.POST.getlist("fg_platform_id")
-        names = request.POST.getlist("name")
-        shortnames = request.POST.getlist("shortname")
-        publish_date_strings = request.POST.getlist("publish_date")
-
-        update_fields_filter = request.POST.getlist("fields")
-
         imports_ok = []  # type: List[str]
         imports_ko = []  # type: List[str]
 
-        for index, name in enumerate(names):
-            try:
-                if int(fg_platform_ids[index]) != constants.NO_PLATFORM:
-                    platform_id = fg_platform_ids[index]
-                else:
-                    platform_id = None
-                ImportManager.import_fetched_platform(
-                    name=name,
-                    shortname=shortnames[index],
-                    publish_date_string=publish_date_strings[index],
-                    fetched_platform_id=fetched_platform_ids[index],
-                    platform_id=platform_id,
-                    update_fields_filter=update_fields_filter
-                )
-                imports_ok.append(name)
-            except PlatformImportSaveError as error:
-                imports_ko.append("{} ({}) [{}]".format(name, fetched_platform_ids[index], error))
+        form_data = {
+            "fields": request.POST.getlist("fields"),
+            "fetched_platform_ids": request.POST.getlist("fetched_platform_id"),
+            "fg_platform_ids": request.POST.getlist("fg_platform_id"),
+            "names": request.POST.getlist("name"),
+            "shortnames": request.POST.getlist("shortname"),
+            "publish_date_strings": request.POST.getlist("publish_date"),
+        }
+        platforms_form = PlatformsImportForm(form_data)
 
-        if len(imports_ko) > 0:
-            if len(imports_ok) > 0:
-                self.message_user(
-                    request,
-                    "Some Fetched Platform imports failed... Imports OK: {} ... Imports KO: {}".format(
-                        ",".join(imports_ok), ",".join(imports_ko)
-                    ),
-                    level="warning"
-                )
+        if platforms_form.is_valid():
+            for index, name in enumerate(platforms_form.cleaned_data["names"]):
+                try:
+                    if int(platforms_form.cleaned_data["fg_platform_ids"][index]) != constants.NO_PLATFORM:
+                        platform_id = platforms_form.cleaned_data["fg_platform_ids"][index]
+                    else:
+                        platform_id = None
+                    ImportManager.import_fetched_platform(
+                        name=name,
+                        shortname=platforms_form.cleaned_data["shortnames"][index],
+                        publish_date_string=platforms_form.cleaned_data["publish_date_strings"][index],
+                        fetched_platform_id=platforms_form.cleaned_data["fetched_platform_ids"][index],
+                        platform_id=platform_id,
+                        update_fields_filter=platforms_form.cleaned_data["fields"]
+                    )
+                    imports_ok.append(name)
+                except PlatformImportSaveError as error:
+                    imports_ko.append("{} ({}) [{}]".format(
+                        name, platforms_form.cleaned_data["fetched_platform_ids"][index], error)
+                    )
+
+            if len(imports_ko) > 0:
+                if len(imports_ok) > 0:
+                    self.message_user(
+                        request,
+                        "Some Fetched Platform imports failed... Imports OK: {} ... Imports KO: {}".format(
+                            ",".join(imports_ok), ",".join(imports_ko)
+                        ),
+                        level="warning"
+                    )
+                else:
+                    self.message_user(
+                        request,
+                        "All imports from the following Fetched Platforms failed: {}".format(",".join(imports_ko)),
+                        level="error"
+                    )
             else:
-                self.message_user(
-                    request,
-                    "All imports from the following Fetched Platforms failed: {}".format(",".join(imports_ko)),
-                    level="error"
-                )
+                self.message_user(request, "Fetched Platforms imported successfully: {}".format(",".join(imports_ok)))
         else:
-            self.message_user(request, "Fetched Platforms imported successfully: {}".format(",".join(imports_ok)))
+            return self.redirect_to_import_errors(
+                form=platforms_form,
+                request=request,
+                capitalized_model_name="Fetched Platforms",
+                model_value=", ".join(request.POST.getlist("name")),
+                redirect_location="admin:catalogsources_fetchedplatform_changelist"
+            )
+
         return HttpResponseRedirect(reverse("admin:catalogsources_fetchedplatform_changelist"))
