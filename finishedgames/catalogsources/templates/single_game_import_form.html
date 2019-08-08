@@ -1,0 +1,307 @@
+{% extends "admin/base_site.html" %}
+{% load i18n admin_urls static admin_modify %}
+
+{% block extrahead %}
+
+{{ block.super }}
+<link rel="stylesheet" type="text/css" href="{% static 'admin/css/forms.css' %}">
+<link rel="stylesheet" type="text/css" media="all" href="{% static 'css/admin.css' %}">
+<style type="text/css">
+    input.btn-operation {
+        background: #79aec8;
+        margin-left: 9px;
+        padding: 3px 6px;
+        height: 24px;
+    }
+    label.text-field {
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        padding: 5px 6px;
+        margin-top: 0;
+    }
+    label.number-field {
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        padding: 5px 6px;
+        margin-top: 0;
+    }
+    a.uri-field {
+        font-size: 14px;
+        vertical-align: middle;
+    }
+    div.with-copy-btn {
+        display: flex;
+    }
+    div.with-copy-btn div span {
+        padding-top: 10px;
+        vertical-align: middle;
+    }
+    .form-content {
+        display: flex;
+    }
+    #existing-game {
+        border-left: 1px solid #eee;
+    }
+    span.unavailable {
+        color: grey;
+    }
+    /* Override forms.css ones for this page only */
+    label.vCheckboxLabel {
+        float: left !important;
+        width: 160px !important;
+        padding: 4px 10px 0 0 !important;
+    }
+</style>
+
+{% endblock extrahead %}
+
+{% block breadcrumbs %}
+
+<div class="breadcrumbs">
+    <a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
+    &rsaquo; <a href="{% url 'admin:app_list' app_label=opts.app_label %}">{{ opts.app_config.verbose_name }}</a>
+    &rsaquo; <a href="{% url 'admin:catalogsources_fetchedgame_changelist' %}">{{ model_class_name }}</a>
+    &rsaquo; Import Game
+</div>
+
+{% endblock breadcrumbs%}
+
+{% block content %}
+
+<div id="content-main">
+    <div class="form-content">
+
+        <form action="#" method="post">
+            <div id="imported-game">
+                <fieldset class="module aligned">
+                    <h3>Source Fetched Game <input onclick="copyAllFields(this, 'imported-game')" type="button" value="➤" class="btn-operation" title="Copy all values"></h3>
+
+                    <div class="form-row">
+                        <div>
+                            {{ fetched_game_form.fetched_name.label_tag }}
+                            <div class="with-copy-btn">
+                                <div class="readonly" id="id_{{ fetched_game_form.fetched_name.html_name }}">
+                                    <span>{{fetched_game_form.fetched_name.value}}</span>
+                                </div>
+                                <input id="{{ fetched_game_form.fetched_name.html_name }}"
+                                    data-source="id_{{ fetched_game_form.fetched_name.html_name }}"
+                                    data-destination="id_{{ game_form.name.html_name }}" onclick="copyField(this)"
+                                    type="button" value="➤" class="btn-operation" title="Copy value">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div>
+                            {{ fetched_game_form.fetched_publish_date.label_tag }}
+                            <div class="with-copy-btn">
+                                <div class="readonly"
+                                    id="id_{{ fetched_game_form.fetched_publish_date.html_name }}">
+                                    <span>{{ fetched_game_form.fetched_publish_date.value }}</span>
+                                </div>
+                                <input id="{{ fetched_game_form.fetched_publish_date.html_name }}"
+                                    data-source="id_{{ fetched_game_form.fetched_publish_date.html_name }}"
+                                    data-destination="id_{{ game_form.publish_date.html_name }}"
+                                    onclick="copyField(this)" type="button" value="➤" class="btn-operation"
+                                    title="Copy value">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <label for="id_{{ fetched_game_form.fg_platform_ids.html_name }}">
+                            {{ fetched_game_form.fg_platforms.label }}:<br/><br/>
+                            Only those already mapped to a catalog platform will be linked
+                        </label>
+                        <div class="with-copy-btn">
+                            <div class="readonly" id="id_{{ fetched_game_form.fg_platform_ids.html_name }}">
+                                <input type="hidden" value="{{ fetched_game_form.fg_platform_ids.value }}">
+                                <span>{{ fetched_game_form.fg_platforms.value|safe }}</span>
+                            </div>
+                            <input data-source="id_{{ fetched_game_form.fg_platform_ids.html_name }}"
+                                data-destination="id_{{ game_form.platforms.html_name }}" onclick="copyField(this)"
+                                type="button" value="➤" class="btn-operation" title="Copy value">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div>
+                            {{ fetched_game_form.fetched_dlc_or_expansion.label_tag }}
+                            <div class="with-copy-btn">
+                                <div class="readonly" id="id_{{ fetched_game_form.fetched_dlc_or_expansion.html_name }}">
+                                    <span>{{fetched_game_form.fetched_dlc_or_expansion.value}}</span>
+                                </div>
+                                <input id="{{ fetched_game_form.fetched_dlc_or_expansion.html_name }}"
+                                    data-source="id_{{ fetched_game_form.fetched_dlc_or_expansion.html_name }}"
+                                    data-destination="id_{{ game_form.dlc_or_expansion.html_name }}"
+                                    onclick="copyField(this)" type="button" value="➤" class="btn-operation"
+                                    title="Copy value">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <label for="parent_game">
+                            {{ fetched_game_form.fetched_parent_game_name.label }}:<br/><br/>
+                            Must be mapped to a catalog game
+                        </label>
+                        <div class="with-copy-btn">
+                            {% if is_parent_fetched_game_imported %}
+                                <div class="readonly"
+                                    id="id_{{ fetched_game_form.fetched_parent_game_name.html_name }}">
+                                    <input type="hidden" value="{{ fetched_game_form.parent_game_fg_game_id.value }}">
+                                    <span>{{ fetched_game.fetched_parent_game_name.value }}</span>
+                                </div>
+                                <input data-source="id_{{ fetched_game_form.fetched_parent_game_name.html_name }}"
+                                    data-destination="id_{{ game_form.parent_game.html_name }}"
+                                    onclick="copyField(this)" type="button" value="➤" class="btn-operation"
+                                    title="Copy value">
+                            {% else %}
+                                <div class="readonly">
+                                    {% if has_parent_game %}
+                                        <span class="unavailable">
+                                            {{ fetched_game.fetched_parent_game_name.value }}
+                                        </span>
+                                    {% endif %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div>
+                            {{ fetched_game_form.source_id.label_tag }}
+                            <div id="id_{{ fetched_game_form.source_id.html_name }}" class="readonly">
+                                {{ fetched_game_form.source_id.value }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div>
+                            {{ fetched_game_form.source_game_id.label_tag }}
+                            <div id="id_{{ fetched_game_form.source_game_id.html_name }}" class="readonly">
+                                {{ fetched_game_form.source_game_id.value }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div>
+                            {{ fetched_game_form.source_url.label_tag }}
+                            <div id="id_{{ fetched_game_form.source_url.html_name }}" class="readonly">
+                                <a class="uri-field" href="{{ fetched_game_form.source_url.value }}"
+                                target="_blank">{{ fetched_game_form.source_url.value }}</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div>
+                            {{ fetched_game_form.fg_game_name.label_tag }}
+                            <div class="readonly">
+                                {% if is_fetched_game_linked %}
+                                    <a href="/admin/core/game/{{ fetched_game_form.fg_game_id.value }}/change/">{{ fetched_game_form.fg_game_name.value }}</a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div>
+                            {{ fetched_game_form.hidden.label_tag }}
+                            <div id="id_{{ fetched_game_form.hidden.html_name }}" class="readonly">
+                                {{ fetched_game_form.hidden.value }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div>
+                            {{ fetched_game_form.last_modified_date.label_tag }}
+                            <div id="id_{{ fetched_game_form.last_modified_date.html_name }}" class="readonly">
+                                {{ fetched_game_form.last_modified_date.value }}
+                            </div>
+                        </div>
+                    </div>
+
+                </fieldset>
+            </div>
+        </form>
+
+        <form action="{% url 'admin:game_import' %}" method="post">
+            <div id="existing-game">
+                {% csrf_token %}
+                {{ game_form.game_id }}
+                {{ game_form.fetched_game_id }}
+                <div>
+                    <fieldset class="module aligned">
+                        <h3>
+                            Destination Game
+                            {% if is_fetched_game_linked %}
+                                - <span class="changelink">Modifying existing Game</span>
+                            {% else %}
+                                - <span class="addlink">Adding new Game</span>
+                            {% endif %}
+                        </h3>
+
+                        <div class="form-row">
+                            <div>
+                                {{ game_form.name.label_tag }}
+                                {{ game_form.name }}
+                                <input data-target="id_{{ game_form.name.html_name }}"
+                                    data-original="{{ game_form.name.value }}" onclick="revertField(this)"
+                                    type="button" value="↺" class="btn-operation" title="Reset to original value">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div>
+                                {{ game_form.publish_date.label_tag }}
+                                {{ game_form.publish_date }}
+                                <input data-target="id_{{ game_form.publish_date.html_name }}"
+                                    data-original="{{ game_form.publish_date.value }}" onclick="revertField(this)"
+                                    type="button" value="↺" class="btn-operation" title="Reset to original value">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div>
+                                {{ game_form.platforms.label_tag }}
+                                {{ game_form.platforms }}
+                                <input data-target="id_{{ game_form.platforms.html_name }}"
+                                    data-original="{{ existing_platform_ids }}" onclick="revertField(this)"
+                                    type="button" value="↺" class="btn-operation" title="Reset to original value">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="checkbox-row">
+                                {{ game_form.dlc_or_expansion.label_tag }}
+                                {{ game_form.dlc_or_expansion }}
+                                <input data-target="id_{{ game_form.dlc_or_expansion.html_name }}"
+                                    data-original="{{ game_form.dlc_or_expansion.value }}" onclick="revertField(this)"
+                                    type="button" value="↺" class="btn-operation" title="Reset to original value">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div>
+                                {{ game_form.parent_game.label_tag }}
+                                {{ game_form.parent_game }}
+                                <input data-target="id_{{ game_form.parent_game.html_name }}"
+                                    data-original="{{ game_form.parent_game.value }}" onclick="revertField(this)"
+                                    type="button" value="↺" class="btn-operation" title="Reset to original value">
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            {{ game_form.source_display_name.label_tag }}
+                            {{ game_form.source_display_name }}
+                        </div>
+                        <div class="form-row">
+                            {{ game_form.source_url.label_tag }}
+                            {{ game_form.source_url }}
+                        </div>
+
+                    </fieldset>
+                </div>
+            </div>
+
+            <div class="submit-row">
+                <input type="submit" value="Save" class="default" name="_save">
+            </div>
+        </form>
+
+    </div>
+</div>
+
+{% include "import_js.html" %}
+
+{% endblock content %}

@@ -77,7 +77,7 @@ class GiantBombAdapter(BaseAdapter):
         self.next_offset = 0
         self.total_results = GiantBombAdapter.UNKOWN_TOTAL_RESULTS_VALUE
         self.error = False
-        self.last_request_data = {}  # type: Dict
+        self.last_request_data = {}
 
     def __exit__(self, *args: Any) -> None:
         self.fetching = False
