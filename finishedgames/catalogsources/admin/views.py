@@ -29,8 +29,8 @@ from catalogsources.models import (
     FetchedGame,
     FetchedPlatform
 )
-from core.admin import FGModelAdmin
 from finishedgames import constants
+from web.admin import FGModelAdmin
 
 
 class BaseFetchedModelAdmin(FGModelAdmin):

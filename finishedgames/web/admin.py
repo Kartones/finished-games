@@ -4,7 +4,8 @@ from django.contrib import admin
 from django.db.models.functions import Lower
 from django.forms import ModelForm
 from django.http import HttpRequest
-from django.utils.html import format_html_join
+from django.urls import reverse
+from django.utils.html import (format_html, format_html_join)
 from django.utils.safestring import mark_safe
 
 from core.forms import (GameForm, PlatformForm)
@@ -35,16 +36,22 @@ class UserGameAdmin(FGModelAdmin):
 
 class PlatformAdmin(FGModelAdmin):
     form = PlatformForm
-    list_display = ["name", "shortname", "publish_date"]
+    list_display = ["name", "shortname", "publish_date", "platform_url"]
+    readonly_fields = ["platform_url"]
 
     def get_ordering(self, request: HttpRequest) -> List[str]:
         return [Lower("name")]
+
+    def platform_url(self, instance: FGModelAdmin) -> str:
+        url = reverse("platform_details", args=[instance.id])
+        return cast(str, format_html("<a href='{}' target='_blank'>{}</a>", url, url))
+    platform_url.short_description = "Platform Url"  # type:ignore # NOQA: E305
 
 
 class GameAdmin(FGModelAdmin):
     form = GameForm
     fieldsets = [
-        ("Basic Info", {"fields": ["name", "platforms", "publish_date"]}),
+        ("Basic Info", {"fields": ["name", "platforms", "publish_date", "game_url"]}),
         ("DLCs & Expansions", {"fields": ["dlc_or_expansion", "parent_game"]}),
         ("Advanced", {"fields": ["urls_list", "urls"]}),
     ]
@@ -53,7 +60,12 @@ class GameAdmin(FGModelAdmin):
     search_fields = ["name"]
     autocomplete_fields = ["parent_game"]
 
-    readonly_fields = ('urls_list',)
+    readonly_fields = ["urls_list", "game_url"]
+
+    def game_url(self, instance: FGModelAdmin) -> str:
+        url = reverse("game_details", args=[instance.id])
+        return cast(str, format_html("<a href='{}' target='_blank'>{}</a>", url, url))
+    game_url.short_description = "Game Url"  # type:ignore # NOQA: E305
 
     def urls_list(self, instance: FGModelAdmin) -> str:
         return cast(str, format_html_join(
