@@ -119,3 +119,16 @@ class SingleGameImportForm(forms.Form):
         max_length=255,
         widget=forms.TextInput(attrs={"size": "60", "readonly": ""}),
     )
+
+
+class GamesImportForm(forms.Form):
+    fields = SimpleArrayField(forms.CharField(max_length=20))
+    fetched_game_ids = SimpleArrayField(forms.IntegerField())
+    fg_game_ids = SimpleArrayField(forms.IntegerField())
+    names = SimpleArrayField(forms.CharField(max_length=200))
+    publish_date_strings = SimpleArrayField(forms.CharField(max_length=4))
+    dlcs_or_expansions = SimpleArrayField(forms.BooleanField(required=False))
+    platforms_lists = SimpleArrayField(forms.CharField(max_length=500))
+    parent_game_ids = SimpleArrayField(forms.IntegerField())
+    source_display_names = SimpleArrayField(forms.CharField(max_length=255))
+    source_urls = SimpleArrayField(forms.CharField(max_length=255))

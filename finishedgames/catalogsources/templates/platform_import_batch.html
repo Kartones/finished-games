@@ -37,9 +37,12 @@
 
         <p>
             <h3>Choose fields to import:</h3>
-            <input type="checkbox" name="fields" value="name" checked>Name<br />
-            <input type="checkbox" name="fields" value="shortname" checked>Shortname<br />
-            <input type="checkbox" name="fields" value="publish_date" checked>Publish Date<br />
+            <input type="checkbox" name="{{platforms_form.fields.html_name}}" value="name"
+                checked>Name<br />
+            <input type="checkbox" name="{{platforms_form.fields.html_name}}" value="shortname"
+                checked>Shortname<br />
+            <input type="checkbox" name="{{platforms_form.fields.html_name}}" value="publish_date"
+                checked>Publish Date<br />
         </p>
 
         <hr />
@@ -48,13 +51,23 @@
         <ul>
             {% for fetched_platform in fetched_platforms %}
                 <li>
-                    {% if fetched_platform.fg_platform %}<span class="changelink" title="Main catalog Platform update"></span>{% else %}<span class="addlink" title="New main catalog Platform"></span>{% endif %}
-                    <strong>{{ fetched_platform.name }}</strong>{% if fetched_platform.fg_platform %} → {{ fetched_platform.fg_platform.name }}{% endif %}
-                    <input type="hidden" name="fetched_platform_id" value="{{ fetched_platform.id }}">
-                    <input type="hidden" name="fg_platform_id" value="{% if fetched_platform.fg_platform %}{{ fetched_platform.fg_platform.id }}{% else %}{{ constants.NO_PLATFORM }}{% endif %}">
-                    <input type="hidden" name="name" value="{{ fetched_platform.name }}">
-                    <input type="hidden" name="shortname" value="{{ fetched_platform.shortname }}">
-                    <input type="hidden" name="publish_date" value="{{ fetched_platform.publish_date }}">
+                    {% if fetched_platform.fg_platform %}
+                        <span class="changelink" title="Main catalog Platform update"></span>
+                    {% else %}
+                        <span class="addlink" title="New main catalog Platform"></span>
+                    {% endif %}
+                    <strong>{{ fetched_platform.name }}</strong>
+                    {% if fetched_platform.fg_platform %} → {{ fetched_platform.fg_platform.name }}{% endif %}
+                    <input type="hidden" name="{{platforms_form.fetched_platform_ids.html_name}}"
+                        value="{{ fetched_platform.id }}">
+                    <input type="hidden" name="{{platforms_form.fg_platform_ids.html_name}}"
+                        value="{% if fetched_platform.fg_platform %}{{ fetched_platform.fg_platform.id }}{% else %}{{ constants.NO_PLATFORM }}{% endif %}">
+                    <input type="hidden" name="{{platforms_form.names.html_name}}"
+                        value="{{ fetched_platform.name }}">
+                    <input type="hidden" name="{{platforms_form.shortnames.html_name}}"
+                        value="{{ fetched_platform.shortname }}">
+                    <input type="hidden" name="{{platforms_form.publish_date_strings.html_name}}"
+                        value="{{ fetched_platform.publish_date }}">
                 </li>
             {% endfor %}
         </ul>

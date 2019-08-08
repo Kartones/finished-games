@@ -18,7 +18,7 @@ class ImportManager():
     @staticmethod
     def import_fetched_game(
         name: str, publish_date_string: str, dlc_or_expansion: bool, platforms: List[int], fetched_game_id: int,
-        game_id: int = None, parent_game_id: int = None, source_display_name: Optional[str] = None,
+        game_id: Optional[int] = None, parent_game_id: Optional[int] = None, source_display_name: Optional[str] = None,
         source_url: Optional[str] = None, update_fields_filter: Optional[List[str]] = None
     ) -> None:
         if game_id:
