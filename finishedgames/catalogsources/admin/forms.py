@@ -1,3 +1,4 @@
+from dal import autocomplete
 from django import forms
 from django.core.validators import (MaxValueValidator, MinValueValidator)
 from django.db.models.functions import Lower
@@ -103,10 +104,15 @@ class SingleGameImportForm(forms.Form):
     )
     platforms = forms.ModelMultipleChoiceField(queryset=Platform.objects.order_by(Lower("name")))
     dlc_or_expansion = forms.BooleanField(label="DLC/Expansion", initial=False, required=False)
-    # TODO: Use https://django-autocomplete-light.readthedocs.io/en/master/tutorial.html
     parent_game = forms.ModelChoiceField(
         label="Parent game",
         queryset=Game.objects.order_by(Lower("name")),
+        widget=autocomplete.ModelSelect2(
+            url="game_autocomplete",
+            attrs={
+                "data-minimum-input-length": 2,
+            },
+        ),
         required=False,
     )
     source_display_name = forms.CharField(

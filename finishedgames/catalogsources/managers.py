@@ -40,6 +40,8 @@ class ImportManager():
         if include_all_fields or "parent_game" in cast(List[str], update_fields_filter):
             if parent_game_id:
                 game.parent_game_id = parent_game_id
+            else:
+                game.parent_game = None
 
         # update always the url for this source
         if source_display_name and source_url:

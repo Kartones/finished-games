@@ -1,7 +1,13 @@
 from django.contrib.auth import views as auth_views
 from django.urls import path
 
-from web.views import (base, game, platform, user)
+from web.views import (
+    base,
+    game,
+    search,
+    platform,
+    user
+)
 
 urlpatterns = [
     path("", base.index, name="index"),
@@ -20,6 +26,8 @@ urlpatterns = [
     path("platforms/", platform.platforms, name="platforms"),
     path("platforms/<int:platform_id>/", platform.platform_details, name="platform_details"),
     path("platforms/<int:platform_id>/games/", game.GamesByPlatformView.as_view(), name="games_by_platform"),
+
+    path("search/game-autocomplete/", search.GameAutocompleteView.as_view(), name="game_autocomplete"),
 
     path("users/", user.users, name="users"),
     path("users/<slug:username>/", user.catalog, name="user_catalog"),

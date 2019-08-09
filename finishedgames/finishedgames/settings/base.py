@@ -38,6 +38,8 @@ INSTALLED_APPS = [
     "core.apps.CoreConfig",
     "web.apps.WebConfig",
     "catalogsources.apps.CatalogSourcesConfig",
+    "dal",
+    "dal_select2",
     # After custom apps to allow for example overriding templates
     "django.contrib.admin",
 ]

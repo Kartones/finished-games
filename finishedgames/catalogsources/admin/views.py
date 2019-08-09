@@ -279,7 +279,6 @@ class FetchedGameAdminViewsMixin(BaseFetchedModelAdmin):
             "source_display_names": request.POST.getlist("source_display_names"),
             "source_urls": request.POST.getlist("source_urls"),
         }
-        print(form_data)
         games_form = GamesImportForm(form_data)
 
         if not games_form.is_valid():
