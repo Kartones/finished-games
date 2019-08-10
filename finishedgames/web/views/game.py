@@ -12,6 +12,7 @@ from django.views import View
 from core.models import (Game, Platform)
 from web import constants
 from web.decorators import authenticated_user_games
+from web.forms import GameSearchForm
 
 
 class GameDetailsView(View):
@@ -61,12 +62,25 @@ class GamesByPlatformView(View):
 
 
 def games(request: HttpRequest) -> HttpResponse:
+    game_search_form = GameSearchForm()
+
     context = {
         "letters": list(string.ascii_lowercase),
         "digits": list(string.digits),
         "non_alphanumeric_constant": constants.CHARACTER_FILTER_NON_ALPHANUMERIC,
+        "game_search_form": game_search_form,
     }
     return render(request, "games.html", context)
+
+
+class GameSearch(View):
+
+    def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
+        game_search_form = GameSearchForm(request.GET)
+        if game_search_form.is_valid():
+            return HttpResponseRedirect(reverse("game_details", args=[game_search_form.cleaned_data["game"].id]))
+        else:
+            return HttpResponseRedirect(reverse("games"))
 
 
 class GamesStartingWithCharacterView(View):

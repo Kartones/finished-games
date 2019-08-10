@@ -22,6 +22,7 @@ urlpatterns = [
         "games/starting-with/<str:character>/", game.GamesStartingWithCharacterView.as_view(),
         name="games_filtered_by_starting_character"
     ),
+    path("games/search/", game.GameSearch.as_view(), name="game_search"),
 
     path("platforms/", platform.platforms, name="platforms"),
     path("platforms/<int:platform_id>/", platform.platform_details, name="platform_details"),
