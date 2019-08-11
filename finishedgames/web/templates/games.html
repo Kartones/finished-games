@@ -1,8 +1,19 @@
 {% extends "base_with_menu.html" %}
 
+{% load static %}
+
 {% block title %}Games - {{ block.super }}{% endblock title %}
 
 {% block content %}
+
+<p>
+    <h3>{{ game_search_form.game.label_tag }}</h3>
+</p>
+<p>
+    <form id="game_search" action="{% url 'game_search' %}" method="get">
+        {{ game_search_form.game }}
+    </form>
+</p>
 
 <p>
     <h3>Choose starting letter/symbol to display games:</h3>
@@ -20,5 +31,12 @@
     <a href="{% url 'games_filtered_by_starting_character' non_alphanumeric_constant %}">#</a>
 </p>
 
+{{ game_search_form.media }}
+
+<script type="text/javascript">
+    $('#id_{{ game_search_form.game.html_name }}').on('select2:select', function (e) {
+        document.forms["game_search"].submit();
+    });
+</script>
 
 {% endblock content %}
