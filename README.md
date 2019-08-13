@@ -8,7 +8,9 @@ Finished games is a small personal project whose purposes are:
 
 **1) To provide an easy to use videogames catalog tracking, both for your owned titles (and videogame platforms), which ones have you finished or are currently playing, and to keep a wishlist of interesting games you desire.** I'm going to use it frequently and wanted to build it my way.
 
-**2) To practice fully developing a website with Django 2.x.** On my daily work I don't get to touch all the pieces that the framework provides, plus I can learn how to setup `pytest` to run Django `TestCases`, add type hinting everywhere with `mypy` and other personal tastes, like `pytest` for testing (including running Django testcases).
+**2) To practice fully developing a website with Django 2.x.** On my daily work I don't get to touch all the pieces that the framework provides, so this project is a good way to fix that.
+
+Near the end of this README you will find detailed lists of libraries and django features used.
 
 
 Some screenshots:
@@ -160,7 +162,7 @@ python manage.py shell
 
 ### Development tips
 
-- Demo of all [NES.css](https://github.com/nostalgic-css/NES.css) available components: https://nostalgic-css.github.io/NES.css/ . Note that this website uses that project CSS but has removed unused assets and replaced external images by local ones, so updates to it are handled manually at the moment.
+- Demo of all [NES.css](https://github.com/nostalgic-css/NES.css) available components: https://nostalgic-css.github.io/NES.css/ . Note that this website uses a project fork, as they dropped (at least for now) support for Firefox while older versions worked fine.
 
 
 - Personal recommendation of IDE for SQLite browsing: [DB Browser for SQLite](https://sqlitebrowser.org/)
@@ -179,19 +181,46 @@ To setup the production settings, copy `finishedgames/finishedgames/settings/pro
 Also remember that you need to [setup the statics](https://docs.djangoproject.com/en/2.1/howto/static-files/) for production when going live, for development it works out of the box. To prepare the statics, run `make statics`.
 
 
+## Technical Details
+
+#### Libraries and tools
+
+- `Docker`: for development and testing, partially done for production
+- `requests`
+- `pytest`: configured to run django `TestCase` tests, including code coverage generation and `pytest-randomly` to shuffle test suites order
+- `mypy`: Fully typed code, including django classes
+- Rate-limiting (custom implementation based on a token bucket algorithm)
+- `flake8` & `mypy` "linter tests" (any broken rule fails tests)
+- configuration hierarchy (`base -> dev/prod/test -> local`), including different default SQLite DB
+- Tiny Javascript footprint: djando admin uses some vanilla JS and jQuery, website uses so far only vanilla JS.
+
+
+#### Django features
+
+- Django >= 2.2
+- Extensive ORM usage, including `select_related()` and `prefetch_related()`, query optimizations (`only()`)
+- custom model managers
+- custom management commands
+- custom template tags
+- admin custom ordering, filters, fieldsets, readonly fields, search fields...
+- custom admin actions, decorators, filters, forms, form fields (a handy non-pg dependant `SimpleArrayField`) and views
+- `django-debug-toolbar`: Disabled on production for security
+- `django-autocomplete-light`: `Select2` based configurable autofill both for the admin and for normal views
+
+
 ## Roadmap
 
 ### ☑️  MVP 1
 
-Initial minimal Django version. Main goal was to have the system working, usable by users, and a single source of script-based data ingestion. Proven to be of use and easily extensible.
+~~Initial minimal Django version. Main goal was to have the system working, usable by users, and a single source of script-based data ingestion. Proven to be of use and easily extensible.~~
 
 ### MVP 1.1
 
-Adding CircleCI integration (free for public repos), bugfixes and some additions like wishlisting games and removing games from wishlist or from the user catalog. Data ingestion should be solid, and have at least two sources.
+~~Adding CircleCI integration (free for public repos), bugfixes and some additions like wishlisting games and removing games from wishlist or from the user catalog.~~ Data ingestion should be solid, and have at least two sources.
 
 ### MVP 2
 
-Game covers, user avatars, some 3rd party API integrations to fetch your games from them (Steam, etc.), export profile...
+Game covers, user avatars?, some 3rd party API integrations to fetch your games from them (Steam, etc.), export profile...
 
 ## License
 
