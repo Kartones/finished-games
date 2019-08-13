@@ -1,15 +1,34 @@
-from typing import (Any, cast, List)
+from typing import (
+    Any,
+    cast,
+    List,
+    Set
+)
 
-from django.contrib import admin
+from django.contrib import (
+    admin,
+    auth
+)
 from django.db.models.functions import Lower
 from django.forms import ModelForm
 from django.http import HttpRequest
 from django.urls import reverse
-from django.utils.html import (format_html, format_html_join)
+from django.utils.html import (
+    format_html,
+    format_html_join
+)
 from django.utils.safestring import mark_safe
 
-from core.forms import (GameForm, PlatformForm)
-from core.models import (Game, Platform, UserGame, WishlistedUserGame)
+from core.forms import (
+    GameForm,
+    PlatformForm
+)
+from core.models import (
+    Game,
+    Platform,
+    UserGame,
+    WishlistedUserGame
+)
 
 
 class FGModelAdmin(admin.ModelAdmin):
@@ -17,6 +36,41 @@ class FGModelAdmin(admin.ModelAdmin):
         css = {
              'all': ('css/admin.css',)
         }
+
+
+class CustomUserAdmin(auth.admin.UserAdmin):
+    """
+    Some security best practices applied
+    """
+    readonly_fields = ["date_joined", "last_login"]
+
+    def get_form(self, request: HttpRequest, obj: Any = None, **kwargs: Any) -> ModelForm:
+        form = super().get_form(request, obj, **kwargs)
+        disabled_fields = set()  # type: Set[str]
+
+        is_superuser = request.user.is_superuser
+
+        if not is_superuser:
+            disabled_fields |= {
+                "username",
+                "is_superuser",
+                "user_permissions",
+            }
+
+        # Prevent non-superusers from editing their own permissions
+        if not is_superuser and obj is not None and obj == request.user:
+            disabled_fields |= {
+                "is_staff",
+                "is_superuser",
+                "groups",
+                "user_permissions",
+            }
+
+        for field in disabled_fields:
+            if field in form.base_fields:
+                form.base_fields[field].disabled = True
+
+        return form
 
 
 class UserGameAdmin(FGModelAdmin):
@@ -29,7 +83,7 @@ class UserGameAdmin(FGModelAdmin):
         return [Lower("user__username"), "-id"]
 
     def get_form(self, request: HttpRequest, obj: Any = None, **kwargs: Any) -> ModelForm:
-        form = super(UserGameAdmin, self).get_form(request, obj, **kwargs)
+        form = super().get_form(request, obj, **kwargs)
         form.base_fields['user'].initial = request.user
         return form
 
@@ -89,11 +143,13 @@ class WishlistedUserGameAdmin(FGModelAdmin):
         return [Lower("user__username"), "-id"]
 
     def get_form(self, request: HttpRequest, obj: Any = None, **kwargs: Any) -> ModelForm:
-        form = super(WishlistedUserGameAdmin, self).get_form(request, obj, **kwargs)
+        form = super().get_form(request, obj, **kwargs)
         form.base_fields['user'].initial = request.user
         return form
 
 
+admin.site.unregister(auth.models.User)
+admin.site.register(auth.models.User, CustomUserAdmin)
 admin.site.register(Game, GameAdmin)
 admin.site.register(Platform, PlatformAdmin)
 admin.site.register(UserGame, UserGameAdmin)
