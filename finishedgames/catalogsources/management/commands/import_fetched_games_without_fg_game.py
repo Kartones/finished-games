@@ -35,7 +35,6 @@ class Command(BaseCommand):
             self.stdout.write("{} ({}) ".format(fetched_game.name, fetched_game.id), ending="")
 
             available_platforms = []  # List[int]
-
             for platform in fetched_game.platforms.all():
                 if platform.fg_platform:
                     available_platforms.append(platform.fg_platform.id)

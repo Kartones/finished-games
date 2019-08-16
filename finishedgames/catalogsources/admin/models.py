@@ -7,31 +7,87 @@ from django.forms import ModelForm
 from django.forms.fields import Field as Form_Field
 from django.urls import path
 
-from catalogsources.admin.actions import (hide_fetched_items, import_fetched_items)
-from catalogsources.admin.decorators import (hyperlink_fg_game, hyperlink_fg_platform, hyperlink_source_url)
-from catalogsources.admin.filters import (
-    CustomPlatformsFilter, HiddenByDefaultFilter, NotImportedFetchedGames, NotImportedFetchedPlatforms
+from catalogsources.admin.actions import (
+    hide_fetched_items,
+    import_fetched_games_fixing_duplicates_appending_platform,
+    import_fetched_games_fixing_duplicates_appending_publish_date,
+    import_fetched_items
 )
-from catalogsources.admin.views import (FetchedGameAdminViewsMixin, FetchedPlatformAdminViewsMixin)
-from catalogsources.models import (FetchedGame, FetchedPlatform)
+from catalogsources.admin.decorators import (
+    hyperlink_fg_game,
+    hyperlink_fg_platform,
+    hyperlink_source_url
+)
+from catalogsources.admin.filters import (
+    CustomPlatformsFilter,
+    HiddenByDefaultFilter,
+    NotImportedFetchedGames,
+    NotImportedFetchedPlatforms
+)
+from catalogsources.admin.views import (
+    FetchedGameAdminViewsMixin,
+    FetchedPlatformAdminViewsMixin
+)
+from catalogsources.models import (
+    FetchedGame,
+    FetchedPlatform
+)
 from core.models import Game
 from web.admin import FGModelAdmin
 
 
 class FetchedGameAdmin(FetchedGameAdminViewsMixin, FGModelAdmin):
     list_display = [
-        "name", hyperlink_fg_game, "platforms_list", "dlc_or_expansion", hyperlink_source_url,
-        "last_modified_date", "source_id", "hidden"
+        "name",
+        hyperlink_fg_game,
+        "platforms_list",
+        "dlc_or_expansion",
+        hyperlink_source_url,
+        "last_modified_date",
+        "source_id",
+        "hidden",
     ]
     list_filter = [
-        "last_modified_date", HiddenByDefaultFilter, NotImportedFetchedGames, "source_id", CustomPlatformsFilter,
-        "dlc_or_expansion"
+        HiddenByDefaultFilter,
+        NotImportedFetchedGames,
+        "last_modified_date",
+        "source_id",
+        CustomPlatformsFilter,
+        "dlc_or_expansion",
     ]
     search_fields = ["name"]
-    readonly_fields = ["last_modified_date", "change_hash"]
-    ordering = ["-last_modified_date", "source_id", "name"]
-    actions = [hide_fetched_items, import_fetched_items]
-    autocomplete_fields = ["fg_game", "parent_game"]
+    readonly_fields = [
+        "last_modified_date",
+        "change_hash",
+    ]
+    ordering = [
+        "-last_modified_date",
+        "source_id",
+        "name",
+    ]
+    actions = [
+        hide_fetched_items,
+        import_fetched_items,
+        import_fetched_games_fixing_duplicates_appending_platform,
+        import_fetched_games_fixing_duplicates_appending_publish_date,
+    ]
+    autocomplete_fields = [
+        "fg_game",
+        "parent_game",
+    ]
+
+    fields = (
+        "name",
+        "platforms",
+        "publish_date",
+        "dlc_or_expansion",
+        "parent_game",
+        "hidden",
+        "fg_game",
+        "source_game_id",
+        ("source_id", "source_url"),
+        ("last_modified_date", "change_hash"),
+    )
 
     def get_form(self, request: HttpRequest, obj: Optional[FetchedGame] = None, **kwargs: Any) -> ModelForm:
         # just save obj reference for future processing in Inline
@@ -80,6 +136,17 @@ class FetchedPlatformAdmin(FetchedPlatformAdminViewsMixin, FGModelAdmin):
     readonly_fields = ["last_modified_date", "change_hash"]
     ordering = ["-last_modified_date", "source_id", "name"]
     actions = [hide_fetched_items, import_fetched_items]
+
+    fields = (
+        "name",
+        "shortname",
+        "publish_date",
+        "hidden",
+        "fg_platform",
+        "source_platform_id",
+        ("source_id", "source_url"),
+        ("last_modified_date", "change_hash"),
+    )
 
     def get_urls(self) -> List[str]:
         urls = super().get_urls()

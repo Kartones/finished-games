@@ -1,8 +1,22 @@
-from typing import (cast, List, Optional)
+import re
+from typing import (
+    cast,
+    List,
+    Optional
+)
+
+from django.conf import settings
 
 from catalogsources.helpers import clean_string_field
-from catalogsources.models import (FetchedGame, FetchedPlatform)
-from core.models import (Game, Platform)
+from catalogsources.models import (
+    FetchedGame,
+    FetchedPlatform
+)
+from core.models import (
+    Game,
+    Platform
+)
+from finishedgames import constants
 
 
 class GameImportSaveError(Exception):
@@ -15,6 +29,119 @@ class PlatformImportSaveError(Exception):
 
 class ImportManager():
 
+    @classmethod
+    def import_fetched_games_fixing_duplicates_appending_publish_date(cls, fetched_game_ids: List[int]) -> List[str]:
+        source_display_names = {
+            key: settings.CATALOG_SOURCES_ADAPTERS[key][constants.ADAPTER_DISPLAY_NAME]
+            for key in settings.CATALOG_SOURCES_ADAPTERS.keys()
+        }
+
+        errors = []  # type: List[str]
+
+        for fetched_game_id in fetched_game_ids:
+            fetched_game = FetchedGame.objects \
+                                      .filter(id=fetched_game_id) \
+                                      .get()
+
+            available_platform_ids = []  # List[int]
+            for platform in fetched_game.platforms.all():
+                if platform.fg_platform:
+                    available_platform_ids.append(platform.fg_platform.id)
+
+            retry_import = False
+            try:
+                cls.import_fetched_game(
+                    name=fetched_game.name,
+                    publish_date_string=str(fetched_game.publish_date),
+                    dlc_or_expansion=fetched_game.dlc_or_expansion,
+                    platforms=available_platform_ids,
+                    fetched_game_id=fetched_game_id,
+                    # TODO: include parent_game
+                    source_display_name=source_display_names[fetched_game.source_id],
+                    source_url=fetched_game.source_url
+                )
+            except GameImportSaveError as error:
+                if re.match(r"UNIQUE constraint failed(.*)\.name", str(error)):
+                    retry_import = True
+                else:
+                    errors.append("'{}': {}".format(fetched_game.name, error))
+
+            if retry_import:
+                fixed_name = "{} ({})".format(fetched_game.name, fetched_game.publish_date)
+                try:
+                    cls.import_fetched_game(
+                        name=fixed_name,
+                        publish_date_string=str(fetched_game.publish_date),
+                        dlc_or_expansion=fetched_game.dlc_or_expansion,
+                        platforms=available_platform_ids,
+                        fetched_game_id=fetched_game_id,
+                        # TODO: include parent_game
+                        source_display_name=source_display_names[fetched_game.source_id],
+                        source_url=fetched_game.source_url
+                    )
+                except GameImportSaveError as error:
+                    errors.append("'{}': {}".format(fetched_game.name, error))
+
+        return errors
+
+    @classmethod
+    def import_fetched_games_fixing_duplicates_appending_platform(cls, fetched_game_ids: List[int]) -> List[str]:
+        source_display_names = {
+            key: settings.CATALOG_SOURCES_ADAPTERS[key][constants.ADAPTER_DISPLAY_NAME]
+            for key in settings.CATALOG_SOURCES_ADAPTERS.keys()
+        }
+
+        errors = []  # type: List[str]
+
+        for fetched_game_id in fetched_game_ids:
+            fetched_game = FetchedGame.objects \
+                                      .filter(id=fetched_game_id) \
+                                      .get()
+
+            available_platform_ids = []  # List[int]
+            first_available_platform_shortname = None
+            for platform in fetched_game.platforms.all():
+                if platform.fg_platform:
+                    available_platform_ids.append(platform.fg_platform.id)
+                    if first_available_platform_shortname is None:
+                        first_available_platform_shortname = platform.fg_platform.shortname
+
+            retry_import = False
+            try:
+                cls.import_fetched_game(
+                    name=fetched_game.name,
+                    publish_date_string=str(fetched_game.publish_date),
+                    dlc_or_expansion=fetched_game.dlc_or_expansion,
+                    platforms=available_platform_ids,
+                    fetched_game_id=fetched_game_id,
+                    # TODO: include parent_game
+                    source_display_name=source_display_names[fetched_game.source_id],
+                    source_url=fetched_game.source_url
+                )
+            except GameImportSaveError as error:
+                if re.match(r"UNIQUE constraint failed(.*)\.name", str(error)):
+                    retry_import = True
+                else:
+                    errors.append("'{}': {}".format(fetched_game.name, error))
+
+            if retry_import:
+                fixed_name = "{} ({})".format(fetched_game.name, first_available_platform_shortname)
+                try:
+                    cls.import_fetched_game(
+                        name=fixed_name,
+                        publish_date_string=str(fetched_game.publish_date),
+                        dlc_or_expansion=fetched_game.dlc_or_expansion,
+                        platforms=available_platform_ids,
+                        fetched_game_id=fetched_game_id,
+                        # TODO: include parent_game
+                        source_display_name=source_display_names[fetched_game.source_id],
+                        source_url=fetched_game.source_url
+                    )
+                except GameImportSaveError as error:
+                    errors.append("'{}': {}".format(fetched_game.name, error))
+
+        return errors
+
     @staticmethod
     def import_fetched_game(
         name: str, publish_date_string: str, dlc_or_expansion: bool, platforms: List[int], fetched_game_id: int,
@@ -23,8 +150,8 @@ class ImportManager():
     ) -> None:
         if game_id:
             game = Game.objects \
-                        .filter(id=game_id) \
-                        .get()
+                       .filter(id=game_id) \
+                       .get()
         else:
             game = Game()
 
