@@ -2,8 +2,7 @@ pytest
 flake8
 mypy>=0.7
 django-debug-toolbar
-# Older versions were incompatible with pytest 4.2
-pytest-django>=3.4.8
+pytest-django>=3.5
 coverage
 pytest-cov
 pytest-randomly

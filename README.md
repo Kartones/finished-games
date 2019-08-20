@@ -183,6 +183,8 @@ Also remember that you need to [setup the statics](https://docs.djangoproject.co
 
 ## Technical Details
 
+Important note: package versions are not pinned on purpose to test compatibility with latest versions. For a production deploy, you should pin them.
+
 #### Libraries and tools
 
 - `Docker`: for development and testing, partially done for production
