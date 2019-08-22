@@ -97,6 +97,10 @@ class PlatformAdmin(FGModelAdmin):
         return [Lower("name")]
 
     def platform_url(self, instance: FGModelAdmin) -> str:
+        # creating new platform
+        if not instance.id:
+            return ""
+
         url = reverse("platform_details", args=[instance.id])
         return cast(str, format_html("<a href='{}' target='_blank'>{}</a>", url, url))
     platform_url.short_description = "Platform Url"  # type:ignore # NOQA: E305
@@ -117,6 +121,10 @@ class GameAdmin(FGModelAdmin):
     readonly_fields = ["urls_list", "game_url"]
 
     def game_url(self, instance: FGModelAdmin) -> str:
+        # creating new game
+        if not instance.id:
+            return ""
+
         url = reverse("game_details", args=[instance.id])
         return cast(str, format_html("<a href='{}' target='_blank'>{}</a>", url, url))
     game_url.short_description = "Game Url"  # type:ignore # NOQA: E305
