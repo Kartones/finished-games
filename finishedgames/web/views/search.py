@@ -1,5 +1,8 @@
 from dal import autocomplete
-from django.db.models.functions import Lower
+from django.db.models.functions import (
+    Length,
+    Lower
+)
 from django.db.models.query import QuerySet
 
 from core.models import Game
@@ -11,6 +14,6 @@ class GameAutocompleteView(autocomplete.Select2QuerySetView):
         queryset = Game.objects.all()
         if self.q:
             queryset = queryset.filter(name__icontains=self.q)
-        queryset = queryset.order_by(Lower("name"))
+        queryset = queryset.order_by(Length("name"), Lower("name"))
 
         return queryset

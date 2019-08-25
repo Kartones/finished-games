@@ -76,9 +76,9 @@ class Game(BaseGame):
 
 
 class BaseUserGame(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    game = models.ForeignKey(Game, on_delete=models.CASCADE)
-    platform = models.ForeignKey(Platform, on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, db_index=True)
+    game = models.ForeignKey(Game, on_delete=models.CASCADE, db_index=True)
+    platform = models.ForeignKey(Platform, on_delete=models.CASCADE, db_index=True)
 
     class Meta:
         abstract = True
