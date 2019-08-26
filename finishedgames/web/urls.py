@@ -9,6 +9,7 @@ from web.views import (
     user
 )
 
+
 urlpatterns = [
     path("", base.index, name="index"),
     path("help/", base.help, name="help"),

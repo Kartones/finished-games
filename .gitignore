@@ -18,3 +18,4 @@ pytest_cache/*
 finishedgames/finishedgames/settings/prod.py
 finishedgames/finishedgames/settings/local.py
 finishedgames/statics/*
+requirements-prod.txt
