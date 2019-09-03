@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     "dal_select2",
     # After custom apps to allow for example overriding templates
     "django.contrib.admin",
+    "django.contrib.humanize",
 ]
 
 MIDDLEWARE = [

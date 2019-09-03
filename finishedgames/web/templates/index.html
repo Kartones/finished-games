@@ -1,10 +1,11 @@
 {% extends "base_with_menu.html" %}
+{% load humanize %}
 
 {% block content %}
 
 <section class="nes-container">
     <div>
-        Currently there are <strong>{{ games_count }}</strong> games from <strong>{{ platforms_count }}</strong> platforms in the catalog.
+        Currently there are <strong>{{ games_count|intcomma }}</strong> games from <strong>{{ platforms_count|intcomma }}</strong> platforms in the catalog.
     </div>
 </section>
 
