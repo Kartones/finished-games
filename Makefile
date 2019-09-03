@@ -53,7 +53,7 @@ test: build
 # opening html file currently only works on Linux
 coverage: build
 	set -o pipefail; \
-	$(COMPOSE_CMD) pytest --cov-report html:../cov_html --cov=. --cov-config .coveragerc; \
+	$(COMPOSE_CMD) pytest --cov-report html:../cov_html --cov=.; \
 	xdg-open cov_html/index.html
 
 statics: build
