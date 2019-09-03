@@ -1,4 +1,6 @@
-Tests: [![CircleCI](https://circleci.com/gh/Kartones/finished-games/tree/master.svg?style=svg)](https://circleci.com/gh/Kartones/finished-games/tree/master)
+Tests: [![CircleCI](https://circleci.com/gh/Kartones/finished-games/tree/master.svg?style=svg)](https://circleci.com/gh/Kartones/finished-games/tree/master) [![Codecov](https://codecov.io/gh/Kartones/finished-games/branch/master/graph/badge.svg)](https://codecov.io/gh/Kartones/finished-games)
+
+
 
 # Finished Games
 
