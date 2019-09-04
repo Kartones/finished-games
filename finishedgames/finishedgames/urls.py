@@ -20,7 +20,7 @@ from django.urls import include, path
 
 urlpatterns = [
     path("", include("web.urls")),
-    path("admin/", admin.site.urls),
+    path("fg-admin/", admin.site.urls),
 ]
 
 if settings.DJANGO_DEBUG_TOOLBAR_ENABLED:
