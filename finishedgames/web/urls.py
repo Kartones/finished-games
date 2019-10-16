@@ -55,5 +55,5 @@ urlpatterns = [
         user.NoLongerOwnedGamesView.as_view(),
         name="user_no_longer_owned_games"
     ),
-    re_path(r'^google.*.html$', TemplateView.as_view(template_name="google-validation.html")),
+    re_path(r'^google.*\.html$', TemplateView.as_view(template_name="google-validation.html")),
 ]
