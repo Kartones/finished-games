@@ -1,8 +1,8 @@
-pytest
-flake8
-mypy>=0.7
-django-debug-toolbar
-pytest-django>=3.5
+pytest==5.2.0
+flake8==3.7.8
+mypy==0.730
+django-debug-toolbar==2.0
+pytest-django==3.5.1
 coverage
-pytest-cov
-pytest-randomly
+pytest-cov==2.7.1
+pytest-randomly==3.1.0

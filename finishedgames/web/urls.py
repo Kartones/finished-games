@@ -1,5 +1,6 @@
 from django.contrib.auth import views as auth_views
-from django.urls import path
+from django.urls import (path, re_path)
+from django.views.generic import TemplateView
 
 from web.views import (
     base,
@@ -54,4 +55,5 @@ urlpatterns = [
         user.NoLongerOwnedGamesView.as_view(),
         name="user_no_longer_owned_games"
     ),
+    re_path(r'^google.*.html$', TemplateView.as_view(template_name="google-validation.html")),
 ]
