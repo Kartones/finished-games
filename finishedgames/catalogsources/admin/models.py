@@ -11,6 +11,7 @@ from catalogsources.admin.actions import (
     hide_fetched_items,
     import_fetched_games_fixing_duplicates_appending_platform,
     import_fetched_games_fixing_duplicates_appending_publish_date,
+    import_fetched_games_link_automatically_if_name_and_year_matches,
     import_fetched_items
 )
 from catalogsources.admin.decorators import (
@@ -40,6 +41,7 @@ class FetchedGameAdmin(FetchedGameAdminViewsMixin, FGModelAdmin):
     list_display = [
         "name",
         hyperlink_fg_game,
+        "publish_date",
         "platforms_list",
         "dlc_or_expansion",
         hyperlink_source_url,
@@ -70,6 +72,7 @@ class FetchedGameAdmin(FetchedGameAdminViewsMixin, FGModelAdmin):
         import_fetched_items,
         import_fetched_games_fixing_duplicates_appending_platform,
         import_fetched_games_fixing_duplicates_appending_publish_date,
+        import_fetched_games_link_automatically_if_name_and_year_matches,
     ]
     autocomplete_fields = [
         "fg_game",

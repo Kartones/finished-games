@@ -17,7 +17,9 @@ from finishedgames import constants
 
 def hide_fetched_items(modeladmin: admin.ModelAdmin, request: HttpRequest, queryset: QuerySet) -> None:
     queryset.update(hidden=True)
-hide_fetched_items.short_description = "Hide selected items"  # type:ignore # NOQA: E305
+
+
+hide_fetched_items.short_description = "Hide item(s)"  # type:ignore # NOQA: E305
 
 
 def import_fetched_items(
@@ -28,7 +30,9 @@ def import_fetched_items(
     else:
         ids = ",".join(request.POST.getlist(admin.ACTION_CHECKBOX_NAME))
     return HttpResponseRedirect("import_setup/?ids={}&hidden={}".format(ids, request.GET.get("hidden", "False")))
-import_fetched_items.short_description = "Import selected items into catalog"  # type:ignore # NOQA: E305
+
+
+import_fetched_items.short_description = "Import item(s) into catalog"  # type:ignore # NOQA: E305
 
 
 def import_fetched_games_fixing_duplicates_appending_platform(
@@ -42,7 +46,9 @@ def import_fetched_games_fixing_duplicates_appending_platform(
         messages.error(request, "Errors importing Fetched Games: {errors}".format(errors=", ".join(errors)))
     else:
         messages.success(request, "Fetched Games imported successfully")
-import_fetched_games_fixing_duplicates_appending_platform.short_description = "Import selected games - on duplicate append 1st platform"  # type:ignore # NOQA: E305, E501
+
+
+import_fetched_games_fixing_duplicates_appending_platform.short_description = "Import game(s) - on duplicate append 1st platform"  # type:ignore # NOQA: E305, E501
 
 
 def import_fetched_games_fixing_duplicates_appending_publish_date(
@@ -56,4 +62,22 @@ def import_fetched_games_fixing_duplicates_appending_publish_date(
         messages.error(request, "Errors importing Fetched Games: {errors}".format(errors=", ".join(errors)))
     else:
         messages.success(request, "Fetched Games imported successfully")
-import_fetched_games_fixing_duplicates_appending_publish_date.short_description = "Import selected games - on duplicate append publish date"  # type:ignore # NOQA: E305, E501
+
+
+import_fetched_games_fixing_duplicates_appending_publish_date.short_description = "Import game(s) - on duplicate append publish date"  # type:ignore # NOQA: E305, E501
+
+
+def import_fetched_games_link_automatically_if_name_and_year_matches(
+    modeladmin: admin.ModelAdmin, request: HttpRequest, QuerySet: QuerySet
+) -> None:
+    errors = ImportManager.import_fetched_games_linking_if_name_and_year_matches(
+        [int(id) for id in request.POST.getlist(admin.ACTION_CHECKBOX_NAME)]
+    )
+
+    if errors:
+        messages.error(request, "Errors importing Fetched Games: {errors}".format(errors=", ".join(errors)))
+    else:
+        messages.success(request, "Fetched Games imported successfully")
+
+
+import_fetched_games_link_automatically_if_name_and_year_matches.short_description = "Import game(s) - link if name & date match"  # type:ignore # NOQA: E305, E501
