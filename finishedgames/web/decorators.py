@@ -25,26 +25,39 @@ def authenticated_user_games(wrapped_function: Callable) -> Any:
             user_games = UserGame.objects \
                                  .filter(user=request.user) \
                                  .select_related("game", "platform")
-            authenticated_user_wishlisted_games = [
+            wishlisted_games = [
                 item.generic_id for item in WishlistedUserGame.objects
                                                               .filter(user=request.user)
                                                               .select_related("game", "platform")
             ]
         else:
             user_games = list()
-            authenticated_user_wishlisted_games = list()
+            wishlisted_games = list()
 
-        authenticated_user_games = [item.generic_id for item in user_games]
-        authenticated_user_currently_playing_games = [item.generic_id for item in user_games if item.currently_playing]
-        authenticated_user_finished_games = [item.generic_id for item in user_games if item.finished()]
-        authenticated_user_no_longer_owned_games = [item.generic_id for item in user_games if item.no_longer_owned]
+        games = list()
+        currently_playing_games = list()
+        finished_games = list()
+        no_longer_owned_games = list()
+        abandoned_games = list()
+
+        for item in user_games:
+            games.append(item.generic_id)
+            if item.currently_playing:
+                currently_playing_games.append(item.generic_id)
+            if item.finished():
+                finished_games.append(item.generic_id)
+            if item.no_longer_owned:
+                no_longer_owned_games.append(item.generic_id)
+            if item.abandoned:
+                abandoned_games.append(item.generic_id)
 
         kwargs["authenticated_user_catalog"] = {
-            constants.KEY_GAMES: authenticated_user_games,
-            constants.KEY_GAMES_WISHLISTED: authenticated_user_wishlisted_games,
-            constants.KEY_GAMES_CURRENTLY_PLAYING: authenticated_user_currently_playing_games,
-            constants.KEY_GAMES_FINISHED: authenticated_user_finished_games,
-            constants.KEY_GAMES_NO_LONGER_OWNED: authenticated_user_no_longer_owned_games,
+            constants.KEY_GAMES: games,
+            constants.KEY_GAMES_WISHLISTED: wishlisted_games,
+            constants.KEY_GAMES_CURRENTLY_PLAYING: currently_playing_games,
+            constants.KEY_GAMES_FINISHED: finished_games,
+            constants.KEY_GAMES_NO_LONGER_OWNED: no_longer_owned_games,
+            constants.KEY_GAMES_ABANDONED: abandoned_games,
         }
         return wrapped_function(request, *args, **kwargs)
     return wrapper

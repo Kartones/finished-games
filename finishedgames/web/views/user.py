@@ -51,10 +51,13 @@ def catalog(request: HttpRequest, username: str) -> HttpResponse:
 
     currently_playing_games_count = all_user_games.filter(currently_playing=True).count()
     finished_games_count = all_user_games.exclude(year_finished__isnull=True).count()
+    abandoned_games_count = all_user_games.filter(abandoned=True).count()
+    completed_games_count = finished_games_count + abandoned_games_count
+    pending_games_count = user_games_count - completed_games_count
     if user_games_count > 0:
-        finished_games_progress = int(finished_games_count * 100 / user_games_count)
+        completed_games_progress = int(completed_games_count * 100 / user_games_count)
     else:
-        finished_games_progress = 0
+        completed_games_progress = 0
     wishlisted_games_count = WishlistedUserGame.objects.filter(user=viewed_user).count()
 
     context = {
@@ -63,9 +66,11 @@ def catalog(request: HttpRequest, username: str) -> HttpResponse:
         "user_platforms_count": user_platforms_count,
         "currently_playing_games_count": currently_playing_games_count,
         "finished_games_count": finished_games_count,
-        "finished_games_progress": finished_games_progress,
-        "pending_games_count": user_games_count - finished_games_count,
-        "progress_class": _progress_bar_class(finished_games_progress),
+        "completed_games_count": completed_games_count,
+        "completed_games_progress": completed_games_progress,
+        "pending_games_count": pending_games_count,
+        "abandoned_games_count": abandoned_games_count,
+        "progress_class": _progress_bar_class(completed_games_progress),
         "wishlisted_games_count": wishlisted_games_count
     }
 
@@ -88,36 +93,6 @@ def platforms(request: HttpRequest, username: str) -> HttpResponse:
     }
 
     return render(request, "user/platforms.html", context)
-
-
-def user_games_by_platform(request: HttpRequest, username: str, platform_id: int) -> HttpResponse:
-    viewed_user = get_object_or_404(get_user_model(), username=username)
-
-    platform = get_object_or_404(Platform, pk=platform_id)
-    user_games = UserGame.objects \
-                         .filter(user=viewed_user, platform=platform) \
-                         .order_by("game__name") \
-                         .select_related("game")
-    games_count = len(user_games)
-
-    currently_playing_games_count = user_games.filter(currently_playing=True).count()
-    finished_games_count = user_games.exclude(year_finished__isnull=True).count()
-    if games_count > 0:
-        finished_games_progress = int(finished_games_count * 100 / games_count)
-    else:
-        finished_games_progress = 0
-
-    context = {
-        "platform": platform,
-        "user_games": user_games,
-        "games_count": games_count,
-        "currently_playing_games_count": currently_playing_games_count,
-        "finished_games_count": finished_games_count,
-        "finished_games_progress": finished_games_progress,
-        "progress_class": _progress_bar_class(finished_games_progress),
-    }
-
-    return render(request, "user/games_by_platform.html", context)
 
 
 @login_required
@@ -214,10 +189,12 @@ class GamesByPlatformView(View):
 
         currently_playing_games_count = user_games.filter(currently_playing=True).count()
         finished_games_count = user_games.exclude(year_finished__isnull=True).count()
+        abandoned_games_count = user_games.filter(abandoned=True).count()
+        completed_games_count = finished_games_count + abandoned_games_count
         if games_count > 0:
-            finished_games_progress = int(finished_games_count * 100 / games_count)
+            completed_games_progress = int(completed_games_count * 100 / games_count)
         else:
-            finished_games_progress = 0
+            completed_games_progress = 0
 
         context = {
             "viewed_user": viewed_user,
@@ -226,8 +203,10 @@ class GamesByPlatformView(View):
             "games_count": games_count,
             "currently_playing_games_count": currently_playing_games_count,
             "finished_games_count": finished_games_count,
-            "finished_games_progress": finished_games_progress,
-            "progress_class": _progress_bar_class(finished_games_progress),
+            "abandoned_games_count": abandoned_games_count,
+            "completed_games_count": completed_games_count,
+            "completed_games_progress": completed_games_progress,
+            "progress_class": _progress_bar_class(completed_games_progress),
             "authenticated_user_catalog": kwargs["authenticated_user_catalog"],
         }
 
@@ -251,6 +230,7 @@ class GamesPendingView(View):
 
         pending_games = UserGame.objects.filter(user=viewed_user) \
                                         .exclude(year_finished__isnull=False) \
+                                        .exclude(abandoned=True) \
                                         .order_by(*order_by) \
                                         .select_related("game", "platform")
 
@@ -309,6 +289,53 @@ class GamesFinishedView(View):
             CatalogManager.mark_game_as_finished(
                 user=request.user, game_id=int(request.POST["game"]), platform_id=int(request.POST["platform"]),
                 year_finished=datetime.now().year
+            )
+
+        return HttpResponse(status=204)
+
+
+class GamesAbandonedView(View):
+
+    @method_decorator(viewed_user)
+    @method_decorator(authenticated_user_games)
+    def get(self, request: HttpRequest, username: str, *args: Any, **kwargs: Any) -> HttpResponse:
+        viewed_user = kwargs["viewed_user"]
+        if not viewed_user:
+            raise Http404("Invalid URL")
+
+        sort_by = request.GET.get("sort_by", constants.SORT_BY_GAME_NAME)
+        try:
+            order_by = constants.SORT_FIELDS_MAPPING[sort_by]
+        except KeyError:
+            order_by = constants.SORT_FIELDS_MAPPING[constants.SORT_BY_GAME_NAME]
+
+        abandoned_Games = UserGame.objects.filter(user=viewed_user) \
+                                          .filter(abandoned=True) \
+                                          .order_by(*order_by) \
+                                          .select_related("game", "platform")
+
+        context = {
+            "viewed_user": viewed_user,
+            "abandoned_games": abandoned_Games,
+            "abandoned_games_count": len(abandoned_Games),
+            "constants": constants,
+            "sort_by": sort_by,
+            "authenticated_user_catalog": kwargs["authenticated_user_catalog"],
+        }
+
+        return render(request, "user/abandoned_games.html", context)
+
+    def post(self, request: HttpRequest, username: str, *args: Any, **kwargs: Any) -> HttpResponse:
+        if username != request.user.get_username() or request.method != "POST":
+            raise Http404("Invalid URL")
+
+        if request.POST.get("_method") == constants.FORM_METHOD_DELETE:
+            CatalogManager.unmark_game_from_abandoned(
+                user=request.user, game_id=int(request.POST["game"]), platform_id=int(request.POST["platform"])
+            )
+        else:
+            CatalogManager.mark_game_as_abandoned(
+                user=request.user, game_id=int(request.POST["game"]), platform_id=int(request.POST["platform"])
             )
 
         return HttpResponse(status=204)

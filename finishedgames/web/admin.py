@@ -74,8 +74,8 @@ class CustomUserAdmin(auth.admin.UserAdmin):
 
 
 class UserGameAdmin(FGModelAdmin):
-    list_display = ["game", "user", "platform", "currently_playing", "year_finished", "no_longer_owned"]
-    list_filter = ["user__username", "platform", "currently_playing", "year_finished", "no_longer_owned"]
+    list_display = ["game", "user", "platform", "currently_playing", "year_finished", "no_longer_owned", "abandoned"]
+    list_filter = ["user__username", "platform", "currently_playing", "year_finished", "no_longer_owned", "abandoned"]
     search_fields = ["game__name"]
     autocomplete_fields = ["user", "game"]
 

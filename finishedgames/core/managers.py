@@ -14,6 +14,7 @@ class CatalogManager():
         user_game.save(update_fields=["no_longer_owned"])
 
         CatalogManager.unmark_game_from_currently_playing(user=user, game_id=game_id, platform_id=platform_id)
+        CatalogManager.unmark_game_from_abandoned(user=user, game_id=game_id, platform_id=platform_id)
 
     @staticmethod
     def unmark_game_from_no_longer_owned(user: settings.AUTH_USER_MODEL, game_id: int, platform_id: int) -> None:
@@ -33,6 +34,8 @@ class CatalogManager():
         user_game.year_finished = year_finished
         user_game.save(update_fields=["year_finished"])
 
+        CatalogManager.unmark_game_from_abandoned(user=user, game_id=game_id, platform_id=platform_id)
+
     @staticmethod
     def unmark_game_from_finished(user: settings.AUTH_USER_MODEL, game_id: int, platform_id: int) -> None:
         user_game = UserGame.objects \
@@ -50,6 +53,7 @@ class CatalogManager():
         user_game.save(update_fields=["currently_playing"])
 
         CatalogManager.unmark_game_from_no_longer_owned(user=user, game_id=game_id, platform_id=platform_id)
+        CatalogManager.unmark_game_from_abandoned(user=user, game_id=game_id, platform_id=platform_id)
 
     @staticmethod
     def unmark_game_from_currently_playing(user: settings.AUTH_USER_MODEL, game_id: int, platform_id: int) -> None:
@@ -88,3 +92,22 @@ class CatalogManager():
         UserGame.objects \
                 .filter(user=user, game_id=game_id, platform_id=platform_id) \
                 .delete()
+
+    @staticmethod
+    def mark_game_as_abandoned(user: settings.AUTH_USER_MODEL, game_id: int, platform_id: int) -> None:
+        user_game = UserGame.objects \
+                            .filter(user=user, game_id=game_id, platform_id=platform_id) \
+                            .get()
+        user_game.abandoned = True
+        user_game.save(update_fields=["abandoned"])
+
+        CatalogManager.unmark_game_from_currently_playing(user=user, game_id=game_id, platform_id=platform_id)
+        CatalogManager.unmark_game_from_finished(user=user, game_id=game_id, platform_id=platform_id)
+
+    @staticmethod
+    def unmark_game_from_abandoned(user: settings.AUTH_USER_MODEL, game_id: int, platform_id: int) -> None:
+        user_game = UserGame.objects \
+                            .filter(user=user, game_id=game_id, platform_id=platform_id) \
+                            .get()
+        user_game.abandoned = False
+        user_game.save(update_fields=["abandoned"])

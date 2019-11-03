@@ -44,6 +44,7 @@ urlpatterns = [
     ),
     path("users/<slug:username>/games/finished/", user.GamesFinishedView.as_view(), name="user_finished_games"),
     path("users/<slug:username>/games/pending/", user.GamesPendingView.as_view(), name="user_pending_games"),
+    path("users/<slug:username>/games/abandoned/", user.GamesAbandonedView.as_view(), name="user_abandoned_games"),
     path("users/<slug:username>/games/wishlisted/", user.GamesWishlistedView.as_view(), name="user_wishlisted_games"),
     path(
         "users/<slug:username>/platforms/<int:platform_id>/games/",

@@ -96,6 +96,7 @@ class UserGame(BaseUserGame):
         validators=[MinValueValidator(1970), MaxValueValidator(3000)], db_index=True
     )
     no_longer_owned = models.BooleanField("No longer owned", default=False, db_index=True)
+    abandoned = models.BooleanField("Abandoned", default=False, db_index=True)
 
     def finished(self) -> bool:
         return self.year_finished is not None

@@ -22,8 +22,7 @@
         {% for item in user_games %}
             <tr>
                 <td>
-                    <a href="{% url "game_details" item.game.id %}">{{ item.game.name }}</a>{% if item.year_finished %} <i class="nes-icon trophy" title="Finished"></i>{% endif %}{% if item.currently_playing %} <i class="nes-pixel-art snes-jp-logo" title="Currently playing"></i>{% endif %}{% if item.no_longer_owned %}
-                    <i class="nes-pixel-art snes-jp-logo is-disabled" title="No longer owned"></i>{% endif %}
+                    <a href="{% url "game_details" item.game.id %}">{{ item.game.name }}</a>{% if item.year_finished %} <i class="nes-icon trophy" title="Finished"></i>{% endif %}{% if item.currently_playing %} <i class="nes-pixel-art snes-jp-logo" title="Currently playing"></i>{% endif %}{% if item.no_longer_owned %}<i class="nes-pixel-art snes-jp-logo is-disabled" title="No longer owned"></i>{% endif %}{% if item.abandoned %} <i class="nes-icon skull" title="Abandoned"></i>{% endif %}
                 </td>
                 {% if user.is_authenticated %}
                     {% render_actions user item.game.id platform.id authenticated_user_catalog %}
@@ -43,11 +42,14 @@
             <strong>{{ currently_playing_games_count }}</strong> currently playing game{{ currently_playing_games_count|pluralize }}.
         </p>
         <p>
-            <strong>{{ finished_games_count }}</strong> finished game{{ finished_games_count|pluralize }}.
+            <strong>{{ finished_games_count }}</strong> finished game{{ finished_games_count|pluralize }} and <strong>{{ abandoned_games_count }}</strong> abandoned game{{ abandoned_games_count|pluralize }}.
+        </p>
+        <p>
+            You've completed {{ completed_games_progress }}% of this platform's owned catalog.
             <br/>
-            <progress class="nes-progress {{ progress_class }}" value="{{ finished_games_progress }}"
+            <progress class="nes-progress {{ progress_class }}" value="{{ completed_games_progress }}"
                 max="100"
-                title="Finished {{ finished_games_progress }}% of the catalog ({{ finished_games_count }}/{{ games_count }})"></progress>
+                title="Completed {{ completed_games_progress }}% of this platform's owned catalog ({{ completed_games_count }}/{{ games_count }})"></progress>
         </p>
     </div>
 </section>
