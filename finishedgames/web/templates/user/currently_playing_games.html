@@ -6,7 +6,9 @@
 
 {% block content %}
 
-<h2><i class="nes-pixel-art snes-jp-logo" title="Currently Playing"></i> {{ viewed_user.get_username.capitalize }} Currently playing games list</h2>
+<h2>
+    <i class="nes-icon snes-pad is-medium" title="Currently Playing"></i> <span style="vertical-align:text-bottom">{{ viewed_user.get_username.capitalize }} Currently playing games list</span>
+</h2>
 
 <table class="nes-table is-bordered">
     <thead>

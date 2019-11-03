@@ -52,10 +52,6 @@ h3.nes-title span {
     vertical-align: super;
 }
 
-.nes-icon, .snes-jp-logo {
-    vertical-align: middle;
-}
-
 .nes-table th.is-centered, .nes-table td.is-centered {
     text-align: center;
 }
