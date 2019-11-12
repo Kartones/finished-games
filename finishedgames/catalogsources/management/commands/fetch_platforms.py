@@ -1,9 +1,9 @@
-from typing import (Any, Dict, List)
+from typing import Any, Dict, List
 
-from django.core.management.base import (BaseCommand, CommandParser)
+from django.core.management.base import BaseCommand, CommandParser
 
 from catalogsources.helpers import clean_string_field
-from catalogsources.management.helpers import (source_class_from_id, TimeProfiler, wait_if_needed)
+from catalogsources.management.helpers import TimeProfiler, source_class_from_id, wait_if_needed
 from catalogsources.models import FetchedPlatform
 
 
@@ -69,15 +69,15 @@ class Command(BaseCommand):
                 last_modified_date = existing_platform.last_modified_date
                 existing_platform.save()
                 if existing_platform.last_modified_date != last_modified_date:
-                    self.stdout.write(self.style.SUCCESS("☑  "), ending="")
+                    self.stdout.write(self.style.SUCCESS("☑ "), ending="")
                 else:
-                    self.stdout.write(self.style.WARNING("☐  "), ending="")
+                    self.stdout.write(self.style.WARNING("☐ "), ending="")
             except FetchedPlatform.DoesNotExist:
                 platform.save()
-                self.stdout.write(self.style.SUCCESS("✓  "), ending="")
+                self.stdout.write(self.style.SUCCESS("✓ "), ending="")
             except Exception as error:
                 errors.append(str(error))
-                self.stdout.write(self.style.ERROR("✗  "), ending="")
+                self.stdout.write(self.style.ERROR("✗ "), ending="")
 
             count += 1
             if count % 10 == 0:
@@ -98,3 +98,4 @@ class Command(BaseCommand):
         self.stdout.write("Existing platform not updated (no changes)")
         self.stdout.write(self.style.ERROR("✗ "), ending="")
         self.stdout.write("Error adding/updating platform\n\n")
+        self.stdout.write("--------")

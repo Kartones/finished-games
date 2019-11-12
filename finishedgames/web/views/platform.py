@@ -1,8 +1,8 @@
 from django.db.models.functions import Lower
-from django.http import (HttpResponse, HttpRequest)
-from django.shortcuts import (get_object_or_404, render)
+from django.http import HttpRequest, HttpResponse
+from django.shortcuts import get_object_or_404, render
 
-from core.models import (Game, Platform)
+from core.models import Game, Platform
 
 
 def platform_details(request: HttpRequest, platform_id: int) -> HttpResponse:

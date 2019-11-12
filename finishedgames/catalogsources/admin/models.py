@@ -1,38 +1,23 @@
-from typing import (Any, cast, List, Optional)
+from typing import Any, List, Optional, cast
 
 from django.db.models.fields import Field
 from django.db.models.functions import Lower
-from django.http import HttpRequest
 from django.forms import ModelForm
 from django.forms.fields import Field as Form_Field
+from django.http import HttpRequest
 from django.urls import path
 
 from catalogsources.admin.actions import (
-    hide_fetched_items,
-    import_fetched_games_fixing_duplicates_appending_platform,
+    hide_fetched_items, import_fetched_games_fixing_duplicates_appending_platform,
     import_fetched_games_fixing_duplicates_appending_publish_date,
-    import_fetched_games_link_automatically_if_name_and_year_matches,
-    import_fetched_items
+    import_fetched_games_link_automatically_if_name_and_year_matches, import_fetched_items
 )
-from catalogsources.admin.decorators import (
-    hyperlink_fg_game,
-    hyperlink_fg_platform,
-    hyperlink_source_url
-)
+from catalogsources.admin.decorators import hyperlink_fg_game, hyperlink_fg_platform, hyperlink_source_url
 from catalogsources.admin.filters import (
-    CustomPlatformsFilter,
-    HiddenByDefaultFilter,
-    NotImportedFetchedGames,
-    NotImportedFetchedPlatforms
+    CustomPlatformsFilter, HiddenByDefaultFilter, NotImportedFetchedGames, NotImportedFetchedPlatforms
 )
-from catalogsources.admin.views import (
-    FetchedGameAdminViewsMixin,
-    FetchedPlatformAdminViewsMixin
-)
-from catalogsources.models import (
-    FetchedGame,
-    FetchedPlatform
-)
+from catalogsources.admin.views import FetchedGameAdminViewsMixin, FetchedPlatformAdminViewsMixin
+from catalogsources.models import FetchedGame, FetchedPlatform
 from core.models import Game
 from web.admin import FGModelAdmin
 

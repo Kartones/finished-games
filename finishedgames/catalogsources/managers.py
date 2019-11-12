@@ -1,22 +1,11 @@
 import re
-from typing import (
-    cast,
-    List,
-    Optional,
-    Tuple
-)
+from typing import List, Optional, Tuple, cast
 
 from django.conf import settings
 
 from catalogsources.helpers import clean_string_field
-from catalogsources.models import (
-    FetchedGame,
-    FetchedPlatform
-)
-from core.models import (
-    Game,
-    Platform
-)
+from catalogsources.models import FetchedGame, FetchedPlatform
+from core.models import Game, Platform
 from finishedgames import constants
 
 

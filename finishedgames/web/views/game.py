@@ -3,13 +3,13 @@ from typing import Any
 
 from django.conf import settings
 from django.db.models.functions import Lower
-from django.http import (HttpResponse, HttpResponseRedirect, HttpRequest)
-from django.shortcuts import (get_object_or_404, render)
+from django.http import HttpRequest, HttpResponse, HttpResponseRedirect
+from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.views import View
 
-from core.models import (Game, Platform)
+from core.models import Game, Platform
 from web import constants
 from web.decorators import authenticated_user_games
 from web.forms import GameSearchForm

@@ -1,8 +1,8 @@
 from django.conf import settings
-from django.http import (HttpResponse, HttpRequest)
+from django.http import HttpRequest, HttpResponse
 from django.shortcuts import render
 
-from core.models import (Game, Platform)
+from core.models import Game, Platform
 
 
 def index(request: HttpRequest) -> HttpResponse:

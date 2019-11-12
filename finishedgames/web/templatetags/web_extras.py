@@ -1,5 +1,5 @@
 from functools import lru_cache
-from typing import (cast, Dict)
+from typing import Dict, cast
 
 from django import template
 from django.conf import settings

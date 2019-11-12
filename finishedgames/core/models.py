@@ -1,12 +1,11 @@
-from typing import (cast, Dict)
+from typing import Dict, cast
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
-from django.core.validators import (MaxValueValidator, MinValueValidator)
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 
 from core.helpers import generic_id as generic_id_helper
-
 
 URLS_KEY_VALUE_GLUE = "||"
 URLS_ITEMS_GLUE = "@@"

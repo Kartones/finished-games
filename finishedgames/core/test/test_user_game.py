@@ -2,7 +2,7 @@ from django.core.exceptions import ValidationError
 from django.test import TestCase
 
 from core.models import UserGame
-from core.test.helpers import (create_game, create_platform, create_user)
+from core.test.helpers import create_game, create_platform, create_user
 
 
 class UserGameTests(TestCase):

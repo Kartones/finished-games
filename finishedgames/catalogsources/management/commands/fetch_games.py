@@ -1,10 +1,10 @@
-from typing import (Any, cast, Dict, List, Tuple)
+from typing import Any, Dict, List, Tuple, cast
 
-from django.core.management.base import (BaseCommand, CommandParser)
+from django.core.management.base import BaseCommand, CommandParser
 
 from catalogsources.helpers import clean_string_field
-from catalogsources.management.helpers import (source_class_from_id, TimeProfiler, wait_if_needed)
-from catalogsources.models import (FetchedGame, FetchedPlatform)
+from catalogsources.management.helpers import TimeProfiler, source_class_from_id, wait_if_needed
+from catalogsources.models import FetchedGame, FetchedPlatform
 
 
 class Command(BaseCommand):
@@ -95,18 +95,18 @@ class Command(BaseCommand):
                 last_modified_date = existing_game.last_modified_date
                 existing_game.save()
                 if existing_game.last_modified_date != last_modified_date:
-                    self.stdout.write(self.style.SUCCESS("☑  "), ending="")
+                    self.stdout.write(self.style.SUCCESS("☑ "), ending="")
                 else:
-                    self.stdout.write(self.style.WARNING("☐  "), ending="")
+                    self.stdout.write(self.style.WARNING("☐ "), ending="")
             except FetchedGame.DoesNotExist:
                 game.save()
                 # Need to have an id before can change a many-to-many field
                 game.platforms.set(platforms)
                 game.save()
-                self.stdout.write(self.style.SUCCESS("✓  "), ending="")
+                self.stdout.write(self.style.SUCCESS("✓ "), ending="")
             except Exception as error:
                 errors.append(str(error))
-                self.stdout.write(self.style.ERROR("✗  "), ending="")
+                self.stdout.write(self.style.ERROR("✗ "), ending="")
 
             count += 1
             if count % 10 == 0:
@@ -131,3 +131,4 @@ class Command(BaseCommand):
         self.stdout.write("Existing game not updated (no changes)")
         self.stdout.write(self.style.ERROR("✗ "), ending="")
         self.stdout.write("Error adding/updating game\n\n")
+        self.stdout.write("--------")

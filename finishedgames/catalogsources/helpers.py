@@ -1,5 +1,5 @@
-from typing import Optional
 import unicodedata
+from typing import Optional
 
 
 def clean_string_field(field: Optional[str]) -> Optional[str]:

@@ -1,9 +1,9 @@
-from typing import (Any, cast, Dict)
+from typing import Any, Dict, cast
 
 from django.conf import settings
-from django.core.management.base import (BaseCommand, CommandParser)
+from django.core.management.base import BaseCommand, CommandParser
 
-from catalogsources.managers import (GameImportSaveError, ImportManager)
+from catalogsources.managers import GameImportSaveError, ImportManager
 from catalogsources.models import FetchedGame
 from finishedgames import constants
 
@@ -18,6 +18,9 @@ class Command(BaseCommand):
         self.import_games(max_items=cast(int, options["max_items"]))
 
     def import_games(self, max_items: int) -> None:
+        imports_ok_count = 0
+        imports_ko_count = 0
+
         if max_items < 1:
             max_items = 1
 
@@ -57,7 +60,12 @@ class Command(BaseCommand):
 
             if error_message:
                 self.stdout.write(self.style.ERROR("✗ - {}".format(error_message)))
+                imports_ko_count += 1
             else:
                 self.stdout.write(self.style.SUCCESS("✓"))
+                imports_ok_count += 1
 
-        self.stdout.write("> Finished importing new Fetched Games")
+        self.stdout.write("> Finished importing new Fetched Games (OK: {} KO: {})".format(
+            imports_ok_count,
+            imports_ko_count
+        ))

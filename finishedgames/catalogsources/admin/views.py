@@ -1,34 +1,19 @@
 from typing import List
 
-from django.forms import Form
 from django.conf import settings
 from django.db.models.functions import Lower
-from django.http import (
-    Http404,
-    HttpRequest,
-    HttpResponseRedirect
-)
+from django.forms import Form
+from django.http import Http404, HttpRequest, HttpResponseRedirect
 from django.template.response import TemplateResponse
 from django.urls import reverse
 
 from catalogsources.admin.forms import (
-    GamesImportForm,
-    PlatformsImportForm,
-    SingleFetchedGameImportForm,
-    SingleFetchedPlatformImportForm,
-    SingleGameImportForm,
-    SinglePlatformImportForm
+    GamesImportForm, PlatformsImportForm, SingleFetchedGameImportForm, SingleFetchedPlatformImportForm,
+    SingleGameImportForm, SinglePlatformImportForm
 )
 from catalogsources.apps import CatalogSourcesConfig
-from catalogsources.managers import (
-    GameImportSaveError,
-    ImportManager,
-    PlatformImportSaveError
-)
-from catalogsources.models import (
-    FetchedGame,
-    FetchedPlatform
-)
+from catalogsources.managers import GameImportSaveError, ImportManager, PlatformImportSaveError
+from catalogsources.models import FetchedGame, FetchedPlatform
 from finishedgames import constants
 from web.admin import FGModelAdmin
 

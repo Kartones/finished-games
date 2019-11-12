@@ -1,7 +1,6 @@
 import json
 from time import time
-
-from typing import (Any, Dict, Tuple)
+from typing import Any, Dict, Tuple
 
 
 def check_rate_limit(

@@ -1,10 +1,10 @@
-from abc import (ABC, abstractmethod)
-from typing import (Any, List, Tuple)
+from abc import ABC, abstractmethod
+from typing import Any, List, Tuple
 
 from django.core.management.base import OutputWrapper
 from django.core.management.color import Style
 
-from catalogsources.models import (FetchedGame, FetchedPlatform)
+from catalogsources.models import FetchedGame, FetchedPlatform
 
 
 class BaseAdapter(ABC):

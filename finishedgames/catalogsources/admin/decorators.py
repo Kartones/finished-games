@@ -3,7 +3,7 @@ from typing import cast
 from django.urls import reverse
 from django.utils.html import format_html
 
-from catalogsources.models import (FetchedGame, FetchedPlatform)
+from catalogsources.models import FetchedGame, FetchedPlatform
 from web.admin import FGModelAdmin
 
 

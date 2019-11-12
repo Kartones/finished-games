@@ -1,16 +1,16 @@
 from datetime import datetime
+from typing import Any, Callable, Dict  # NOQA: F401
 
-from django.contrib.auth.decorators import login_required
 from django.contrib.auth import get_user_model
+from django.contrib.auth.decorators import login_required
 from django.db.models.functions import Lower
-from django.http import (Http404, HttpResponse, HttpRequest)
-from django.shortcuts import (get_object_or_404, render)
+from django.http import Http404, HttpRequest, HttpResponse
+from django.shortcuts import get_object_or_404, render
 from django.utils.decorators import method_decorator
 from django.views import View
-from typing import (Any, Callable, Dict)  # NOQA: F401
 
 from core.managers import CatalogManager
-from core.models import (Platform, UserGame, WishlistedUserGame)
+from core.models import Platform, UserGame, WishlistedUserGame
 from web import constants
 from web.decorators import authenticated_user_games, viewed_user
 

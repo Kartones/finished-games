@@ -1,11 +1,10 @@
-from typing import (Any, Callable)
+from typing import Any, Callable
 
 from django.contrib.auth import get_user_model
 from django.http import HttpRequest
 from django.shortcuts import get_object_or_404
 
-from core.models import (UserGame, WishlistedUserGame)
-
+from core.models import UserGame, WishlistedUserGame
 from web import constants
 
 

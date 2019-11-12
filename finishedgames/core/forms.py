@@ -1,9 +1,9 @@
 from datetime import datetime
-from typing import (Any, cast, Dict)
+from typing import Any, Dict, cast
 
-from django.forms import (ModelForm, ValidationError)
+from django.forms import ModelForm, ValidationError
 
-from core.models import (Game, Platform)
+from core.models import Game, Platform
 
 
 class PlatformForm(ModelForm):

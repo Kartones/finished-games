@@ -1,8 +1,5 @@
 from dal import autocomplete
-from django.db.models.functions import (
-    Length,
-    Lower
-)
+from django.db.models.functions import Length, Lower
 from django.db.models.query import QuerySet
 
 from core.models import Game

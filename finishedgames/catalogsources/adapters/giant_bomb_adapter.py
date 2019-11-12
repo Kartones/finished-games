@@ -1,15 +1,15 @@
 import json
 import time
-from typing import (Any, Callable, cast, Dict, List, Optional, Tuple)  # NOQA: F401
+from typing import Any, Callable, Dict, List, Optional, Tuple, cast  # NOQA: F401
 
+import requests
 from django.conf import settings
 from django.core.management.base import OutputWrapper
 from django.core.management.color import Style
-import requests
 
 from catalogsources.adapters.base_adapter import BaseAdapter
-from catalogsources.adapters.helpers import (check_rate_limit, games_json_fetch_to_file, platforms_json_fetch_to_file)
-from catalogsources.models import (FetchedGame, FetchedPlatform)
+from catalogsources.adapters.helpers import check_rate_limit, games_json_fetch_to_file, platforms_json_fetch_to_file
+from catalogsources.models import FetchedGame, FetchedPlatform
 from finishedgames import constants
 
 
@@ -139,7 +139,7 @@ class GiantBombAdapter(BaseAdapter):
 
         # Limit is implicitly 100
         # `platforms` parameter is actually a single platform id filter
-        url = "https://www.giantbomb.com/api/games/?api_key={api_key}&format=json&limit={limit}&offset={offset}&platforms={platform}&field_list=id,name,aliases,platforms,original_release_date,releases,dlcs,site_detail_url".format(   # NOQA: E501
+        url = "https://www.giantbomb.com/api/games/?api_key={api_key}&format=json&limit={limit}&offset={offset}&platforms={platform}&field_list=id,name,aliases,platforms,original_release_date,expected_release_year,dlcs,site_detail_url".format(   # NOQA: E501
             api_key=self.api_key, offset=self.offset, platform=platform_id, limit=self._batch_size
         )
         request = requests.get(url, headers={
@@ -232,8 +232,11 @@ class GiantBombAdapter(BaseAdapter):
                 # Cheating here, instead of parsing as datetime and extracting year. sample: `1985-07-23 00:00:00`
                 data["publish_date"] = int(result["original_release_date"].split("-")[0])
             else:
-                # Some items don't have publish/release date
-                data["publish_date"] = GiantBombAdapter.DEFAULT_PUBLISH_DATE
+                # Some items don't have publish/release date, try giantbomb's assumption or set to a default
+                if "expected_release_year" in result and result["expected_release_year"]:
+                    data["publish_date"] = int(result["expected_release_year"])
+                else:
+                    data["publish_date"] = GiantBombAdapter.DEFAULT_PUBLISH_DATE
 
             game = FetchedGame(**data)
 

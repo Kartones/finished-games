@@ -1,7 +1,7 @@
-from typing import (Any, Dict)
+from typing import Any, Dict
 
 from django.conf import settings
-from django.core.management.base import (BaseCommand, CommandParser)
+from django.core.management.base import BaseCommand, CommandParser
 from django.urls import reverse
 
 from core.models import Game

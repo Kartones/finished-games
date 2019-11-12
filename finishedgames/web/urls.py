@@ -1,15 +1,8 @@
 from django.contrib.auth import views as auth_views
-from django.urls import (path, re_path)
+from django.urls import path, re_path
 from django.views.generic import TemplateView
 
-from web.views import (
-    base,
-    game,
-    search,
-    platform,
-    user
-)
-
+from web.views import base, game, platform, search, user
 
 urlpatterns = [
     path("", base.index, name="index"),

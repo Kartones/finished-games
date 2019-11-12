@@ -1,13 +1,10 @@
 from dal import autocomplete
 from django import forms
-from django.core.validators import (MaxValueValidator, MinValueValidator)
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db.models.functions import Lower
 
-from core.models import (
-    Game,
-    Platform,
-)
 from catalogsources.admin.form_fields import SimpleArrayField
+from core.models import Game, Platform
 
 
 class SingleFetchedPlatformImportForm(forms.Form):

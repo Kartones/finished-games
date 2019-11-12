@@ -4,12 +4,9 @@ Custom admin actions
 
 """
 
-from django.contrib import (
-    admin,
-    messages
-)
+from django.contrib import admin, messages
 from django.db.models.query import QuerySet
-from django.http import (HttpRequest, HttpResponseRedirect)
+from django.http import HttpRequest, HttpResponseRedirect
 
 from catalogsources.managers import ImportManager
 from finishedgames import constants

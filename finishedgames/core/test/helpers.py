@@ -1,12 +1,12 @@
-from datetime import datetime
-from typing import (List, Optional, Union)
 import uuid
+from datetime import datetime
+from typing import List, Optional, Union
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
 
-from core.models import (Game, Platform)
-from core.forms import (GameForm, PlatformForm)
+from core.forms import GameForm, PlatformForm
+from core.models import Game, Platform
 
 
 def create_platform(name: Optional[str] = None, shortname: Optional[str] = None) -> Platform:

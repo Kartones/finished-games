@@ -4,7 +4,7 @@ from django.core.exceptions import ValidationError
 from django.test import TestCase
 
 from core.forms import GameForm
-from core.test.helpers import (create_platform, create_game)
+from core.test.helpers import create_game, create_platform
 
 
 class GameFormTests(TestCase):

@@ -205,7 +205,7 @@ Important note: package versions are not pinned on purpose to test compatibility
 - Extensive ORM usage, including `select_related()` and `prefetch_related()`, query optimizations (`only()`)
 - custom model managers
 - custom management commands
-- custom template tags
+- custom template tags (with and without rendering templates) and filters
 - admin custom ordering, filters, fieldsets, readonly fields, search fields...
 - custom admin actions, decorators, filters, forms, form fields (a handy non-pg dependant `SimpleArrayField`) and views
 - `django-debug-toolbar`: Disabled on production for security
@@ -213,10 +213,6 @@ Important note: package versions are not pinned on purpose to test compatibility
 
 
 ## Roadmap
-
-### ☑️  MVP 1
-
-~~Initial minimal Django version. Main goal was to have the system working, usable by users, and a single source of script-based data ingestion. Proven to be of use and easily extensible.~~
 
 ### MVP 1.1
 

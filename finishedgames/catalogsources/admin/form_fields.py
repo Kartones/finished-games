@@ -1,16 +1,8 @@
-from typing import (
-    Any,
-    cast,
-    List,
-    Optional
-)
+from typing import Any, List, Optional, cast
 
 from django import forms
-from django.contrib.postgres.validators import (
-    ArrayMaxLengthValidator,
-    ArrayMinLengthValidator,
-)
 from django.contrib.postgres.utils import prefix_validation_error
+from django.contrib.postgres.validators import ArrayMaxLengthValidator, ArrayMinLengthValidator
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 

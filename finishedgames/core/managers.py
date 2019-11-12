@@ -1,6 +1,6 @@
 from django.conf import settings
 
-from core.models import (UserGame, WishlistedUserGame)
+from core.models import UserGame, WishlistedUserGame
 
 
 class CatalogManager():

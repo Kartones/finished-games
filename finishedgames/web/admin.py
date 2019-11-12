@@ -1,34 +1,15 @@
-from typing import (
-    Any,
-    cast,
-    List,
-    Set
-)
+from typing import Any, List, Set, cast
 
-from django.contrib import (
-    admin,
-    auth
-)
+from django.contrib import admin, auth
 from django.db.models.functions import Lower
 from django.forms import ModelForm
 from django.http import HttpRequest
 from django.urls import reverse
-from django.utils.html import (
-    format_html,
-    format_html_join
-)
+from django.utils.html import format_html, format_html_join
 from django.utils.safestring import mark_safe
 
-from core.forms import (
-    GameForm,
-    PlatformForm
-)
-from core.models import (
-    Game,
-    Platform,
-    UserGame,
-    WishlistedUserGame
-)
+from core.forms import GameForm, PlatformForm
+from core.models import Game, Platform, UserGame, WishlistedUserGame
 
 
 class FGModelAdmin(admin.ModelAdmin):

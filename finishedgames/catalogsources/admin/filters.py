@@ -1,4 +1,4 @@
-from typing import (Generator, Tuple)
+from typing import Generator, Tuple
 
 from django.contrib import admin
 from django.contrib.admin.views.main import ChangeList
