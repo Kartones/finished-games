@@ -194,7 +194,8 @@ Important note: package versions are not pinned on purpose to test compatibility
 - `pytest`: configured to run django `TestCase` tests, including code coverage generation and `pytest-randomly` to shuffle test suites order
 - `mypy`: Fully typed code, including django classes
 - Rate-limiting (custom implementation based on a token bucket algorithm)
-- `flake8` & `mypy` "linter tests" (any broken rule fails tests)
+- `flake8` & `mypy` mandatory linter tests (any broken rule fails tests)
+- `isort` auto-formatter test (automatically reformats files)
 - configuration hierarchy (`base -> dev/prod/test -> local`), including different default SQLite DB
 - Tiny Javascript footprint: djando admin uses some vanilla JS and jQuery, website uses so far only vanilla JS.
 
