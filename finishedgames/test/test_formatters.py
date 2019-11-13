@@ -9,9 +9,12 @@ def test_isort_compliance() -> None:
                                               shell=True,
                                               stderr=sys.stderr).decode("ascii").replace("\n", "")
     print("")
-    result = subprocess.call("{} -rc --atomic {}".format(binary_location, SOURCE_FOLDER),
-                             shell=True,
-                             stdout=sys.stdout,
-                             stderr=sys.stderr)
-    # isort only returns non-zero on fatal error
-    assert result == 0
+    result = subprocess.check_output("{} -rc --atomic {}".format(binary_location, SOURCE_FOLDER),
+                                     shell=True,
+                                     stderr=sys.stderr).decode("utf-8")
+
+    print(result)
+    assert all([
+        "Fixing " not in result,
+        "ERROR: " not in result,
+    ]), result
