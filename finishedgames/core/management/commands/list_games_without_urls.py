@@ -1,10 +1,9 @@
 from typing import Any, Dict
 
+from core.models import Game
 from django.conf import settings
 from django.core.management.base import BaseCommand, CommandParser
 from django.urls import reverse
-
-from core.models import Game
 
 
 class Command(BaseCommand):
@@ -14,8 +13,7 @@ class Command(BaseCommand):
         pass
 
     def handle(self, *args: Any, **options: Dict) -> None:
-        games = Game.objects  \
-                    .filter(urls="")
+        games = Game.objects.filter(urls="")
 
         host = settings.ALLOWED_HOSTS[-1]
         if settings.DEBUG:

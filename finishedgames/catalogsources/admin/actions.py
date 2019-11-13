@@ -4,11 +4,10 @@ Custom admin actions
 
 """
 
+from catalogsources.managers import ImportManager
 from django.contrib import admin, messages
 from django.db.models.query import QuerySet
 from django.http import HttpRequest, HttpResponseRedirect
-
-from catalogsources.managers import ImportManager
 from finishedgames import constants
 
 
@@ -45,7 +44,9 @@ def import_fetched_games_fixing_duplicates_appending_platform(
         messages.success(request, "Fetched Games imported successfully")
 
 
-import_fetched_games_fixing_duplicates_appending_platform.short_description = "Import game(s) - on duplicate append 1st platform"  # type:ignore # NOQA: E305, E501
+import_fetched_games_fixing_duplicates_appending_platform.short_description = (  # type:ignore # NOQA: E305, E501
+    "Import game(s) - on duplicate append 1st platform"
+)
 
 
 def import_fetched_games_fixing_duplicates_appending_publish_date(
@@ -61,7 +62,9 @@ def import_fetched_games_fixing_duplicates_appending_publish_date(
         messages.success(request, "Fetched Games imported successfully")
 
 
-import_fetched_games_fixing_duplicates_appending_publish_date.short_description = "Import game(s) - on duplicate append publish date"  # type:ignore # NOQA: E305, E501
+import_fetched_games_fixing_duplicates_appending_publish_date.short_description = (  # type:ignore # NOQA: E305, E501
+    "Import game(s) - on duplicate append publish date"
+)
 
 
 def import_fetched_games_link_automatically_if_name_and_year_matches(
@@ -77,4 +80,6 @@ def import_fetched_games_link_automatically_if_name_and_year_matches(
         messages.success(request, "Fetched Games imported successfully")
 
 
-import_fetched_games_link_automatically_if_name_and_year_matches.short_description = "Import game(s) - link if name & date match"  # type:ignore # NOQA: E305, E501
+import_fetched_games_link_automatically_if_name_and_year_matches.short_description = (  # type:ignore # NOQA: E305, E501
+    "Import game(s) - link if name & date match"
+)

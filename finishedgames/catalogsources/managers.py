@@ -1,11 +1,10 @@
 import re
 from typing import List, Optional, Tuple, cast
 
-from django.conf import settings
-
 from catalogsources.helpers import clean_string_field
 from catalogsources.models import FetchedGame, FetchedPlatform
 from core.models import Game, Platform
+from django.conf import settings
 from finishedgames import constants
 
 
@@ -17,21 +16,26 @@ class PlatformImportSaveError(Exception):
     pass
 
 
-class ImportManager():
+class ImportManager:
 
     # Games that have no date at a source catalog get the minimum accepted date (we always need a date)
     UNKNOWN_DATE = 1970
 
     @staticmethod
     def import_fetched_game(
-        name: str, publish_date_string: str, dlc_or_expansion: bool, platforms: List[int], fetched_game_id: int,
-        game_id: Optional[int] = None, parent_game_id: Optional[int] = None, source_display_name: Optional[str] = None,
-        source_url: Optional[str] = None, update_fields_filter: Optional[List[str]] = None
+        name: str,
+        publish_date_string: str,
+        dlc_or_expansion: bool,
+        platforms: List[int],
+        fetched_game_id: int,
+        game_id: Optional[int] = None,
+        parent_game_id: Optional[int] = None,
+        source_display_name: Optional[str] = None,
+        source_url: Optional[str] = None,
+        update_fields_filter: Optional[List[str]] = None,
     ) -> None:
         if game_id:
-            game = Game.objects \
-                       .filter(id=game_id) \
-                       .get()
+            game = Game.objects.filter(id=game_id).get()
         else:
             game = Game()
 
@@ -69,21 +73,21 @@ class ImportManager():
                 raise GameImportSaveError(str(error))
 
         # Update always linked game
-        fetched_game = FetchedGame.objects \
-                                  .filter(id=fetched_game_id) \
-                                  .get()
+        fetched_game = FetchedGame.objects.filter(id=fetched_game_id).get()
         fetched_game.fg_game_id = game.id
         fetched_game.save(update_fields=["fg_game_id"])
 
     @staticmethod
     def import_fetched_platform(
-        name: str, shortname: str, publish_date_string: str, fetched_platform_id: int, platform_id: int = None,
-        update_fields_filter: Optional[List[str]] = None
+        name: str,
+        shortname: str,
+        publish_date_string: str,
+        fetched_platform_id: int,
+        platform_id: int = None,
+        update_fields_filter: Optional[List[str]] = None,
     ) -> None:
         if platform_id:
-            platform = Platform.objects \
-                               .filter(id=platform_id) \
-                               .get()
+            platform = Platform.objects.filter(id=platform_id).get()
         else:
             platform = Platform()
 
@@ -103,9 +107,7 @@ class ImportManager():
             raise PlatformImportSaveError(str(error))
 
         # Update always linked platform
-        fetched_platform = FetchedPlatform.objects \
-                                          .filter(id=fetched_platform_id) \
-                                          .get()
+        fetched_platform = FetchedPlatform.objects.filter(id=fetched_platform_id).get()
         fetched_platform.fg_platform_id = platform.id
         fetched_platform.save(update_fields=["fg_platform_id"])
 
@@ -118,9 +120,7 @@ class ImportManager():
         errors = []  # type: List[str]
 
         for fetched_game_id in fetched_game_ids:
-            fetched_game = FetchedGame.objects \
-                                      .filter(id=fetched_game_id) \
-                                      .get()
+            fetched_game = FetchedGame.objects.filter(id=fetched_game_id).get()
 
             available_platform_ids = []  # List[int]
             for platform in fetched_game.platforms.all():
@@ -144,7 +144,7 @@ class ImportManager():
                         fetched_game_id=fetched_game_id,
                         # TODO: include parent_game
                         source_display_name=source_display_names[fetched_game.source_id],
-                        source_url=fetched_game.source_url
+                        source_url=fetched_game.source_url,
                     )
                 except GameImportSaveError as error:
                     errors.append("'{}': {}".format(fetched_game.name, error))
@@ -161,9 +161,7 @@ class ImportManager():
         errors = []  # type: List[str]
 
         for fetched_game_id in fetched_game_ids:
-            fetched_game = FetchedGame.objects \
-                                      .filter(id=fetched_game_id) \
-                                      .get()
+            fetched_game = FetchedGame.objects.filter(id=fetched_game_id).get()
 
             available_platform_ids = []  # List[int]
             first_available_platform_shortname = None
@@ -190,7 +188,7 @@ class ImportManager():
                         fetched_game_id=fetched_game_id,
                         # TODO: include parent_game
                         source_display_name=source_display_names[fetched_game.source_id],
-                        source_url=fetched_game.source_url
+                        source_url=fetched_game.source_url,
                     )
                 except GameImportSaveError as error:
                     errors.append("'{}': {}".format(fetched_game.name, error))
@@ -206,9 +204,7 @@ class ImportManager():
         errors = []  # type: List[str]
 
         for fetched_game_id in fetched_game_ids:
-            fetched_game = FetchedGame.objects \
-                                      .filter(id=fetched_game_id) \
-                                      .get()
+            fetched_game = FetchedGame.objects.filter(id=fetched_game_id).get()
 
             game_id = None  # Optional[int]
             available_platform_ids = []  # List[int]
@@ -226,10 +222,7 @@ class ImportManager():
 
             # If we don't know the date, don't touch it
             if should_retry_import and fetched_game.publish_date != cls.UNKNOWN_DATE:
-                existing_game = Game.objects \
-                                    .only("id") \
-                                    .filter(name=fetched_game.name) \
-                                    .get()
+                existing_game = Game.objects.only("id").filter(name=fetched_game.name).get()
                 game_id = existing_game.id
 
                 if fetched_game.publish_date == existing_game.publish_date:
@@ -243,7 +236,7 @@ class ImportManager():
                         # TODO: include parent_game
                         source_display_name=source_display_name,
                         source_url=fetched_game.source_url,
-                        update_fields_filter=["publish_date", "dlc_or_expansion", "platforms"]
+                        update_fields_filter=["publish_date", "dlc_or_expansion", "platforms"],
                     )
 
         return errors
@@ -254,7 +247,7 @@ class ImportManager():
         fetched_game: FetchedGame,
         available_platform_ids: List[int],
         fetched_game_id: int,
-        source_display_name: str
+        source_display_name: str,
     ) -> Tuple[bool, str]:
         error_message = ""
         import_failed_name_exists = False
@@ -268,7 +261,7 @@ class ImportManager():
                 fetched_game_id=fetched_game_id,
                 # TODO: include parent_game
                 source_display_name=source_display_name,
-                source_url=fetched_game.source_url
+                source_url=fetched_game.source_url,
             )
         except GameImportSaveError as error:
             if re.match(r"UNIQUE constraint failed(.*)\.name", str(error)):

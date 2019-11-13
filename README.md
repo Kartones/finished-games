@@ -133,7 +133,7 @@ When using the Admin site to browse fetched items, there are custom convenience 
 
 ## Development
 
-Running tests (including type hint checking with `mypy` and `flake8` linting):
+Running tests (including type hint checking with `mypy`):
 ```
 make test
 ```
@@ -160,6 +160,14 @@ To run a Django shell if you need it:
 ```
 make shell
 python manage.py shell
+```
+
+### Commiting code and Code Formatting
+
+You must install `pre-commit` to run the formatters and some linters upon commiting code:
+```
+pip3 install pre-commit
+pre-commit install
 ```
 
 ### Development tips
@@ -194,8 +202,8 @@ Important note: package versions are not pinned on purpose to test compatibility
 - `pytest`: configured to run django `TestCase` tests, including code coverage generation and `pytest-randomly` to shuffle test suites order
 - `mypy`: Fully typed code, including django classes
 - Rate-limiting (custom implementation based on a token bucket algorithm)
-- `flake8` & `mypy` mandatory linter tests (any broken rule fails tests)
-- `isort` auto-formatter test (automatically reformats files)
+- `mypy` mandatory linter test (any broken rule fails tests run)
+- `isort` & `black` auto-formatters upon commit (automatically reformat files)
 - configuration hierarchy (`base -> dev/prod/test -> local`), including different default SQLite DB
 - Tiny Javascript footprint: djando admin uses some vanilla JS and jQuery, website uses so far only vanilla JS.
 

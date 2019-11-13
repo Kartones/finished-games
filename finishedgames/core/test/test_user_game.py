@@ -1,12 +1,10 @@
+from core.models import UserGame
+from core.test.helpers import create_game, create_platform, create_user
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 
-from core.models import UserGame
-from core.test.helpers import create_game, create_platform, create_user
-
 
 class UserGameTests(TestCase):
-
     def setUp(self):
         self.platform_1 = create_platform()
         self.platform_2 = create_platform()

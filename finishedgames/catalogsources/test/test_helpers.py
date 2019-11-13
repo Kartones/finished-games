@@ -1,10 +1,8 @@
-from django.test import TestCase
-
 from catalogsources.helpers import clean_string_field
+from django.test import TestCase
 
 
 class HelpersTests(TestCase):
-
     def test_field_cleaning_helper_with_typical_string_field(self):
         unclean_name = " _A name needing cleaning: ñ-:!"
         cleaned_name = "A name needing cleaning: ñ"

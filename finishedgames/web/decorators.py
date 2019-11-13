@@ -1,10 +1,9 @@
 from typing import Any, Callable
 
+from core.models import UserGame, WishlistedUserGame
 from django.contrib.auth import get_user_model
 from django.http import HttpRequest
 from django.shortcuts import get_object_or_404
-
-from core.models import UserGame, WishlistedUserGame
 from web import constants
 
 
@@ -15,19 +14,17 @@ def viewed_user(wrapped_function: Callable) -> Any:
         else:
             kwargs["viewed_user"] = None
         return wrapped_function(request, *args, **kwargs)
+
     return wrapper
 
 
 def authenticated_user_games(wrapped_function: Callable) -> Any:
     def wrapper(request: HttpRequest, *args: Any, **kwargs: Any) -> Any:
         if request.user.is_authenticated:
-            user_games = UserGame.objects \
-                                 .filter(user=request.user) \
-                                 .select_related("game", "platform")
+            user_games = UserGame.objects.filter(user=request.user).select_related("game", "platform")
             wishlisted_games = [
-                item.generic_id for item in WishlistedUserGame.objects
-                                                              .filter(user=request.user)
-                                                              .select_related("game", "platform")
+                item.generic_id
+                for item in WishlistedUserGame.objects.filter(user=request.user).select_related("game", "platform")
             ]
         else:
             user_games = list()
@@ -59,4 +56,5 @@ def authenticated_user_games(wrapped_function: Callable) -> Any:
             constants.KEY_GAMES_ABANDONED: abandoned_games,
         }
         return wrapped_function(request, *args, **kwargs)
+
     return wrapper

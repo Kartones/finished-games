@@ -1,12 +1,11 @@
 from typing import Generator, Tuple
 
+from catalogsources.models import FetchedPlatform
 from django.contrib import admin
 from django.contrib.admin.views.main import ChangeList
 from django.db.models.query import QuerySet
 from django.http import HttpRequest
 from django.utils.translation import ugettext_lazy as _
-
-from catalogsources.models import FetchedPlatform
 
 
 # Don't show platforms which are hidden, and filter by source_id if one chosen
@@ -19,13 +18,9 @@ class CustomPlatformsFilter(admin.SimpleListFilter):
         queryset = FetchedPlatform.objects.filter(hidden=False)
         if source_id:
             queryset = queryset.filter(source_id=source_id)
-            return (
-                tuple((platform.id, platform.name) for platform in queryset)
-            )
+            return tuple((platform.id, platform.name) for platform in queryset)
         else:
-            return (
-                tuple((platform.id, "{} [{}]".format(platform.name, platform.source_id)) for platform in queryset)
-            )
+            return tuple((platform.id, "{} [{}]".format(platform.name, platform.source_id)) for platform in queryset)
 
     def queryset(self, request: HttpRequest, queryset: QuerySet) -> QuerySet:
         if self.value():

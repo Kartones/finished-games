@@ -3,13 +3,12 @@ import time
 from typing import Any, Callable, Dict, List, Optional, Tuple, cast  # NOQA: F401
 
 import requests
-from django.conf import settings
-from django.core.management.base import OutputWrapper
-from django.core.management.color import Style
-
 from catalogsources.adapters.base_adapter import BaseAdapter
 from catalogsources.adapters.helpers import check_rate_limit, games_json_fetch_to_file, platforms_json_fetch_to_file
 from catalogsources.models import FetchedGame, FetchedPlatform
+from django.conf import settings
+from django.core.management.base import OutputWrapper
+from django.core.management.color import Style
 from finishedgames import constants
 
 
@@ -24,15 +23,18 @@ def rate_limit(decorated_function: Callable) -> Callable:
                 max_tokens=instance.max_requests_per_time_window,
                 time_window=instance.time_window,
                 token_bucket=instance.token_bucket,
-                last_check_timestamp=instance.last_check_timestamp
+                last_check_timestamp=instance.last_check_timestamp,
             )
             if not can_pass:
-                instance.stdout.write(instance.stdout_style.WARNING(
-                    "> Rate limit hit, waiting {} seconds".format(instance.wait_seconds_when_rate_limited))
+                instance.stdout.write(
+                    instance.stdout_style.WARNING(
+                        "> Rate limit hit, waiting {} seconds".format(instance.wait_seconds_when_rate_limited)
+                    )
                 )
                 time.sleep(instance.wait_seconds_when_rate_limited)
 
         return decorated_function(*args, **kwargs)
+
     return wrapper
 
 
@@ -51,10 +53,12 @@ class GiantBombAdapter(BaseAdapter):
 
         # This block is all related with rate limits
         self.api_key = settings.CATALOG_SOURCES_ADAPTERS[self.SOURCE_ID][constants.ADAPTER_API_KEY]
-        self.max_requests_per_time_window = \
-            settings.CATALOG_SOURCES_ADAPTERS[self.SOURCE_ID][constants.ADAPTER_REQUESTS_PER_HOUR]
-        self.wait_seconds_when_rate_limited = \
-            settings.CATALOG_SOURCES_ADAPTERS[self.SOURCE_ID][constants.ADAPTER_WAIT_SECONDS_WHEN_RATE_LIMITED]
+        self.max_requests_per_time_window = settings.CATALOG_SOURCES_ADAPTERS[self.SOURCE_ID][
+            constants.ADAPTER_REQUESTS_PER_HOUR
+        ]
+        self.wait_seconds_when_rate_limited = settings.CATALOG_SOURCES_ADAPTERS[self.SOURCE_ID][
+            constants.ADAPTER_WAIT_SECONDS_WHEN_RATE_LIMITED
+        ]
         self.time_window = 3600  # X requests allowed in Y seconds
         self.token_bucket = self.max_requests_per_time_window  # start with bucket full of tokens
         self.last_check_timestamp = 0.0
@@ -97,12 +101,11 @@ class GiantBombAdapter(BaseAdapter):
     def fetch_platforms_block(self) -> List[FetchedPlatform]:
         self.offset = self.next_offset
 
-        request = requests.get("https://www.giantbomb.com/api/platforms/?api_key={api_key}&format=json&limit={limit}&offset={offset}&field_list=id,name,release_date,site_detail_url".format(   # NOQA: E501
+        request = requests.get(
+            "https://www.giantbomb.com/api/platforms/?api_key={api_key}&format=json&limit={limit}&offset={offset}&field_list=id,name,release_date,site_detail_url".format(  # NOQA: E501
                 api_key=self.api_key, offset=self.offset, limit=self._batch_size
             ),
-            headers={
-                "user-agent": settings.CATALOG_SOURCES_ADAPTER_USER_AGENT
-            }
+            headers={"user-agent": settings.CATALOG_SOURCES_ADAPTER_USER_AGENT},
         )
 
         if request.status_code == 200:
@@ -113,11 +116,19 @@ class GiantBombAdapter(BaseAdapter):
                 self.errored = True
         else:
             self.errored = True
-            self.stdout.write(self.stdout_style.ERROR(
-                "{code}: {error}.\nInfo: S:{status_code} O:{offset} NO:{next_offset} T:{total_results} L:{limit}".format(  # NOQA: E501
-                    code=request.status_code, error=request.text, status_code=request.status_code, offset=self.offset,
-                    next_offset=self.next_offset, total_results=self.total_results, limit=self._batch_size)
-            ))
+            self.stdout.write(
+                self.stdout_style.ERROR(
+                    "{code}: {error}.\nInfo: S:{status_code} O:{offset} NO:{next_offset} T:{total_results} L:{limit}".format(  # NOQA: E501
+                        code=request.status_code,
+                        error=request.text,
+                        status_code=request.status_code,
+                        offset=self.offset,
+                        next_offset=self.next_offset,
+                        total_results=self.total_results,
+                        limit=self._batch_size,
+                    )
+                )
+            )
 
         if self.errored:
             return []
@@ -139,12 +150,10 @@ class GiantBombAdapter(BaseAdapter):
 
         # Limit is implicitly 100
         # `platforms` parameter is actually a single platform id filter
-        url = "https://www.giantbomb.com/api/games/?api_key={api_key}&format=json&limit={limit}&offset={offset}&platforms={platform}&field_list=id,name,aliases,platforms,original_release_date,expected_release_year,dlcs,site_detail_url".format(   # NOQA: E501
+        url = "https://www.giantbomb.com/api/games/?api_key={api_key}&format=json&limit={limit}&offset={offset}&platforms={platform}&field_list=id,name,aliases,platforms,original_release_date,expected_release_year,dlcs,site_detail_url".format(  # NOQA: E501
             api_key=self.api_key, offset=self.offset, platform=platform_id, limit=self._batch_size
         )
-        request = requests.get(url, headers={
-            "user-agent": settings.CATALOG_SOURCES_ADAPTER_USER_AGENT
-        })
+        request = requests.get(url, headers={"user-agent": settings.CATALOG_SOURCES_ADAPTER_USER_AGENT})
 
         if request.status_code == 200:
             try:
@@ -154,19 +163,29 @@ class GiantBombAdapter(BaseAdapter):
                 self.errored = True
         else:
             self.errored = True
-            self.stdout.write(self.stdout_style.ERROR(
-                "{code}: {error}.\nInfo: S:{status_code} O:{offset} NO:{next_offset} T:{total_results} L:{limit}".format(  # NOQA: E501
-                    code=request.status_code, error=request.text, status_code=request.status_code, offset=self.offset,
-                    next_offset=self.next_offset, total_results=self.total_results, limit=self._batch_size)
-            ))
+            self.stdout.write(
+                self.stdout_style.ERROR(
+                    "{code}: {error}.\nInfo: S:{status_code} O:{offset} NO:{next_offset} T:{total_results} L:{limit}".format(  # NOQA: E501
+                        code=request.status_code,
+                        error=request.text,
+                        status_code=request.status_code,
+                        offset=self.offset,
+                        next_offset=self.next_offset,
+                        total_results=self.total_results,
+                        limit=self._batch_size,
+                    )
+                )
+            )
 
         if self.errored:
             return []
 
         if settings.DEBUG:
             games_json_fetch_to_file(
-                json_data=self.last_request_data, source_id=self.source_id(), platform_id=platform_id,
-                offset=self.offset
+                json_data=self.last_request_data,
+                source_id=self.source_id(),
+                platform_id=platform_id,
+                offset=self.offset,
             )
 
         self.next_offset += self.last_request_data["number_of_page_results"]

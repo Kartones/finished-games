@@ -1,9 +1,8 @@
 from datetime import datetime
 from typing import Any, Dict, cast
 
-from django.forms import ModelForm, ValidationError
-
 from core.models import Game, Platform
+from django.forms import ModelForm, ValidationError
 
 
 class PlatformForm(ModelForm):
@@ -75,17 +74,21 @@ class GameForm(ModelForm):
                 raise ValidationError({"parent_game": "A Game DLC cannot have as parent another game DLC"})
 
             # platforms should be a subset of parent platforms
-            new_game_platforms = sorted((
-                item.id
-                for item in self.cleaned_data["platforms"].all()
-                if item in self.cleaned_data["parent_game"].platforms.all()
-            ))
+            new_game_platforms = sorted(
+                (
+                    item.id
+                    for item in self.cleaned_data["platforms"].all()
+                    if item in self.cleaned_data["parent_game"].platforms.all()
+                )
+            )
             parent_game_platforms = sorted((item.id for item in self.cleaned_data["platforms"].all()))
             if not new_game_platforms == parent_game_platforms:
-                raise ValidationError({
-                    "platforms": "Game DLC must be available on subset or all of parent game platforms: '{}'".format(
-                        "','".join((platform.name for platform in self.cleaned_data["parent_game"].platforms.all()))
-                    )
-                })
+                raise ValidationError(
+                    {
+                        "platforms": "Game DLC must be available on subset or all of parent game platforms: '{}'".format(
+                            "','".join((platform.name for platform in self.cleaned_data["parent_game"].platforms.all()))
+                        )
+                    }
+                )
 
         return cast(Dict, self.cleaned_data)

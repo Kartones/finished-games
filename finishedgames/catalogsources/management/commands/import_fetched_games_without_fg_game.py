@@ -1,10 +1,9 @@
 from typing import Any, Dict, cast
 
-from django.conf import settings
-from django.core.management.base import BaseCommand, CommandParser
-
 from catalogsources.managers import GameImportSaveError, ImportManager
 from catalogsources.models import FetchedGame
+from django.conf import settings
+from django.core.management.base import BaseCommand, CommandParser
 from finishedgames import constants
 
 
@@ -24,8 +23,7 @@ class Command(BaseCommand):
         if max_items < 1:
             max_items = 1
 
-        fetched_games = FetchedGame.objects  \
-                                   .filter(fg_game__isnull=True, hidden=False)[:max_items]
+        fetched_games = FetchedGame.objects.filter(fg_game__isnull=True, hidden=False)[:max_items]
 
         self.stdout.write("> Going to import {} new Fetched Games:".format(self.style.WARNING(str(len(fetched_games)))))
 
@@ -53,7 +51,7 @@ class Command(BaseCommand):
                     game_id=None,
                     parent_game_id=None,
                     source_display_name=source_display_names[fetched_game.source_id],
-                    source_url=fetched_game.source_url
+                    source_url=fetched_game.source_url,
                 )
             except GameImportSaveError as error:
                 error_message = str(error)
@@ -65,7 +63,6 @@ class Command(BaseCommand):
                 self.stdout.write(self.style.SUCCESS("✓"))
                 imports_ok_count += 1
 
-        self.stdout.write("> Finished importing new Fetched Games (OK: {} KO: {})".format(
-            imports_ok_count,
-            imports_ko_count
-        ))
+        self.stdout.write(
+            "> Finished importing new Fetched Games (OK: {} KO: {})".format(imports_ok_count, imports_ko_count)
+        )

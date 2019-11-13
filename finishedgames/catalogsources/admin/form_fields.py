@@ -14,14 +14,14 @@ class SimpleArrayField(forms.Field):
     """
 
     default_error_messages = {
-        'item_invalid': _('Item %(nth)s in the array did not validate:'),
+        "item_invalid": _("Item %(nth)s in the array did not validate:"),
     }
 
     def __init__(
         self,
         base_field: forms.Field,
         *,
-        delimiter: str = ',',
+        delimiter: str = ",",
         max_length: Optional[int] = None,
         min_length: Optional[int] = None,
         **kwargs: Any
@@ -58,12 +58,14 @@ class SimpleArrayField(forms.Field):
             try:
                 values.append(self.base_field.to_python(item))
             except ValidationError as error:
-                errors.append(prefix_validation_error(
-                    error,
-                    prefix=self.error_messages['item_invalid'],
-                    code='item_invalid',
-                    params={'nth': index + 1},
-                ))
+                errors.append(
+                    prefix_validation_error(
+                        error,
+                        prefix=self.error_messages["item_invalid"],
+                        code="item_invalid",
+                        params={"nth": index + 1},
+                    )
+                )
         if errors:
             raise ValidationError(errors)
         return values
@@ -75,12 +77,14 @@ class SimpleArrayField(forms.Field):
             try:
                 self.base_field.validate(item)
             except ValidationError as error:
-                errors.append(prefix_validation_error(
-                    error,
-                    prefix=self.error_messages['item_invalid'],
-                    code='item_invalid',
-                    params={'nth': index + 1},
-                ))
+                errors.append(
+                    prefix_validation_error(
+                        error,
+                        prefix=self.error_messages["item_invalid"],
+                        code="item_invalid",
+                        params={"nth": index + 1},
+                    )
+                )
         if errors:
             raise ValidationError(errors)
 
@@ -91,12 +95,14 @@ class SimpleArrayField(forms.Field):
             try:
                 self.base_field.run_validators(item)
             except ValidationError as error:
-                errors.append(prefix_validation_error(
-                    error,
-                    prefix=self.error_messages['item_invalid'],
-                    code='item_invalid',
-                    params={'nth': index + 1},
-                ))
+                errors.append(
+                    prefix_validation_error(
+                        error,
+                        prefix=self.error_messages["item_invalid"],
+                        code="item_invalid",
+                        params={"nth": index + 1},
+                    )
+                )
         if errors:
             raise ValidationError(errors)
 

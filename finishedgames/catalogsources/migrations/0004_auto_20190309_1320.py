@@ -6,13 +6,9 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('catalogsources', '0003_auto_20190303_2035'),
+        ("catalogsources", "0003_auto_20190303_2035"),
     ]
 
     operations = [
-        migrations.RenameField(
-            model_name='fetchedgame',
-            old_name='fg_game_id',
-            new_name='fg_game',
-        ),
+        migrations.RenameField(model_name="fetchedgame", old_name="fg_game_id", new_name="fg_game",),
     ]

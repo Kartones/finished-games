@@ -1,5 +1,7 @@
 from typing import Any, List, Set, cast
 
+from core.forms import GameForm, PlatformForm
+from core.models import Game, Platform, UserGame, WishlistedUserGame
 from django.contrib import admin, auth
 from django.db.models.functions import Lower
 from django.forms import ModelForm
@@ -8,21 +10,17 @@ from django.urls import reverse
 from django.utils.html import format_html, format_html_join
 from django.utils.safestring import mark_safe
 
-from core.forms import GameForm, PlatformForm
-from core.models import Game, Platform, UserGame, WishlistedUserGame
-
 
 class FGModelAdmin(admin.ModelAdmin):
     class Media:
-        css = {
-             'all': ('css/admin.css',)
-        }
+        css = {"all": ("css/admin.css",)}
 
 
 class CustomUserAdmin(auth.admin.UserAdmin):
     """
     Some security best practices applied
     """
+
     readonly_fields = ["date_joined", "last_login"]
 
     def get_form(self, request: HttpRequest, obj: Any = None, **kwargs: Any) -> ModelForm:
@@ -65,7 +63,7 @@ class UserGameAdmin(FGModelAdmin):
 
     def get_form(self, request: HttpRequest, obj: Any = None, **kwargs: Any) -> ModelForm:
         form = super().get_form(request, obj, **kwargs)
-        form.base_fields['user'].initial = request.user
+        form.base_fields["user"].initial = request.user
         return form
 
 
@@ -84,6 +82,7 @@ class PlatformAdmin(FGModelAdmin):
 
         url = reverse("platform_details", args=[instance.id])
         return cast(str, format_html("<a href='{}' target='_blank'>{}</a>", url, url))
+
     platform_url.short_description = "Platform Url"  # type:ignore # NOQA: E305
 
 
@@ -108,14 +107,19 @@ class GameAdmin(FGModelAdmin):
 
         url = reverse("game_details", args=[instance.id])
         return cast(str, format_html("<a href='{}' target='_blank'>{}</a>", url, url))
+
     game_url.short_description = "Game Url"  # type:ignore # NOQA: E305
 
     def urls_list(self, instance: FGModelAdmin) -> str:
-        return cast(str, format_html_join(
-            mark_safe("<br>"),
-            "{}: <a href='{}' target='_blank'>{}</a>",
-            ((name, url, url) for name, url in instance.urls_dict.items()),
-        ))
+        return cast(
+            str,
+            format_html_join(
+                mark_safe("<br>"),
+                "{}: <a href='{}' target='_blank'>{}</a>",
+                ((name, url, url) for name, url in instance.urls_dict.items()),
+            ),
+        )
+
     urls_list.short_description = "URLs list"  # type:ignore # NOQA: E305
 
     def get_ordering(self, request: HttpRequest) -> List[str]:
@@ -133,7 +137,7 @@ class WishlistedUserGameAdmin(FGModelAdmin):
 
     def get_form(self, request: HttpRequest, obj: Any = None, **kwargs: Any) -> ModelForm:
         form = super().get_form(request, obj, **kwargs)
-        form.base_fields['user'].initial = request.user
+        form.base_fields["user"].initial = request.user
         return form
 
 

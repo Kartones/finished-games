@@ -1,14 +1,12 @@
 from datetime import datetime
 
+from core.forms import GameForm
+from core.test.helpers import create_game, create_platform
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 
-from core.forms import GameForm
-from core.test.helpers import create_game, create_platform
-
 
 class GameFormTests(TestCase):
-
     def setUp(self):
         self.platform_1 = create_platform()
 
@@ -29,9 +27,7 @@ class GameFormTests(TestCase):
     def test_game_name_is_unique(self):
         game_data = {
             "name": "a unique name",
-            "platforms": [
-                self.platform_1.id
-            ],
+            "platforms": [self.platform_1.id],
             "publish_date": datetime.now().year,
         }
 
@@ -44,9 +40,7 @@ class GameFormTests(TestCase):
     def test_game_name_uniqueness_is_case_insensitive(self):
         game_data = {
             "name": "A Case Sensitive Unique Name",
-            "platforms": [
-                self.platform_1.id
-            ],
+            "platforms": [self.platform_1.id],
             "publish_date": datetime.now().year,
         }
 
@@ -64,9 +58,7 @@ class GameFormTests(TestCase):
 
         game_data = {
             "name": "an irrelevant name",
-            "platforms": [
-                self.platform_1.id
-            ],
+            "platforms": [self.platform_1.id],
             "publish_date": datetime.now().year,
             "dlc_or_expansion": True,
             "parent_game": None,
@@ -87,9 +79,7 @@ class GameFormTests(TestCase):
 
         game_data = {
             "name": "an irrelevant name",
-            "platforms": [
-                self.platform_1.id
-            ],
+            "platforms": [self.platform_1.id],
             "publish_date": datetime.now().year,
             "dlc_or_expansion": True,
             "parent_game": game_1_dlc.id,

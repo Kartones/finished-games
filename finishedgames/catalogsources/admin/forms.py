@@ -1,10 +1,9 @@
+from catalogsources.admin.form_fields import SimpleArrayField
+from core.models import Game, Platform
 from dal import autocomplete
 from django import forms
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db.models.functions import Lower
-
-from catalogsources.admin.form_fields import SimpleArrayField
-from core.models import Game, Platform
 
 
 class SingleFetchedPlatformImportForm(forms.Form):
@@ -12,12 +11,11 @@ class SingleFetchedPlatformImportForm(forms.Form):
     This form will only display field data, is not meant to be sent back.
     Field values will be used at the template to either display some data or populate SinglePlatformImportForm fields.
     """
+
     fetched_name = forms.CharField(label="Name", max_length=100, disabled=True)
     fetched_shortname = forms.CharField(label="Shortname", max_length=40, disabled=True)
     fetched_publish_date = forms.IntegerField(
-        label="Year published",
-        validators=[MinValueValidator(1970), MaxValueValidator(3000)],
-        disabled=True,
+        label="Year published", validators=[MinValueValidator(1970), MaxValueValidator(3000)], disabled=True,
     )
     source_id = forms.CharField(label="Source", max_length=50, disabled=True)
     source_platform_id = forms.CharField(label="Source platform identifier", max_length=50, disabled=True)
@@ -32,21 +30,18 @@ class SinglePlatformImportForm(forms.Form):
     fetched_platform_id = forms.IntegerField(widget=forms.HiddenInput)
     platform_id = forms.IntegerField(required=False, widget=forms.HiddenInput)
     name = forms.CharField(
-        label="Name",
-        max_length=100,
-        initial="",
-        widget=forms.TextInput(attrs={"size": "60", "class": "vTextField"})
+        label="Name", max_length=100, initial="", widget=forms.TextInput(attrs={"size": "60", "class": "vTextField"})
     )
     shortname = forms.CharField(
         label="Shortname",
         max_length=40,
         initial="",
-        widget=forms.TextInput(attrs={"size": "40", "class": "vTextField"})
+        widget=forms.TextInput(attrs={"size": "40", "class": "vTextField"}),
     )
     publish_date = forms.IntegerField(
         label="Year published",
         validators=[MinValueValidator(1970), MaxValueValidator(3000)],
-        widget=forms.NumberInput(attrs={"class": "vIntegerField"})
+        widget=forms.NumberInput(attrs={"class": "vIntegerField"}),
     )
 
 
@@ -64,11 +59,10 @@ class SingleFetchedGameImportForm(forms.Form):
     This form will only display field data, is not meant to be sent back.
     Field values will be used at the template to either display some data or populate SingleGameImportForm fields.
     """
+
     fetched_name = forms.CharField(label="Name", max_length=200, disabled=True)
     fetched_publish_date = forms.IntegerField(
-        label="Year published",
-        validators=[MinValueValidator(1970), MaxValueValidator(3000)],
-        disabled=True,
+        label="Year published", validators=[MinValueValidator(1970), MaxValueValidator(3000)], disabled=True,
     )
     fg_platform_ids = forms.CharField(label="Fetched Platform Ids", disabled=True)
     fg_platforms = forms.CharField(label="Fetched Platforms", disabled=True)
@@ -89,27 +83,19 @@ class SingleGameImportForm(forms.Form):
     fetched_game_id = forms.IntegerField(widget=forms.HiddenInput)
     game_id = forms.IntegerField(required=False, widget=forms.HiddenInput)
     name = forms.CharField(
-        label="Name",
-        max_length=200,
-        initial="",
-        widget=forms.TextInput(attrs={"size": "60", "class": "vTextField"})
+        label="Name", max_length=200, initial="", widget=forms.TextInput(attrs={"size": "60", "class": "vTextField"})
     )
     publish_date = forms.IntegerField(
         label="Year published",
         validators=[MinValueValidator(1970), MaxValueValidator(3000)],
-        widget=forms.NumberInput(attrs={"class": "vIntegerField"})
+        widget=forms.NumberInput(attrs={"class": "vIntegerField"}),
     )
     platforms = forms.ModelMultipleChoiceField(queryset=Platform.objects.order_by(Lower("name")))
     dlc_or_expansion = forms.BooleanField(label="DLC/Expansion", initial=False, required=False)
     parent_game = forms.ModelChoiceField(
         label="Parent game",
         queryset=Game.objects.order_by(Lower("name")),
-        widget=autocomplete.ModelSelect2(
-            url="game_autocomplete",
-            attrs={
-                "data-minimum-input-length": 2,
-            },
-        ),
+        widget=autocomplete.ModelSelect2(url="game_autocomplete", attrs={"data-minimum-input-length": 2},),
         required=False,
     )
     source_display_name = forms.CharField(

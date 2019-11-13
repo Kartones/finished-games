@@ -1,14 +1,12 @@
 from datetime import datetime
 
+from core.forms import PlatformForm
+from core.test.helpers import create_platform
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 
-from core.forms import PlatformForm
-from core.test.helpers import create_platform
-
 
 class PlatformFormTests(TestCase):
-
     def setUp(self):
         self.platform_1 = create_platform()
 
@@ -16,7 +14,7 @@ class PlatformFormTests(TestCase):
         platform_data = {
             "name": "a unique name",
             "shortname": "a unique shortname",
-            "publish_date": datetime.now().year
+            "publish_date": datetime.now().year,
         }
         create_platform(name=platform_data["name"], shortname=platform_data["shortname"])
 
@@ -31,7 +29,7 @@ class PlatformFormTests(TestCase):
         platform_data = {
             "name": "A Case Sensitive Unique Name",
             "shortname": "A Case Sensitive Unique Shortname",
-            "publish_date": datetime.now().year
+            "publish_date": datetime.now().year,
         }
         create_platform(name=platform_data["name"], shortname=platform_data["shortname"])
 

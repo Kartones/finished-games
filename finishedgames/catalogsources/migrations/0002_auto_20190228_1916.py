@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('catalogsources', '0001_initial'),
+        ("catalogsources", "0001_initial"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='fetchedgame',
-            name='platforms',
-            field=models.ManyToManyField(to='catalogsources.FetchedPlatform'),
+            model_name="fetchedgame",
+            name="platforms",
+            field=models.ManyToManyField(to="catalogsources.FetchedPlatform"),
         ),
     ]

@@ -1,10 +1,8 @@
-from django.test import TestCase
-
 from catalogsources.adapters.helpers import check_rate_limit
+from django.test import TestCase
 
 
 class AdapterHelpersTests(TestCase):
-
     def test_bucket_decrements_if_tokens_available(self):
         max_tokens = 2
         time_window = 600  # 10 minutes
@@ -14,8 +12,11 @@ class AdapterHelpersTests(TestCase):
         mock_ts = 1
 
         token_bucket, current_timestamp, can_pass = check_rate_limit(
-            max_tokens=max_tokens, time_window=time_window, token_bucket=bucket, last_check_timestamp=last_check_ts,
-            time=lambda: mock_ts
+            max_tokens=max_tokens,
+            time_window=time_window,
+            token_bucket=bucket,
+            last_check_timestamp=last_check_ts,
+            time=lambda: mock_ts,
         )
 
         # bucket not even modified
@@ -33,8 +34,11 @@ class AdapterHelpersTests(TestCase):
         mock_ts = 1
 
         token_bucket, current_timestamp, can_pass = check_rate_limit(
-            max_tokens=max_tokens, time_window=time_window, token_bucket=bucket, last_check_timestamp=last_check_ts,
-            time=lambda: mock_ts
+            max_tokens=max_tokens,
+            time_window=time_window,
+            token_bucket=bucket,
+            last_check_timestamp=last_check_ts,
+            time=lambda: mock_ts,
         )
 
         # Will generate 1 token each 5 minutes so impossible to have one already
@@ -53,8 +57,11 @@ class AdapterHelpersTests(TestCase):
         # 1/2 token generated
         mock_ts = time_window / max_tokens / 2
         bucket, last_check_ts, can_pass = check_rate_limit(
-            max_tokens=max_tokens, time_window=time_window, token_bucket=bucket, last_check_timestamp=last_check_ts,
-            time=lambda: mock_ts
+            max_tokens=max_tokens,
+            time_window=time_window,
+            token_bucket=bucket,
+            last_check_timestamp=last_check_ts,
+            time=lambda: mock_ts,
         )
         self.assertTrue(bucket < 1.0)  # should be ~0.5
         self.assertFalse(can_pass)
@@ -62,8 +69,11 @@ class AdapterHelpersTests(TestCase):
         # Not yet...
         mock_ts = time_window / max_tokens - 0.1
         bucket, last_check_ts, can_pass = check_rate_limit(
-            max_tokens=max_tokens, time_window=time_window, token_bucket=bucket, last_check_timestamp=last_check_ts,
-            time=lambda: mock_ts
+            max_tokens=max_tokens,
+            time_window=time_window,
+            token_bucket=bucket,
+            last_check_timestamp=last_check_ts,
+            time=lambda: mock_ts,
         )
         self.assertTrue(bucket < 1.0)  # should be ~ 0.99
         self.assertFalse(can_pass)
@@ -71,8 +81,11 @@ class AdapterHelpersTests(TestCase):
         # Now should have one token
         mock_ts = time_window / max_tokens + 0.1
         bucket, last_check_ts, can_pass = check_rate_limit(
-            max_tokens=max_tokens, time_window=time_window, token_bucket=bucket, last_check_timestamp=last_check_ts,
-            time=lambda: mock_ts
+            max_tokens=max_tokens,
+            time_window=time_window,
+            token_bucket=bucket,
+            last_check_timestamp=last_check_ts,
+            time=lambda: mock_ts,
         )
         self.assertTrue(can_pass)
         # Why this? Because as was able to pass, the token it just obtained was consumed actually letting it pass

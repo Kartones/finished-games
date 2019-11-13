@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('core', '0003_game_urls'),
+        ("core", "0003_game_urls"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='usergame',
-            name='abandoned',
-            field=models.BooleanField(db_index=True, default=False, verbose_name='Abandoned'),
+            model_name="usergame",
+            name="abandoned",
+            field=models.BooleanField(db_index=True, default=False, verbose_name="Abandoned"),
         ),
     ]

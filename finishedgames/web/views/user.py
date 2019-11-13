@@ -1,6 +1,8 @@
 from datetime import datetime
 from typing import Any, Callable, Dict  # NOQA: F401
 
+from core.managers import CatalogManager
+from core.models import Platform, UserGame, WishlistedUserGame
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 from django.db.models.functions import Lower
@@ -8,9 +10,6 @@ from django.http import Http404, HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, render
 from django.utils.decorators import method_decorator
 from django.views import View
-
-from core.managers import CatalogManager
-from core.models import Platform, UserGame, WishlistedUserGame
 from web import constants
 from web.decorators import authenticated_user_games, viewed_user
 
@@ -71,7 +70,7 @@ def catalog(request: HttpRequest, username: str) -> HttpResponse:
         "pending_games_count": pending_games_count,
         "abandoned_games_count": abandoned_games_count,
         "progress_class": _progress_bar_class(completed_games_progress),
-        "wishlisted_games_count": wishlisted_games_count
+        "wishlisted_games_count": wishlisted_games_count,
     }
 
     return render(request, "user/catalog.html", context)
@@ -106,7 +105,6 @@ def profile(request: HttpRequest, username: str) -> HttpResponse:
 
 
 class NoLongerOwnedGamesView(View):
-
     def post(self, request: HttpRequest, username: str, *args: Any, **kwargs: Any) -> HttpResponse:
         if username != request.user.get_username() or request.method != "POST":
             raise Http404("Invalid URL")
@@ -124,7 +122,6 @@ class NoLongerOwnedGamesView(View):
 
 
 class GamesView(View):
-
     @method_decorator(viewed_user)
     @method_decorator(authenticated_user_games)
     def get(self, request: HttpRequest, username: str, *args: Any, **kwargs: Any) -> HttpResponse:
@@ -138,10 +135,7 @@ class GamesView(View):
         except KeyError:
             order_by = constants.SORT_FIELDS_MAPPING[constants.SORT_BY_GAME_NAME]
 
-        user_games = UserGame.objects \
-                             .filter(user=viewed_user) \
-                             .order_by(*order_by) \
-                             .select_related("game", "platform")
+        user_games = UserGame.objects.filter(user=viewed_user).order_by(*order_by).select_related("game", "platform")
 
         context = {
             "viewed_user": viewed_user,
@@ -164,15 +158,16 @@ class GamesView(View):
             )
         else:
             CatalogManager.add_game_to_catalog(
-                user=request.user, form_user_id=int(request.POST["user"]), game_id=int(request.POST["game"]),
-                platform_id=int(request.POST["platform"])
+                user=request.user,
+                form_user_id=int(request.POST["user"]),
+                game_id=int(request.POST["game"]),
+                platform_id=int(request.POST["platform"]),
             )
 
         return HttpResponse(status=204)
 
 
 class GamesByPlatformView(View):
-
     @method_decorator(viewed_user)
     @method_decorator(authenticated_user_games)
     def get(self, request: HttpRequest, username: str, platform_id: int, *args: Any, **kwargs: Any) -> HttpResponse:
@@ -181,10 +176,9 @@ class GamesByPlatformView(View):
             raise Http404("Invalid URL")
 
         platform = get_object_or_404(Platform, pk=platform_id)
-        user_games = UserGame.objects \
-                             .filter(user=viewed_user, platform=platform) \
-                             .order_by("game__name") \
-                             .select_related("game")
+        user_games = (
+            UserGame.objects.filter(user=viewed_user, platform=platform).order_by("game__name").select_related("game")
+        )
         games_count = len(user_games)
 
         currently_playing_games_count = user_games.filter(currently_playing=True).count()
@@ -214,7 +208,6 @@ class GamesByPlatformView(View):
 
 
 class GamesPendingView(View):
-
     @method_decorator(viewed_user)
     @method_decorator(authenticated_user_games)
     def get(self, request: HttpRequest, username: str, *args: Any, **kwargs: Any) -> HttpResponse:
@@ -228,11 +221,13 @@ class GamesPendingView(View):
         except KeyError:
             order_by = constants.SORT_FIELDS_MAPPING[constants.SORT_BY_GAME_NAME]
 
-        pending_games = UserGame.objects.filter(user=viewed_user) \
-                                        .exclude(year_finished__isnull=False) \
-                                        .exclude(abandoned=True) \
-                                        .order_by(*order_by) \
-                                        .select_related("game", "platform")
+        pending_games = (
+            UserGame.objects.filter(user=viewed_user)
+            .exclude(year_finished__isnull=False)
+            .exclude(abandoned=True)
+            .order_by(*order_by)
+            .select_related("game", "platform")
+        )
 
         context = {
             "viewed_user": viewed_user,
@@ -247,7 +242,6 @@ class GamesPendingView(View):
 
 
 class GamesFinishedView(View):
-
     @method_decorator(viewed_user)
     @method_decorator(authenticated_user_games)
     def get(self, request: HttpRequest, username: str, *args: Any, **kwargs: Any) -> HttpResponse:
@@ -261,10 +255,12 @@ class GamesFinishedView(View):
         except KeyError:
             order_by = constants.SORT_FIELDS_MAPPING[constants.SORT_BY_GAME_NAME]
 
-        finished_games = UserGame.objects.filter(user=viewed_user) \
-                                         .exclude(year_finished__isnull=True) \
-                                         .order_by(*order_by) \
-                                         .select_related("game", "platform")
+        finished_games = (
+            UserGame.objects.filter(user=viewed_user)
+            .exclude(year_finished__isnull=True)
+            .order_by(*order_by)
+            .select_related("game", "platform")
+        )
 
         context = {
             "viewed_user": viewed_user,
@@ -287,15 +283,16 @@ class GamesFinishedView(View):
             )
         else:
             CatalogManager.mark_game_as_finished(
-                user=request.user, game_id=int(request.POST["game"]), platform_id=int(request.POST["platform"]),
-                year_finished=datetime.now().year
+                user=request.user,
+                game_id=int(request.POST["game"]),
+                platform_id=int(request.POST["platform"]),
+                year_finished=datetime.now().year,
             )
 
         return HttpResponse(status=204)
 
 
 class GamesAbandonedView(View):
-
     @method_decorator(viewed_user)
     @method_decorator(authenticated_user_games)
     def get(self, request: HttpRequest, username: str, *args: Any, **kwargs: Any) -> HttpResponse:
@@ -309,10 +306,12 @@ class GamesAbandonedView(View):
         except KeyError:
             order_by = constants.SORT_FIELDS_MAPPING[constants.SORT_BY_GAME_NAME]
 
-        abandoned_Games = UserGame.objects.filter(user=viewed_user) \
-                                          .filter(abandoned=True) \
-                                          .order_by(*order_by) \
-                                          .select_related("game", "platform")
+        abandoned_Games = (
+            UserGame.objects.filter(user=viewed_user)
+            .filter(abandoned=True)
+            .order_by(*order_by)
+            .select_related("game", "platform")
+        )
 
         context = {
             "viewed_user": viewed_user,
@@ -342,7 +341,6 @@ class GamesAbandonedView(View):
 
 
 class GamesCurrentlyPlayingView(View):
-
     @method_decorator(viewed_user)
     @method_decorator(authenticated_user_games)
     def get(self, request: HttpRequest, username: str, *args: Any, **kwargs: Any) -> HttpResponse:
@@ -356,10 +354,11 @@ class GamesCurrentlyPlayingView(View):
         except KeyError:
             order_by = constants.SORT_FIELDS_MAPPING[constants.SORT_BY_GAME_NAME]
 
-        currently_playing_games = UserGame.objects \
-                                          .filter(user=viewed_user, currently_playing=True) \
-                                          .order_by(*order_by) \
-                                          .select_related("game", "platform")
+        currently_playing_games = (
+            UserGame.objects.filter(user=viewed_user, currently_playing=True)
+            .order_by(*order_by)
+            .select_related("game", "platform")
+        )
 
         context = {
             "viewed_user": viewed_user,
@@ -389,7 +388,6 @@ class GamesCurrentlyPlayingView(View):
 
 
 class GamesWishlistedView(View):
-
     @method_decorator(viewed_user)
     @method_decorator(authenticated_user_games)
     def get(self, request: HttpRequest, username: str, *args: Any, **kwargs: Any) -> HttpResponse:
@@ -403,10 +401,9 @@ class GamesWishlistedView(View):
         except KeyError:
             order_by = constants.SORT_FIELDS_MAPPING[constants.SORT_BY_GAME_NAME]
 
-        wishlisted_games = WishlistedUserGame.objects \
-                                             .filter(user=viewed_user) \
-                                             .order_by(*order_by) \
-                                             .select_related("game", "platform")
+        wishlisted_games = (
+            WishlistedUserGame.objects.filter(user=viewed_user).order_by(*order_by).select_related("game", "platform")
+        )
 
         context = {
             "viewed_user": viewed_user,
@@ -429,8 +426,10 @@ class GamesWishlistedView(View):
             )
         else:
             CatalogManager.mark_game_as_wishlisted(
-                user=request.user, form_user_id=int(request.POST["user"]), game_id=int(request.POST["game"]),
-                platform_id=int(request.POST["platform"])
+                user=request.user,
+                form_user_id=int(request.POST["user"]),
+                game_id=int(request.POST["game"]),
+                platform_id=int(request.POST["platform"]),
             )
 
         return HttpResponse(status=204)

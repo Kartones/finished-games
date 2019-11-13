@@ -1,10 +1,9 @@
 from typing import Any, Dict, List, Tuple, cast
 
-from django.core.management.base import BaseCommand, CommandParser
-
 from catalogsources.helpers import clean_string_field
 from catalogsources.management.helpers import TimeProfiler, source_class_from_id, wait_if_needed
 from catalogsources.models import FetchedGame, FetchedPlatform
+from django.core.management.base import BaseCommand, CommandParser
 
 
 class Command(BaseCommand):
@@ -19,30 +18,38 @@ class Command(BaseCommand):
     def handle(self, *args: Any, **options: Dict) -> None:
         self._display_legend()
         self._fetch_source(
-            source_id=cast(str, options["source"]), platforms=cast(List[int], options["platforms"]),
-            initial_offset=cast(int, options["offset"])
+            source_id=cast(str, options["source"]),
+            platforms=cast(List[int], options["platforms"]),
+            initial_offset=cast(int, options["offset"]),
         )
 
     def _fetch_source(self, source_id: str, platforms: List[int], initial_offset=0) -> None:
         had_errors = False
-        self.stdout.write(self.style.WARNING(
-            "> Started fetching games from '{source}' and source platform ids: {platforms}".format(
-                source=source_id, platforms=platforms)
-        ))
+        self.stdout.write(
+            self.style.WARNING(
+                "> Started fetching games from '{source}' and source platform ids: {platforms}".format(
+                    source=source_id, platforms=platforms
+                )
+            )
+        )
 
         adapter_class = source_class_from_id(source_id)
         self.default_publish_date = adapter_class.DEFAULT_PUBLISH_DATE
 
         if not self._source_has_plaforms(source_id):
-            self.stdout.write(self.style.ERROR(
-                "You must first fetch platforms from source '{}' as games needs to be linked to them".format(source_id)
-            ))
+            self.stdout.write(
+                self.style.ERROR(
+                    "You must first fetch platforms from source '{}' as games needs to be linked to them".format(
+                        source_id
+                    )
+                )
+            )
             exit(1)
 
         with adapter_class(stdout=self.stdout, stdout_color_style=self.style) as adapter:
-            self.stdout.write(self.style.WARNING("> Initial Offset:{}  Batch size:{}".format(
-                initial_offset, adapter.batch_size()
-            )))
+            self.stdout.write(
+                self.style.WARNING("> Initial Offset:{}  Batch size:{}".format(initial_offset, adapter.batch_size()))
+            )
 
             if initial_offset > 0:
                 adapter.set_offset(initial_offset)
@@ -53,8 +60,11 @@ class Command(BaseCommand):
                         total = adapter.total_results
                     else:
                         total = "-"
-                    self.stdout.write("\n> Fetch call (platform_id {id}): {current}/{total}".format(
-                        id=platform_id, current=adapter.next_offset, total=total))
+                    self.stdout.write(
+                        "\n> Fetch call (platform_id {id}): {current}/{total}".format(
+                            id=platform_id, current=adapter.next_offset, total=total
+                        )
+                    )
 
                     with TimeProfiler(use_performance_counter=True) as profiler:
                         games = adapter.fetch_games_block(platform_id=platform_id)
@@ -82,9 +92,7 @@ class Command(BaseCommand):
             game.name = clean_string_field(game.name)
 
             try:
-                existing_game = FetchedGame.objects.get(
-                    source_game_id=game.source_game_id, source_id=game.source_id
-                )
+                existing_game = FetchedGame.objects.get(source_game_id=game.source_game_id, source_id=game.source_id)
                 existing_game.name = game.name
                 existing_game.source_game_id = game.source_game_id
                 existing_game.source_id = game.source_id

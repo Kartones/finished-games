@@ -1,24 +1,28 @@
 from typing import Any, List, Optional, cast
 
+from catalogsources.admin.actions import (
+    hide_fetched_items,
+    import_fetched_games_fixing_duplicates_appending_platform,
+    import_fetched_games_fixing_duplicates_appending_publish_date,
+    import_fetched_games_link_automatically_if_name_and_year_matches,
+    import_fetched_items,
+)
+from catalogsources.admin.decorators import hyperlink_fg_game, hyperlink_fg_platform, hyperlink_source_url
+from catalogsources.admin.filters import (
+    CustomPlatformsFilter,
+    HiddenByDefaultFilter,
+    NotImportedFetchedGames,
+    NotImportedFetchedPlatforms,
+)
+from catalogsources.admin.views import FetchedGameAdminViewsMixin, FetchedPlatformAdminViewsMixin
+from catalogsources.models import FetchedGame, FetchedPlatform
+from core.models import Game
 from django.db.models.fields import Field
 from django.db.models.functions import Lower
 from django.forms import ModelForm
 from django.forms.fields import Field as Form_Field
 from django.http import HttpRequest
 from django.urls import path
-
-from catalogsources.admin.actions import (
-    hide_fetched_items, import_fetched_games_fixing_duplicates_appending_platform,
-    import_fetched_games_fixing_duplicates_appending_publish_date,
-    import_fetched_games_link_automatically_if_name_and_year_matches, import_fetched_items
-)
-from catalogsources.admin.decorators import hyperlink_fg_game, hyperlink_fg_platform, hyperlink_source_url
-from catalogsources.admin.filters import (
-    CustomPlatformsFilter, HiddenByDefaultFilter, NotImportedFetchedGames, NotImportedFetchedPlatforms
-)
-from catalogsources.admin.views import FetchedGameAdminViewsMixin, FetchedPlatformAdminViewsMixin
-from catalogsources.models import FetchedGame, FetchedPlatform
-from core.models import Game
 from web.admin import FGModelAdmin
 
 
@@ -110,15 +114,13 @@ class FetchedGameAdmin(FetchedGameAdminViewsMixin, FGModelAdmin):
         my_urls = [
             path("import_setup/", self.admin_site.admin_view(self.import_setup_view), name="game_import_setup"),
             path("import/batch", self.admin_site.admin_view(self.import_batch_view), name="game_import_batch"),
-            path("import/", self.admin_site.admin_view(self.import_view), name="game_import")
+            path("import/", self.admin_site.admin_view(self.import_view), name="game_import"),
         ]
         return cast(List[str], my_urls + urls)
 
 
 class FetchedPlatformAdmin(FetchedPlatformAdminViewsMixin, FGModelAdmin):
-    list_display = [
-        "name", hyperlink_fg_platform, hyperlink_source_url, "last_modified_date", "source_id", "hidden"
-    ]
+    list_display = ["name", hyperlink_fg_platform, hyperlink_source_url, "last_modified_date", "source_id", "hidden"]
     list_filter = ["last_modified_date", HiddenByDefaultFilter, NotImportedFetchedPlatforms, "source_id"]
     search_fields = ["name"]
     readonly_fields = ["last_modified_date", "change_hash"]
