@@ -2,3 +2,5 @@
 max-line-length = 120
 inline-quotes = "
 exclude = migrations
+select = C,E,F,W,B,B950
+ignore = E203, E501, W503

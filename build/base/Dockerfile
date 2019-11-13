@@ -1,4 +1,4 @@
-FROM python:3.7.4-slim
+FROM python:3.7.5
 
 LABEL title "Finished-Games"
 LABEL maintainer "Diego / Kartones"

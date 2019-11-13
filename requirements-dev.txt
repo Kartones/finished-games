@@ -7,3 +7,4 @@ coverage
 pytest-cov==2.7.1
 pytest-randomly==3.1.0
 isort==4.3.21
+black==19.10b0
