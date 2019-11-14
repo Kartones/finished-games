@@ -1,10 +1,10 @@
-pytest==5.2.0
-flake8==3.7.8
-mypy==0.730
-django-debug-toolbar==2.0
-pytest-django==3.5.1
+pytest==5.2.3
+flake8==3.7.9
+mypy==0.740
+django-debug-toolbar==2.1
+pytest-django==3.7.0
 coverage
-pytest-cov==2.7.1
+pytest-cov==2.8.1
 pytest-randomly==3.1.0
 isort==4.3.21
 black==19.10b0

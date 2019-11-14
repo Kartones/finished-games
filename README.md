@@ -183,6 +183,13 @@ pre-commit install
 print(latest_finished_games.query)
 ```
 
+
+- To check if there are new versions of the dependencies
+```
+make shell
+pip list --outdated
+```
+
 ## Deployment
 
 
