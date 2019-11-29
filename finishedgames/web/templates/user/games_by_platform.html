@@ -46,14 +46,14 @@
         </p>
         <p>
             {% if user.is_authenticated and user == viewed_user %}
-                You've completed {{ completed_games_progress }}% of this platform's owned catalog.
+                You've completed {{ completed_games_progress }}% of this catalog.
             {% else %}
-                {{ viewed_user.get_username.capitalize }} has completed {{ completed_games_progress }}% of this platform's owned catalog.
+                {{ viewed_user.get_username.capitalize }} has completed {{ completed_games_progress }}% of this catalog.
             {% endif %}
             <br/>
             <progress class="nes-progress {{ progress_class }}" value="{{ completed_games_progress }}"
                 max="100"
-                title="Completed {{ completed_games_progress }}% of this platform's owned catalog ({{ completed_games_count }}/{{ games_count }})"></progress>
+                title="Completed {{ completed_games_progress }}% of this catalog ({{ completed_games_count }}/{{ games_count }})"></progress>
         </p>
     </div>
 </section>

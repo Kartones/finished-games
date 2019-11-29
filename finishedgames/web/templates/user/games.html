@@ -51,6 +51,23 @@
         <p>
             <strong>{{ user_games_count }}</strong> game{{ user_games_count|pluralize }}.
         </p>
+        <p>
+            <strong>{{ currently_playing_games_count }}</strong> currently playing game{{ currently_playing_games_count|pluralize }}.
+        </p>
+        <p>
+            <strong>{{ finished_games_count }}</strong> finished game{{ finished_games_count|pluralize }}, <strong>{{ abandoned_games_count }}</strong> abandoned game{{ abandoned_games_count|pluralize }} and <strong>{{ pending_games_count }}</strong> pending game{{ pending_games_count|pluralize }}.
+        </p>
+        <p>
+            {% if user.is_authenticated and user == viewed_user %}
+                You've completed {{ completed_games_progress }}% of this catalog.
+            {% else %}
+                {{ viewed_user.get_username.capitalize }} has completed {{ completed_games_progress }}% of this catalog.
+            {% endif %}
+            <br/>
+            <progress class="nes-progress {{ progress_class }}" value="{{ completed_games_progress }}"
+                max="100"
+                title="Completed {{ completed_games_progress }}% of this catalog ({{ completed_games_count }}/{{ user_games_count }})"></progress>
+        </p>
     </div>
 </section>
 

@@ -136,11 +136,29 @@ class GamesView(View):
             order_by = constants.SORT_FIELDS_MAPPING[constants.SORT_BY_GAME_NAME]
 
         user_games = UserGame.objects.filter(user=viewed_user).order_by(*order_by).select_related("game", "platform")
+        games_count = len(user_games)
+
+        currently_playing_games_count = user_games.filter(currently_playing=True).count()
+        finished_games_count = user_games.exclude(year_finished__isnull=True).count()
+        abandoned_games_count = user_games.filter(abandoned=True).count()
+        completed_games_count = finished_games_count + abandoned_games_count
+        pending_games_count = games_count - completed_games_count
+        if games_count > 0:
+            completed_games_progress = int(completed_games_count * 100 / games_count)
+        else:
+            completed_games_progress = 0
 
         context = {
             "viewed_user": viewed_user,
             "user_games": user_games,
-            "user_games_count": len(user_games),
+            "user_games_count": games_count,
+            "currently_playing_games_count": currently_playing_games_count,
+            "finished_games_count": finished_games_count,
+            "abandoned_games_count": abandoned_games_count,
+            "completed_games_count": completed_games_count,
+            "pending_games_count": pending_games_count,
+            "completed_games_progress": completed_games_progress,
+            "progress_class": _progress_bar_class(completed_games_progress),
             "constants": constants,
             "sort_by": sort_by,
             "authenticated_user_catalog": kwargs["authenticated_user_catalog"],
