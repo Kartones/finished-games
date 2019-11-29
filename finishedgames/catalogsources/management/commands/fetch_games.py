@@ -105,7 +105,7 @@ class Command(BaseCommand):
                 if existing_game.last_modified_date != last_modified_date:
                     self.stdout.write(self.style.SUCCESS("☑ "), ending="")
                 else:
-                    self.stdout.write(self.style.WARNING("☐ "), ending="")
+                    self.stdout.write("☐ ", ending="")
             except FetchedGame.DoesNotExist:
                 game.save()
                 # Need to have an id before can change a many-to-many field
@@ -130,13 +130,13 @@ class Command(BaseCommand):
         return FetchedPlatform.objects.filter(source_id=source_id).count() > 0
 
     def _display_legend(self) -> None:
-        self.stdout.write("Legend: ")
+        self.stdout.write(self.style.WARNING("Legend: "))
         self.stdout.write(self.style.SUCCESS("✓ "), ending="")
         self.stdout.write("Added new game")
         self.stdout.write(self.style.SUCCESS("☑ "), ending="")
         self.stdout.write("Updated existing game (new changes)")
-        self.stdout.write(self.style.WARNING("☐ "), ending="")
+        self.stdout.write("☐ ", ending="")
         self.stdout.write("Existing game not updated (no changes)")
         self.stdout.write(self.style.ERROR("✗ "), ending="")
-        self.stdout.write("Error adding/updating game\n\n")
-        self.stdout.write("--------")
+        self.stdout.write("Error adding/updating game")
+        self.stdout.write(self.style.WARNING("-------\n"))
