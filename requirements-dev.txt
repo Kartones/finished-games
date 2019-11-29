@@ -1,6 +1,6 @@
-pytest==5.2.3
+pytest==5.3.1
 flake8==3.7.9
-mypy==0.740
+mypy==0.750
 django-debug-toolbar==2.1
 pytest-django==3.7.0
 coverage

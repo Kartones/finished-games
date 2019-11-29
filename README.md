@@ -166,7 +166,7 @@ python manage.py shell
 
 You must install `pre-commit` to run the formatters and some linters upon commiting code:
 ```
-pip3 install pre-commit
+python3 -m pip install pre-commit --user
 pre-commit install
 ```
 
@@ -187,7 +187,7 @@ print(latest_finished_games.query)
 - To check if there are new versions of the dependencies
 ```
 make shell
-pip list --outdated
+python3 -m pip list --outdated
 ```
 
 ## Deployment
