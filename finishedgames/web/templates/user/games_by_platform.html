@@ -52,10 +52,26 @@
                     <a href="{% url "game_details" item.game.id %}">{{ item.game.name }}</a>
                 </td>
                 <td class="is-centered">
-                    {% if item.currently_playing %} <i class="nes-icon snes-pad" title="Currently playing"></i>{% endif %}
-                    {% if item.year_finished %} <i class="nes-icon trophy" title="Finished"></i>{% endif %}
-                    {% if item.abandoned %} <i class="nes-icon skull" title="Abandoned"></i>{% endif %}
-                    {% if item.no_longer_owned %}<i class="nes-icon snes-pad is-disabled" title="No longer owned"></i>{% endif %}
+                    {% if item.currently_playing %}
+                        <i class="nes-icon snes-pad" title="Currently playing"></i>
+                    {% else %}
+                        <i class="nes-icon snes-pad is-empty is-half-transparent" title="Not currently playing"></i>
+                    {% endif %}
+                    {% if item.year_finished %}
+                        <i class="nes-icon trophy" title="Finished"></i>
+                    {% else %}
+                        <i class="nes-icon trophy is-empty is-half-transparent" title="Not finished"></i>
+                    {% endif %}
+                    {% if item.abandoned %}
+                        <i class="nes-icon skull" title="Abandoned"></i>
+                    {% else %}
+                        <i class="nes-icon skull is-empty is-half-transparent" title="Pending"></i>
+                    {% endif %}
+                    {% if item.no_longer_owned %}
+                        <i class="nes-icon snes-pad is-disabled" title="No longer owned"></i>
+                    {% else %}
+                        <i class="nes-icon snes-pad is-empty is-half-transparent" title="Owned"></i>
+                    {% endif %}
                 </td>
                 {% if user.is_authenticated %}
                     {% render_actions user item.game.id platform.id authenticated_user_catalog %}

@@ -111,3 +111,7 @@ p.character-filter {
 a:hover {
     text-decoration: none;
 }
+
+.is-half-transparent {
+    opacity: 0.5;
+}

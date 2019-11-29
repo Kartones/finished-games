@@ -12,9 +12,9 @@
     <thead>
         <tr>
             {% if sort_by == constants.SORT_BY_GAME_NAME %}
-                <th>Game <a href="{{ request.path }}?sort_by={{ constants.SORT_BY_GAME_NAME_DESC }}">&#8593;</a></th>
+                <th>Name <a href="{{ request.path }}?sort_by={{ constants.SORT_BY_GAME_NAME_DESC }}">&#8593;</a></th>
             {% else %}
-                <th>Game <a href="{{ request.path }}?sort_by={{ constants.SORT_BY_GAME_NAME }}">&#8595;</a></th>
+                <th>Name <a href="{{ request.path }}?sort_by={{ constants.SORT_BY_GAME_NAME }}">&#8595;</a></th>
             {% endif %}
 
             {% if sort_by == constants.SORT_BY_PLATFORM %}
