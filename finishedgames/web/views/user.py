@@ -193,9 +193,15 @@ class GamesByPlatformView(View):
         if not viewed_user:
             raise Http404("Invalid URL")
 
+        sort_by = request.GET.get("sort_by", constants.SORT_BY_GAME_NAME)
+        try:
+            order_by = constants.SORT_FIELDS_MAPPING[sort_by]
+        except KeyError:
+            order_by = constants.SORT_FIELDS_MAPPING[constants.SORT_BY_GAME_NAME]
+
         platform = get_object_or_404(Platform, pk=platform_id)
         user_games = (
-            UserGame.objects.filter(user=viewed_user, platform=platform).order_by("game__name").select_related("game")
+            UserGame.objects.filter(user=viewed_user, platform=platform).order_by(*order_by).select_related("game")
         )
         games_count = len(user_games)
 
@@ -221,6 +227,8 @@ class GamesByPlatformView(View):
             "pending_games_count": pending_games_count,
             "completed_games_progress": completed_games_progress,
             "progress_class": _progress_bar_class(completed_games_progress),
+            "constants": constants,
+            "sort_by": sort_by,
             "authenticated_user_catalog": kwargs["authenticated_user_catalog"],
         }
 

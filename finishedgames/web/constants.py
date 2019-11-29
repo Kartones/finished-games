@@ -4,6 +4,14 @@ SORT_BY_PLATFORM = "platform"
 SORT_BY_PLATFORM_DESC = "-platform"
 SORT_BY_YEAR = "year"
 SORT_BY_YEAR_DESC = "-year"
+SORT_BY_FINISHED = "finished"
+SORT_BY_FINISHED_DESC = "-finished"
+SORT_BY_ABANDONED = "abandoned"
+SORT_BY_ABANDONED_DESC = "-abandoned"
+SORT_BY_CURRENTLY_PLAYING = "playing"
+SORT_BY_CURRENTLY_PLAYING_DESC = "-playing"
+SORT_BY_NO_LONGER_OWNED = "notowned"
+SORT_BY_NO_LONGER_OWNED_DESC = "-notowned"
 
 SORT_FIELDS_MAPPING = {
     SORT_BY_GAME_NAME: ["game__name"],
@@ -12,6 +20,14 @@ SORT_FIELDS_MAPPING = {
     SORT_BY_PLATFORM_DESC: ["-platform__shortname", "game__name"],
     SORT_BY_YEAR: ["year_finished", "game__name"],
     SORT_BY_YEAR_DESC: ["-year_finished", "game__name"],
+    SORT_BY_FINISHED: ["-year_finished", "game__name"],
+    SORT_BY_FINISHED_DESC: ["year_finished", "game__name"],
+    SORT_BY_ABANDONED: ["-abandoned", "game__name"],
+    SORT_BY_ABANDONED_DESC: ["abandoned", "game__name"],
+    SORT_BY_CURRENTLY_PLAYING: ["-currently_playing", "game__name"],
+    SORT_BY_CURRENTLY_PLAYING_DESC: ["currently_playing", "game__name"],
+    SORT_BY_NO_LONGER_OWNED: ["-no_longer_owned", "game__name"],
+    SORT_BY_NO_LONGER_OWNED_DESC: ["no_longer_owned", "game__name"],
 }
 
 # Used at actions template for the ids

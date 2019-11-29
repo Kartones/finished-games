@@ -25,6 +25,14 @@
                 <th>Platform <a href="{{ request.path }}?sort_by={{ constants.SORT_BY_PLATFORM }}">&#8595;</a></th>
             {% endif %}
 
+            <th>
+                {% if sort_by == constants.SORT_BY_FINISHED %}
+                    <a href="{{ request.path }}?sort_by={{ constants.SORT_BY_FINISHED_DESC }}"><i class="nes-icon trophy" title="Finished"></i>&#8593;</a>
+                {% else %}
+                    <a href="{{ request.path }}?sort_by={{ constants.SORT_BY_FINISHED }}"><i class="nes-icon trophy" title="Finished"></i>&#8595;</a>
+                {% endif %}
+            </th>
+
             {% if user.is_authenticated %}
                 <th>Actions</th>
             {% endif %}
@@ -34,11 +42,13 @@
         {% for item in currently_playing_games %}
         <tr>
             <td>
-                <a href="{% url 'game_details' item.game.id %}">{{ item.game.name }}</a>{% if item.year_finished %} <i
-                    class="nes-icon trophy" title="Finished"></i>{% endif %}
+                <a href="{% url 'game_details' item.game.id %}">{{ item.game.name }}</a>
             </td>
             <td class="is-centered">
                 {{ item.platform.shortname }}
+            </td>
+            <td class="is-centered">
+                {% if item.year_finished %} <i class="nes-icon trophy" title="Finished"></i>{% endif %}
             </td>
             {% if user.is_authenticated %}
                 {% render_actions user item.game.id item.platform.id authenticated_user_catalog %}

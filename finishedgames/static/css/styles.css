@@ -52,6 +52,10 @@ h3.nes-title span {
     vertical-align: super;
 }
 
+.nes-table th {
+    background-color: #EAEAEA;
+}
+
 .nes-table th.is-centered, .nes-table td.is-centered {
     text-align: center;
 }

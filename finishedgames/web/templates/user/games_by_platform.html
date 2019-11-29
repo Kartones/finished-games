@@ -11,7 +11,34 @@
 <table class="nes-table is-bordered">
     <thead>
         <tr>
-            <th>Name</th>
+            {% if sort_by == constants.SORT_BY_GAME_NAME %}
+                <th>Name <a href="{{ request.path }}?sort_by={{ constants.SORT_BY_GAME_NAME_DESC }}">&#8593;</a></th>
+            {% else %}
+                <th>Name <a href="{{ request.path }}?sort_by={{ constants.SORT_BY_GAME_NAME }}">&#8595;</a></th>
+            {% endif %}
+
+            <th>
+                {% if sort_by == constants.SORT_BY_CURRENTLY_PLAYING %}
+                    <a href="{{ request.path }}?sort_by={{ constants.SORT_BY_CURRENTLY_PLAYING_DESC }}"><i class="nes-icon snes-pad" title="Currently playing"></i>&#8593;</a>
+                {% else %}
+                    <a href="{{ request.path }}?sort_by={{ constants.SORT_BY_CURRENTLY_PLAYING }}"><i class="nes-icon snes-pad" title="Currently playing"></i>&#8595;</a>
+                {% endif %}
+                {% if sort_by == constants.SORT_BY_FINISHED %}
+                    <a href="{{ request.path }}?sort_by={{ constants.SORT_BY_FINISHED_DESC }}"><i class="nes-icon trophy" title="Finished"></i>&#8593;</a>
+                {% else %}
+                    <a href="{{ request.path }}?sort_by={{ constants.SORT_BY_FINISHED }}"><i class="nes-icon trophy" title="Finished"></i>&#8595;</a>
+                {% endif %}
+                {% if sort_by == constants.SORT_BY_ABANDONED %}
+                    <a href="{{ request.path }}?sort_by={{ constants.SORT_BY_ABANDONED_DESC }}"><i class="nes-icon skull" title="Abandoned"></i>&#8593;</a>
+                {% else %}
+                    <a href="{{ request.path }}?sort_by={{ constants.SORT_BY_ABANDONED }}"><i class="nes-icon skull" title="Abandoned"></i>&#8595;</a>
+                {% endif %}
+                {% if sort_by == constants.SORT_BY_NO_LONGER_OWNED %}
+                    <a href="{{ request.path }}?sort_by={{ constants.SORT_BY_NO_LONGER_OWNED_DESC }}"><i class="nes-icon snes-pad is-disabled" title="No longer owned"></i>&#8593;</a>
+                {% else %}
+                    <a href="{{ request.path }}?sort_by={{ constants.SORT_BY_NO_LONGER_OWNED }}"><i class="nes-icon snes-pad is-disabled" title="No longer owned"></i>&#8595;</a>
+                {% endif %}
+            </th>
 
             {% if user.is_authenticated %}
                 <th>Actions</th>
@@ -22,7 +49,13 @@
         {% for item in user_games %}
             <tr>
                 <td>
-                    <a href="{% url "game_details" item.game.id %}">{{ item.game.name }}</a>{% if item.year_finished %} <i class="nes-icon trophy" title="Finished"></i>{% endif %}{% if item.currently_playing %} <i class="nes-icon snes-pad" title="Currently playing"></i>{% endif %}{% if item.no_longer_owned %}<i class="nes-icon snes-pad is-disabled" title="No longer owned"></i>{% endif %}{% if item.abandoned %} <i class="nes-icon skull" title="Abandoned"></i>{% endif %}
+                    <a href="{% url "game_details" item.game.id %}">{{ item.game.name }}</a>
+                </td>
+                <td class="is-centered">
+                    {% if item.currently_playing %} <i class="nes-icon snes-pad" title="Currently playing"></i>{% endif %}
+                    {% if item.year_finished %} <i class="nes-icon trophy" title="Finished"></i>{% endif %}
+                    {% if item.abandoned %} <i class="nes-icon skull" title="Abandoned"></i>{% endif %}
+                    {% if item.no_longer_owned %}<i class="nes-icon snes-pad is-disabled" title="No longer owned"></i>{% endif %}
                 </td>
                 {% if user.is_authenticated %}
                     {% render_actions user item.game.id platform.id authenticated_user_catalog %}
