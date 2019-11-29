@@ -22,7 +22,11 @@
             <i class="nes-icon trophy is-small"></i> <a href="{% url 'user_finished_games' viewed_user.get_username %}"><strong>{{ finished_games_count }}</strong> finished game{{ finished_games_count|pluralize }}</a>, <i class="nes-icon trophy is-empty is-small"></i> <a href="{% url 'user_pending_games' viewed_user.get_username %}"><strong>{{ pending_games_count }}</strong> pending game{{ pending_games_count|pluralize }}</a> and <i class="nes-icon skull is-small"></i> <a href="{% url 'user_abandoned_games' viewed_user.get_username %}"><strong>{{ abandoned_games_count }}</strong> abandoned game{{ abandoned_games_count|pluralize }}</a>
         </p>
         <p>
-            You've completed {{ completed_games_progress }}% of your catalog
+            {% if user.is_authenticated and user == viewed_user %}
+                You've completed {{ completed_games_progress }}% of your catalog
+            {% else %}
+                {{ viewed_user.get_username.capitalize }} has completed {{ completed_games_progress }}% of his/her catalog.
+            {% endif %}
             <br/>
             <progress
                 class="nes-progress {{ progress_class }}"
