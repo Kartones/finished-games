@@ -54,6 +54,7 @@ h3.nes-title span {
 
 .nes-table th {
     background-color: #EAEAEA;
+    white-space: nowrap;
 }
 
 .nes-table th.is-centered, .nes-table td.is-centered {
