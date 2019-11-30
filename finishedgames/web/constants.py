@@ -30,6 +30,10 @@ SORT_FIELDS_MAPPING = {
     SORT_BY_NO_LONGER_OWNED_DESC: ["no_longer_owned", "game__name"],
 }
 
+EXCLUDE_ABANDONED = "abandoned"
+
+EXCLUDE_FIELDS_MAPPING = {EXCLUDE_ABANDONED: {"abandoned": True}}
+
 # Used at actions template for the ids
 FORM_METHOD_DELETE = "DELETE"
 FORM_ACTION_WISHLIST = "wl_"

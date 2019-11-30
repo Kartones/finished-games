@@ -135,7 +135,16 @@ class GamesView(View):
         except KeyError:
             order_by = constants.SORT_FIELDS_MAPPING[constants.SORT_BY_GAME_NAME]
 
-        user_games = UserGame.objects.filter(user=viewed_user).order_by(*order_by).select_related("game", "platform")
+        exclude = request.GET.get("exclude", None)
+        try:
+            exclude_kwargs = constants.EXCLUDE_FIELDS_MAPPING[exclude]
+        except KeyError:
+            exclude = None
+
+        user_games = UserGame.objects.filter(user=viewed_user)
+        if exclude:
+            user_games = user_games.exclude(**exclude_kwargs)
+        user_games = user_games.order_by(*order_by).select_related("game", "platform")
         games_count = len(user_games)
 
         currently_playing_games_count = user_games.filter(currently_playing=True).count()
@@ -161,6 +170,7 @@ class GamesView(View):
             "progress_class": _progress_bar_class(completed_games_progress),
             "constants": constants,
             "sort_by": sort_by,
+            "exclude": exclude if exclude else "",
             "authenticated_user_catalog": kwargs["authenticated_user_catalog"],
         }
 

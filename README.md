@@ -1,4 +1,4 @@
-Tests: [![CircleCI](https://circleci.com/gh/Kartones/finished-games/tree/master.svg?style=svg)](https://circleci.com/gh/Kartones/finished-games/tree/master)
+[![CircleCI](https://circleci.com/gh/Kartones/finished-games/tree/master.svg?style=svg)](https://circleci.com/gh/Kartones/finished-games/tree/master)
 
 
 

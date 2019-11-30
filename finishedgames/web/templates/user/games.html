@@ -12,37 +12,66 @@
     <thead>
         <tr>
             {% if sort_by == constants.SORT_BY_GAME_NAME %}
-                <th>Name <a href="{{ request.path }}?sort_by={{ constants.SORT_BY_GAME_NAME_DESC }}">&#8593;</a></th>
+                <th>
+                    <a href="{{ request.path }}?sort_by={{ constants.SORT_BY_GAME_NAME_DESC }}&exclude={{ exclude }}">Name &#8595;</a>
+                </th>
+            {% elif sort_by == constants.SORT_BY_GAME_NAME_DESC %}
+                <th>
+                    <a href="{{ request.path }}?sort_by={{ constants.SORT_BY_GAME_NAME }}&exclude={{ exclude }}">Name &#8593;</a>
+                </th>
             {% else %}
-                <th>Name <a href="{{ request.path }}?sort_by={{ constants.SORT_BY_GAME_NAME }}">&#8595;</a></th>
+                <th>
+                    <a href="{{ request.path }}?sort_by={{ constants.SORT_BY_GAME_NAME }}&exclude={{ exclude }}">Name</a>
+                </th>
             {% endif %}
 
             {% if sort_by == constants.SORT_BY_PLATFORM %}
-                <th>Platform <a href="{{ request.path }}?sort_by={{ constants.SORT_BY_PLATFORM_DESC }}">️️️️&#8593;</a></th>
+                <th>
+                    <a href="{{ request.path }}?sort_by={{ constants.SORT_BY_PLATFORM_DESC }}&exclude={{ exclude }}">️️️️Platform &#8595;</a>
+                </th>
+            {% elif sort_by == constants.SORT_BY_PLATFORM_DESC %}
+                <th>
+                    <a href="{{ request.path }}?sort_by={{ constants.SORT_BY_PLATFORM }}&exclude={{ exclude }}">Platform &#8593;</a>
+                </th>
             {% else %}
-                <th>Platform <a href="{{ request.path }}?sort_by={{ constants.SORT_BY_PLATFORM }}">&#8595;</a></th>
+                <th>
+                    <a href="{{ request.path }}?sort_by={{ constants.SORT_BY_PLATFORM }}&exclude={{ exclude }}">Platform</a>
+                </th>
             {% endif %}
 
             <th>
                 {% if sort_by == constants.SORT_BY_CURRENTLY_PLAYING %}
-                    <a href="{{ request.path }}?sort_by={{ constants.SORT_BY_CURRENTLY_PLAYING_DESC }}"><i class="nes-icon snes-pad" title="Currently playing"></i>&#8593;</a>
+                    <a href="{{ request.path }}?sort_by={{ constants.SORT_BY_CURRENTLY_PLAYING_DESC }}&exclude={{ exclude }}"><i class="nes-icon snes-pad" title="Currently playing"></i>&#8595;</a>
+                {% elif sort_by == constants.SORT_BY_CURRENTLY_PLAYING_DESC %}
+                    <a href="{{ request.path }}?sort_by={{ constants.SORT_BY_CURRENTLY_PLAYING }}&exclude={{ exclude }}"><i class="nes-icon snes-pad" title="Currently playing"></i>&#8593;</a>
                 {% else %}
-                    <a href="{{ request.path }}?sort_by={{ constants.SORT_BY_CURRENTLY_PLAYING }}"><i class="nes-icon snes-pad" title="Currently playing"></i>&#8595;</a>
+                    <a href="{{ request.path }}?sort_by={{ constants.SORT_BY_CURRENTLY_PLAYING }}&exclude={{ exclude }}"><i class="nes-icon snes-pad" title="Currently playing"></i></a>
                 {% endif %}
+
                 {% if sort_by == constants.SORT_BY_FINISHED %}
-                    <a href="{{ request.path }}?sort_by={{ constants.SORT_BY_FINISHED_DESC }}"><i class="nes-icon trophy" title="Finished"></i>&#8593;</a>
+                    <a href="{{ request.path }}?sort_by={{ constants.SORT_BY_FINISHED_DESC }}&exclude={{ exclude }}"><i class="nes-icon trophy" title="Finished"></i>&#8595;</a>
+                {% elif sort_by == constants.SORT_BY_FINISHED_DESC %}
+                    <a href="{{ request.path }}?sort_by={{ constants.SORT_BY_FINISHED }}&exclude={{ exclude }}"><i class="nes-icon trophy" title="Finished"></i>&#8593;</a>
                 {% else %}
-                    <a href="{{ request.path }}?sort_by={{ constants.SORT_BY_FINISHED }}"><i class="nes-icon trophy" title="Finished"></i>&#8595;</a>
+                    <a href="{{ request.path }}?sort_by={{ constants.SORT_BY_FINISHED }}&exclude={{ exclude }}"><i class="nes-icon trophy" title="Finished"></i></a>
                 {% endif %}
+
                 {% if sort_by == constants.SORT_BY_ABANDONED %}
-                    <a href="{{ request.path }}?sort_by={{ constants.SORT_BY_ABANDONED_DESC }}"><i class="nes-icon skull" title="Abandoned"></i>&#8593;</a>
+                    <a href="{{ request.path }}?sort_by={{ constants.SORT_BY_ABANDONED_DESC }}"><i class="nes-icon skull" title="Abandoned"></i>&#8595;</a>
+                {% elif sort_by == constants.SORT_BY_ABANDONED_DESC %}
+                    <a href="{{ request.path }}?exclude={{ constants.EXCLUDE_ABANDONED }}"><i class="nes-icon skull" title="Abandoned"></i>&#8593;</a>
+                {% elif exclude == constants.EXCLUDE_ABANDONED %}
+                    <a href="{{ request.path }}?sort_by={{ constants.SORT_BY_ABANDONED }}"><i class="nes-icon skull is-empty" title="Abandoned"></i></a>
                 {% else %}
-                    <a href="{{ request.path }}?sort_by={{ constants.SORT_BY_ABANDONED }}"><i class="nes-icon skull" title="Abandoned"></i>&#8595;</a>
+                    <a href="{{ request.path }}?sort_by={{ constants.SORT_BY_ABANDONED }}"><i class="nes-icon skull" title="Abandoned"></i></a>
                 {% endif %}
+
                 {% if sort_by == constants.SORT_BY_NO_LONGER_OWNED %}
-                    <a href="{{ request.path }}?sort_by={{ constants.SORT_BY_NO_LONGER_OWNED_DESC }}"><i class="nes-icon snes-pad is-disabled" title="No longer owned"></i>&#8593;</a>
+                    <a href="{{ request.path }}?sort_by={{ constants.SORT_BY_NO_LONGER_OWNED_DESC }}&exclude={{ exclude }}"><i class="nes-icon snes-pad is-disabled" title="No longer owned"></i>&#8595;</a>
+                {% elif sort_by == constants.SORT_BY_NO_LONGER_OWNED_DESC %}
+                    <a href="{{ request.path }}?sort_by={{ constants.SORT_BY_NO_LONGER_OWNED }}&exclude={{ exclude }}"><i class="nes-icon snes-pad is-disabled" title="No longer owned"></i>&#8593;</a>
                 {% else %}
-                    <a href="{{ request.path }}?sort_by={{ constants.SORT_BY_NO_LONGER_OWNED }}"><i class="nes-icon snes-pad is-disabled" title="No longer owned"></i>&#8595;</a>
+                    <a href="{{ request.path }}?sort_by={{ constants.SORT_BY_NO_LONGER_OWNED }}&exclude={{ exclude }}"><i class="nes-icon snes-pad is-disabled" title="No longer owned"></i></a>
                 {% endif %}
             </th>
 
