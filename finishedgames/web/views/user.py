@@ -1,11 +1,12 @@
 from datetime import datetime
-from typing import Any, Callable, Dict  # NOQA: F401
+from typing import Any, Callable, Dict, Optional, Tuple  # NOQA: F401
 
 from core.managers import CatalogManager
 from core.models import Platform, UserGame, WishlistedUserGame
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 from django.db.models.functions import Lower
+from django.db.models.query import QuerySet
 from django.http import Http404, HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, render
 from django.utils.decorators import method_decorator
@@ -14,7 +15,7 @@ from web import constants
 from web.decorators import authenticated_user_games, viewed_user
 
 
-def _progress_bar_class(progress: int) -> str:
+def progress_bar_class(progress: int) -> str:
     # Leaving "bad" colors for low thresholds, as in general users will have high % of catalog unfinished
     if progress <= 15:
         return "is-error"
@@ -24,6 +25,26 @@ def _progress_bar_class(progress: int) -> str:
         return "is-primary"
     else:
         return "is-success"
+
+
+def filter_and_exclude_games(user_games: QuerySet, request: HttpRequest) -> Tuple[QuerySet, str, str]:
+    sort_by = request.GET.get("sort_by", constants.SORT_BY_GAME_NAME)
+    try:
+        order_by = constants.SORT_FIELDS_MAPPING[sort_by]
+    except KeyError:
+        order_by = constants.SORT_FIELDS_MAPPING[constants.SORT_BY_GAME_NAME]
+
+    exclude = request.GET.get("exclude", None)
+    exclude_kwargs = None  # type: Any
+    try:
+        exclude_kwargs = constants.EXCLUDE_FIELDS_MAPPING[exclude]
+    except KeyError:
+        exclude = None
+
+    if exclude:
+        return user_games.exclude(**exclude_kwargs).order_by(*order_by), sort_by, exclude
+    else:
+        return user_games.order_by(*order_by), sort_by, ""
 
 
 def users(request: HttpRequest) -> HttpResponse:
@@ -69,7 +90,7 @@ def catalog(request: HttpRequest, username: str) -> HttpResponse:
         "completed_games_progress": completed_games_progress,
         "pending_games_count": pending_games_count,
         "abandoned_games_count": abandoned_games_count,
-        "progress_class": _progress_bar_class(completed_games_progress),
+        "progress_class": progress_bar_class(completed_games_progress),
         "wishlisted_games_count": wishlisted_games_count,
     }
 
@@ -129,22 +150,9 @@ class GamesView(View):
         if not viewed_user:
             raise Http404("Invalid URL")
 
-        sort_by = request.GET.get("sort_by", constants.SORT_BY_GAME_NAME)
-        try:
-            order_by = constants.SORT_FIELDS_MAPPING[sort_by]
-        except KeyError:
-            order_by = constants.SORT_FIELDS_MAPPING[constants.SORT_BY_GAME_NAME]
+        user_games, sort_by, exclude = filter_and_exclude_games(UserGame.objects.filter(user=viewed_user), request)
+        user_games = user_games.select_related("game", "platform")
 
-        exclude = request.GET.get("exclude", None)
-        try:
-            exclude_kwargs = constants.EXCLUDE_FIELDS_MAPPING[exclude]
-        except KeyError:
-            exclude = None
-
-        user_games = UserGame.objects.filter(user=viewed_user)
-        if exclude:
-            user_games = user_games.exclude(**exclude_kwargs)
-        user_games = user_games.order_by(*order_by).select_related("game", "platform")
         games_count = len(user_games)
 
         currently_playing_games_count = user_games.filter(currently_playing=True).count()
@@ -167,10 +175,16 @@ class GamesView(View):
             "completed_games_count": completed_games_count,
             "pending_games_count": pending_games_count,
             "completed_games_progress": completed_games_progress,
-            "progress_class": _progress_bar_class(completed_games_progress),
+            "progress_class": progress_bar_class(completed_games_progress),
             "constants": constants,
             "sort_by": sort_by,
             "exclude": exclude if exclude else "",
+            "enabled_statuses": [
+                constants.KEY_GAMES_CURRENTLY_PLAYING,
+                constants.KEY_GAMES_FINISHED,
+                constants.KEY_GAMES_ABANDONED,
+                constants.KEY_GAMES_NO_LONGER_OWNED,
+            ],
             "authenticated_user_catalog": kwargs["authenticated_user_catalog"],
         }
 
@@ -236,7 +250,7 @@ class GamesByPlatformView(View):
             "completed_games_count": completed_games_count,
             "pending_games_count": pending_games_count,
             "completed_games_progress": completed_games_progress,
-            "progress_class": _progress_bar_class(completed_games_progress),
+            "progress_class": progress_bar_class(completed_games_progress),
             "constants": constants,
             "sort_by": sort_by,
             "authenticated_user_catalog": kwargs["authenticated_user_catalog"],

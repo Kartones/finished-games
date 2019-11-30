@@ -1,0 +1,33 @@
+<td class="is-centered">
+    {% if constants.KEY_GAMES_CURRENTLY_PLAYING in enabled_statuses %}
+        {% if user_game.currently_playing %}
+            <i class="nes-icon snes-pad" title="Currently playing"></i>
+        {% else %}
+            <i class="nes-icon snes-pad is-empty is-half-transparent" title="Not currently playing"></i>
+        {% endif %}
+    {% endif %}
+
+    {% if constants.KEY_GAMES_FINISHED in enabled_statuses %}
+        {% if user_game.year_finished %}
+            <i class="nes-icon trophy" title="Finished"></i>
+        {% else %}
+            <i class="nes-icon trophy is-empty is-half-transparent" title="Not finished"></i>
+        {% endif %}
+    {% endif %}
+
+    {% if constants.KEY_GAMES_ABANDONED in enabled_statuses %}
+        {% if user_game.abandoned %}
+            <i class="nes-icon skull" title="Abandoned"></i>
+        {% else %}
+            <i class="nes-icon skull is-empty is-half-transparent" title="Pending"></i>
+        {% endif %}
+    {% endif %}
+
+    {% if constants.KEY_GAMES_NO_LONGER_OWNED in enabled_statuses %}
+        {% if user_game.no_longer_owned %}
+            <i class="nes-icon snes-pad is-disabled" title="No longer owned"></i>
+        {% else %}
+            <i class="nes-icon snes-pad is-empty is-half-transparent" title="Owned"></i>
+        {% endif %}
+    {% endif %}
+</td>

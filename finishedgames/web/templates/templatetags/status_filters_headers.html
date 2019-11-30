@@ -1,0 +1,43 @@
+<th>
+    {% if constants.KEY_GAMES_CURRENTLY_PLAYING in enabled_statuses %}
+        {% if sort_by == constants.SORT_BY_CURRENTLY_PLAYING %}
+            <a href="{{ request_path }}?sort_by={{ constants.SORT_BY_CURRENTLY_PLAYING_DESC }}&exclude={{ exclude }}"><i class="nes-icon snes-pad" title="Currently playing"></i>&#8595;</a>
+        {% elif sort_by == constants.SORT_BY_CURRENTLY_PLAYING_DESC %}
+            <a href="{{ request_path }}?sort_by={{ constants.SORT_BY_CURRENTLY_PLAYING }}&exclude={{ exclude }}"><i class="nes-icon snes-pad" title="Currently playing"></i>&#8593;</a>
+        {% else %}
+            <a href="{{ request_path }}?sort_by={{ constants.SORT_BY_CURRENTLY_PLAYING }}&exclude={{ exclude }}"><i class="nes-icon snes-pad" title="Currently playing"></i></a>
+        {% endif %}
+    {% endif %}
+
+    {% if constants.KEY_GAMES_FINISHED in enabled_statuses %}
+        {% if sort_by == constants.SORT_BY_FINISHED %}
+            <a href="{{ request_path }}?sort_by={{ constants.SORT_BY_FINISHED_DESC }}&exclude={{ exclude }}"><i class="nes-icon trophy" title="Finished"></i>&#8595;</a>
+        {% elif sort_by == constants.SORT_BY_FINISHED_DESC %}
+            <a href="{{ request_path }}?sort_by={{ constants.SORT_BY_FINISHED }}&exclude={{ exclude }}"><i class="nes-icon trophy" title="Finished"></i>&#8593;</a>
+        {% else %}
+            <a href="{{ request_path }}?sort_by={{ constants.SORT_BY_FINISHED }}&exclude={{ exclude }}"><i class="nes-icon trophy" title="Finished"></i></a>
+        {% endif %}
+    {% endif %}
+
+    {% if constants.KEY_GAMES_ABANDONED in enabled_statuses %}
+        {% if sort_by == constants.SORT_BY_ABANDONED %}
+            <a href="{{ request_path }}?sort_by={{ constants.SORT_BY_ABANDONED_DESC }}"><i class="nes-icon skull" title="Abandoned"></i>&#8595;</a>
+        {% elif sort_by == constants.SORT_BY_ABANDONED_DESC %}
+            <a href="{{ request_path }}?exclude={{ constants.EXCLUDE_ABANDONED }}"><i class="nes-icon skull" title="Abandoned"></i>&#8593;</a>
+        {% elif exclude == constants.EXCLUDE_ABANDONED %}
+            <a href="{{ request_path }}?sort_by={{ constants.SORT_BY_ABANDONED }}"><i class="nes-icon skull is-empty" title="Abandoned"></i></a>
+        {% else %}
+            <a href="{{ request_path }}?sort_by={{ constants.SORT_BY_ABANDONED }}"><i class="nes-icon skull" title="Abandoned"></i></a>
+        {% endif %}
+    {% endif %}
+
+    {% if constants.KEY_GAMES_NO_LONGER_OWNED in enabled_statuses %}
+        {% if sort_by == constants.SORT_BY_NO_LONGER_OWNED %}
+            <a href="{{ request_path }}?sort_by={{ constants.SORT_BY_NO_LONGER_OWNED_DESC }}&exclude={{ exclude }}"><i class="nes-icon snes-pad is-disabled" title="No longer owned"></i>&#8595;</a>
+        {% elif sort_by == constants.SORT_BY_NO_LONGER_OWNED_DESC %}
+            <a href="{{ request_path }}?sort_by={{ constants.SORT_BY_NO_LONGER_OWNED }}&exclude={{ exclude }}"><i class="nes-icon snes-pad is-disabled" title="No longer owned"></i>&#8593;</a>
+        {% else %}
+            <a href="{{ request_path }}?sort_by={{ constants.SORT_BY_NO_LONGER_OWNED }}&exclude={{ exclude }}"><i class="nes-icon snes-pad is-disabled" title="No longer owned"></i></a>
+        {% endif %}
+    {% endif %}
+</th>
