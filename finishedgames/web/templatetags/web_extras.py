@@ -30,6 +30,18 @@ def render_actions(
     }
 
 
+@register.inclusion_tag("templatetags/field_filters_headers.html")
+def field_filters_headers(sort_by: str, exclude: str, request_path: str, enabled_fields: List[str]) -> Dict:
+    # NOTE: Name column is implicitly enabled
+    return {
+        "sort_by": sort_by,
+        "exclude": exclude,
+        "request_path": request_path,
+        "enabled_fields": enabled_fields,
+        "constants": constants,
+    }
+
+
 @register.inclusion_tag("templatetags/status_filters_headers.html")
 def status_filters_headers(sort_by: str, exclude: str, request_path: str, enabled_statuses: List[str]) -> Dict:
     return {

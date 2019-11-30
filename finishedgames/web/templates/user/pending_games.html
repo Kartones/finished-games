@@ -11,33 +11,7 @@
 <table class="nes-table is-bordered">
     <thead>
         <tr>
-            {% if sort_by == constants.SORT_BY_GAME_NAME %}
-                <th>
-                    <a href="{{ request.path }}?sort_by={{ constants.SORT_BY_GAME_NAME_DESC }}&exclude={{ exclude }}">Name &#8595;</a>
-                </th>
-            {% elif sort_by == constants.SORT_BY_GAME_NAME_DESC %}
-                <th>
-                    <a href="{{ request.path }}?sort_by={{ constants.SORT_BY_GAME_NAME }}&exclude={{ exclude }}">Name &#8593;</a>
-                </th>
-            {% else %}
-                <th>
-                    <a href="{{ request.path }}?sort_by={{ constants.SORT_BY_GAME_NAME }}&exclude={{ exclude }}">Name</a>
-                </th>
-            {% endif %}
-
-            {% if sort_by == constants.SORT_BY_PLATFORM %}
-                <th>
-                    <a href="{{ request.path }}?sort_by={{ constants.SORT_BY_PLATFORM_DESC }}&exclude={{ exclude }}">️️️️Platform &#8595;</a>
-                </th>
-            {% elif sort_by == constants.SORT_BY_PLATFORM_DESC %}
-                <th>
-                    <a href="{{ request.path }}?sort_by={{ constants.SORT_BY_PLATFORM }}&exclude={{ exclude }}">Platform &#8593;</a>
-                </th>
-            {% else %}
-                <th>
-                    <a href="{{ request.path }}?sort_by={{ constants.SORT_BY_PLATFORM }}&exclude={{ exclude }}">Platform</a>
-                </th>
-            {% endif %}
+            {% field_filters_headers sort_by exclude request.path enabled_fields %}
 
             {% status_filters_headers sort_by exclude request.path enabled_statuses %}
 

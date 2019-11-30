@@ -185,6 +185,7 @@ class GamesView(View):
                 constants.KEY_GAMES_ABANDONED,
                 constants.KEY_GAMES_NO_LONGER_OWNED,
             ],
+            "enabled_fields": [constants.KEY_FIELD_PLATFORM],
             "authenticated_user_catalog": kwargs["authenticated_user_catalog"],
         }
 
@@ -256,6 +257,7 @@ class GamesByPlatformView(View):
                 constants.KEY_GAMES_ABANDONED,
                 constants.KEY_GAMES_NO_LONGER_OWNED,
             ],
+            "enabled_fields": [],
             "authenticated_user_catalog": kwargs["authenticated_user_catalog"],
         }
 
@@ -283,6 +285,7 @@ class GamesPendingView(View):
             "constants": constants,
             "sort_by": sort_by,
             "enabled_statuses": [constants.KEY_GAMES_CURRENTLY_PLAYING, constants.KEY_GAMES_NO_LONGER_OWNED],
+            "enabled_fields": [constants.KEY_FIELD_PLATFORM],
             "authenticated_user_catalog": kwargs["authenticated_user_catalog"],
         }
 
@@ -310,6 +313,7 @@ class GamesFinishedView(View):
             "sort_by": sort_by,
             "enabled_statuses": [constants.KEY_GAMES_CURRENTLY_PLAYING, constants.KEY_GAMES_NO_LONGER_OWNED],
             "authenticated_user_catalog": kwargs["authenticated_user_catalog"],
+            "enabled_fields": [constants.KEY_FIELD_PLATFORM, constants.KEY_FIELD_YEAR],
         }
 
         return render(request, "user/finished_games.html", context)
@@ -352,6 +356,7 @@ class GamesAbandonedView(View):
             "abandoned_games_count": len(abandoned_Games),
             "constants": constants,
             "sort_by": sort_by,
+            "enabled_fields": [constants.KEY_FIELD_PLATFORM],
             "authenticated_user_catalog": kwargs["authenticated_user_catalog"],
         }
 
@@ -394,6 +399,7 @@ class GamesCurrentlyPlayingView(View):
             "sort_by": sort_by,
             "authenticated_user_catalog": kwargs["authenticated_user_catalog"],
             "enabled_statuses": [constants.KEY_GAMES_FINISHED],
+            "enabled_fields": [constants.KEY_FIELD_PLATFORM],
         }
 
         return render(request, "user/currently_playing_games.html", context)
@@ -433,6 +439,7 @@ class GamesWishlistedView(View):
             "wishlisted_games_count": len(wishlisted_games),
             "constants": constants,
             "sort_by": sort_by,
+            "enabled_fields": [constants.KEY_FIELD_PLATFORM],
             "authenticated_user_catalog": kwargs["authenticated_user_catalog"],
         }
 
