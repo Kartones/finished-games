@@ -217,16 +217,12 @@ class GamesByPlatformView(View):
         if not viewed_user:
             raise Http404("Invalid URL")
 
-        sort_by = request.GET.get("sort_by", constants.SORT_BY_GAME_NAME)
-        try:
-            order_by = constants.SORT_FIELDS_MAPPING[sort_by]
-        except KeyError:
-            order_by = constants.SORT_FIELDS_MAPPING[constants.SORT_BY_GAME_NAME]
-
         platform = get_object_or_404(Platform, pk=platform_id)
-        user_games = (
-            UserGame.objects.filter(user=viewed_user, platform=platform).order_by(*order_by).select_related("game")
+        user_games, sort_by, exclude = filter_and_exclude_games(
+            UserGame.objects.filter(user=viewed_user, platform=platform), request
         )
+        user_games = user_games.select_related("game")
+
         games_count = len(user_games)
 
         currently_playing_games_count = user_games.filter(currently_playing=True).count()
@@ -253,6 +249,13 @@ class GamesByPlatformView(View):
             "progress_class": progress_bar_class(completed_games_progress),
             "constants": constants,
             "sort_by": sort_by,
+            "exclude": exclude,
+            "enabled_statuses": [
+                constants.KEY_GAMES_CURRENTLY_PLAYING,
+                constants.KEY_GAMES_FINISHED,
+                constants.KEY_GAMES_ABANDONED,
+                constants.KEY_GAMES_NO_LONGER_OWNED,
+            ],
             "authenticated_user_catalog": kwargs["authenticated_user_catalog"],
         }
 
@@ -267,19 +270,11 @@ class GamesPendingView(View):
         if not viewed_user:
             raise Http404("Invalid URL")
 
-        sort_by = request.GET.get("sort_by", constants.SORT_BY_GAME_NAME)
-        try:
-            order_by = constants.SORT_FIELDS_MAPPING[sort_by]
-        except KeyError:
-            order_by = constants.SORT_FIELDS_MAPPING[constants.SORT_BY_GAME_NAME]
-
-        pending_games = (
-            UserGame.objects.filter(user=viewed_user)
-            .exclude(year_finished__isnull=False)
-            .exclude(abandoned=True)
-            .order_by(*order_by)
-            .select_related("game", "platform")
+        pending_games, sort_by, exclude = filter_and_exclude_games(
+            UserGame.objects.filter(user=viewed_user).exclude(year_finished__isnull=False).exclude(abandoned=True),
+            request,
         )
+        pending_games = pending_games.select_related("game", "platform")
 
         context = {
             "viewed_user": viewed_user,
@@ -287,6 +282,7 @@ class GamesPendingView(View):
             "pending_games_count": len(pending_games),
             "constants": constants,
             "sort_by": sort_by,
+            "enabled_statuses": [constants.KEY_GAMES_CURRENTLY_PLAYING, constants.KEY_GAMES_NO_LONGER_OWNED],
             "authenticated_user_catalog": kwargs["authenticated_user_catalog"],
         }
 
@@ -301,18 +297,10 @@ class GamesFinishedView(View):
         if not viewed_user:
             raise Http404("Invalid URL")
 
-        sort_by = request.GET.get("sort_by", constants.SORT_BY_GAME_NAME)
-        try:
-            order_by = constants.SORT_FIELDS_MAPPING[sort_by]
-        except KeyError:
-            order_by = constants.SORT_FIELDS_MAPPING[constants.SORT_BY_GAME_NAME]
-
-        finished_games = (
-            UserGame.objects.filter(user=viewed_user)
-            .exclude(year_finished__isnull=True)
-            .order_by(*order_by)
-            .select_related("game", "platform")
+        finished_games, sort_by, exclude = filter_and_exclude_games(
+            UserGame.objects.filter(user=viewed_user).exclude(year_finished__isnull=True), request
         )
+        finished_games = finished_games.select_related("game", "platform")
 
         context = {
             "viewed_user": viewed_user,
@@ -320,6 +308,7 @@ class GamesFinishedView(View):
             "finished_games_count": len(finished_games),
             "constants": constants,
             "sort_by": sort_by,
+            "enabled_statuses": [constants.KEY_GAMES_CURRENTLY_PLAYING, constants.KEY_GAMES_NO_LONGER_OWNED],
             "authenticated_user_catalog": kwargs["authenticated_user_catalog"],
         }
 
@@ -352,18 +341,10 @@ class GamesAbandonedView(View):
         if not viewed_user:
             raise Http404("Invalid URL")
 
-        sort_by = request.GET.get("sort_by", constants.SORT_BY_GAME_NAME)
-        try:
-            order_by = constants.SORT_FIELDS_MAPPING[sort_by]
-        except KeyError:
-            order_by = constants.SORT_FIELDS_MAPPING[constants.SORT_BY_GAME_NAME]
-
-        abandoned_Games = (
-            UserGame.objects.filter(user=viewed_user)
-            .filter(abandoned=True)
-            .order_by(*order_by)
-            .select_related("game", "platform")
+        abandoned_Games, sort_by, exclude = filter_and_exclude_games(
+            UserGame.objects.filter(user=viewed_user).filter(abandoned=True), request
         )
+        abandoned_Games = abandoned_Games.select_related("game", "platform")
 
         context = {
             "viewed_user": viewed_user,
@@ -400,17 +381,10 @@ class GamesCurrentlyPlayingView(View):
         if not viewed_user:
             raise Http404("Invalid URL")
 
-        sort_by = request.GET.get("sort_by", constants.SORT_BY_GAME_NAME)
-        try:
-            order_by = constants.SORT_FIELDS_MAPPING[sort_by]
-        except KeyError:
-            order_by = constants.SORT_FIELDS_MAPPING[constants.SORT_BY_GAME_NAME]
-
-        currently_playing_games = (
-            UserGame.objects.filter(user=viewed_user, currently_playing=True)
-            .order_by(*order_by)
-            .select_related("game", "platform")
+        currently_playing_games, sort_by, exclude = filter_and_exclude_games(
+            UserGame.objects.filter(user=viewed_user, currently_playing=True), request
         )
+        currently_playing_games = currently_playing_games.select_related("game", "platform")
 
         context = {
             "viewed_user": viewed_user,
@@ -419,6 +393,7 @@ class GamesCurrentlyPlayingView(View):
             "constants": constants,
             "sort_by": sort_by,
             "authenticated_user_catalog": kwargs["authenticated_user_catalog"],
+            "enabled_statuses": [constants.KEY_GAMES_FINISHED],
         }
 
         return render(request, "user/currently_playing_games.html", context)
@@ -447,15 +422,10 @@ class GamesWishlistedView(View):
         if not viewed_user:
             raise Http404("Invalid URL")
 
-        sort_by = request.GET.get("sort_by", constants.SORT_BY_GAME_NAME)
-        try:
-            order_by = constants.SORT_FIELDS_MAPPING[sort_by]
-        except KeyError:
-            order_by = constants.SORT_FIELDS_MAPPING[constants.SORT_BY_GAME_NAME]
-
-        wishlisted_games = (
-            WishlistedUserGame.objects.filter(user=viewed_user).order_by(*order_by).select_related("game", "platform")
+        wishlisted_games, sort_by, exclude = filter_and_exclude_games(
+            WishlistedUserGame.objects.filter(user=viewed_user), request
         )
+        wishlisted_games = wishlisted_games.select_related("game", "platform")
 
         context = {
             "viewed_user": viewed_user,

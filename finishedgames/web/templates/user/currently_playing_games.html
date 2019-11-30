@@ -14,24 +14,34 @@
     <thead>
         <tr>
             {% if sort_by == constants.SORT_BY_GAME_NAME %}
-                <th>Name <a href="{{ request.path }}?sort_by={{ constants.SORT_BY_GAME_NAME_DESC }}">&#8593;</a></th>
+                <th>
+                    <a href="{{ request.path }}?sort_by={{ constants.SORT_BY_GAME_NAME_DESC }}&exclude={{ exclude }}">Name &#8595;</a>
+                </th>
+            {% elif sort_by == constants.SORT_BY_GAME_NAME_DESC %}
+                <th>
+                    <a href="{{ request.path }}?sort_by={{ constants.SORT_BY_GAME_NAME }}&exclude={{ exclude }}">Name &#8593;</a>
+                </th>
             {% else %}
-                <th>Name <a href="{{ request.path }}?sort_by={{ constants.SORT_BY_GAME_NAME }}">&#8595;</a></th>
+                <th>
+                    <a href="{{ request.path }}?sort_by={{ constants.SORT_BY_GAME_NAME }}&exclude={{ exclude }}">Name</a>
+                </th>
             {% endif %}
 
             {% if sort_by == constants.SORT_BY_PLATFORM %}
-                <th>Platform <a href="{{ request.path }}?sort_by={{ constants.SORT_BY_PLATFORM_DESC }}">️️️️&#8593;</a></th>
+                <th>
+                    <a href="{{ request.path }}?sort_by={{ constants.SORT_BY_PLATFORM_DESC }}&exclude={{ exclude }}">️️️️Platform &#8595;</a>
+                </th>
+            {% elif sort_by == constants.SORT_BY_PLATFORM_DESC %}
+                <th>
+                    <a href="{{ request.path }}?sort_by={{ constants.SORT_BY_PLATFORM }}&exclude={{ exclude }}">Platform &#8593;</a>
+                </th>
             {% else %}
-                <th>Platform <a href="{{ request.path }}?sort_by={{ constants.SORT_BY_PLATFORM }}">&#8595;</a></th>
+                <th>
+                    <a href="{{ request.path }}?sort_by={{ constants.SORT_BY_PLATFORM }}&exclude={{ exclude }}">Platform</a>
+                </th>
             {% endif %}
 
-            <th>
-                {% if sort_by == constants.SORT_BY_FINISHED %}
-                    <a href="{{ request.path }}?sort_by={{ constants.SORT_BY_FINISHED_DESC }}"><i class="nes-icon trophy" title="Finished"></i>&#8593;</a>
-                {% else %}
-                    <a href="{{ request.path }}?sort_by={{ constants.SORT_BY_FINISHED }}"><i class="nes-icon trophy" title="Finished"></i>&#8595;</a>
-                {% endif %}
-            </th>
+            {% status_filters_headers sort_by None request.path enabled_statuses %}
 
             {% if user.is_authenticated %}
                 <th>Actions</th>
@@ -44,16 +54,13 @@
             <td>
                 <a href="{% url 'game_details' item.game.id %}">{{ item.game.name }}</a>
             </td>
+
             <td class="is-centered">
                 {{ item.platform.shortname }}
             </td>
-            <td class="is-centered">
-                {% if item.year_finished %}
-                    <i class="nes-icon trophy" title="Finished"></i>
-                {% else %}
-                    <i class="nes-icon trophy is-empty is-half-transparent" title="Not finished"></i>
-                {% endif %}
-            </td>
+
+            {% status_filters_row item enabled_statuses %}
+
             {% if user.is_authenticated %}
                 {% render_actions user item.game.id item.platform.id authenticated_user_catalog %}
             {% endif %}

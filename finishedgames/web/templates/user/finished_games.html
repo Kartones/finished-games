@@ -12,35 +12,48 @@
     <thead>
         <tr>
             {% if sort_by == constants.SORT_BY_GAME_NAME %}
-                <th>Name <a href="{{ request.path }}?sort_by={{ constants.SORT_BY_GAME_NAME_DESC }}">&#8593;</a></th>
+                <th>
+                    <a href="{{ request.path }}?sort_by={{ constants.SORT_BY_GAME_NAME_DESC }}&exclude={{ exclude }}">Name &#8595;</a>
+                </th>
+            {% elif sort_by == constants.SORT_BY_GAME_NAME_DESC %}
+                <th>
+                    <a href="{{ request.path }}?sort_by={{ constants.SORT_BY_GAME_NAME }}&exclude={{ exclude }}">Name &#8593;</a>
+                </th>
             {% else %}
-                <th>Name <a href="{{ request.path }}?sort_by={{ constants.SORT_BY_GAME_NAME }}">&#8595;</a></th>
+                <th>
+                    <a href="{{ request.path }}?sort_by={{ constants.SORT_BY_GAME_NAME }}&exclude={{ exclude }}">Name</a>
+                </th>
             {% endif %}
 
             {% if sort_by == constants.SORT_BY_PLATFORM %}
-                <th>Platform <a href="{{ request.path }}?sort_by={{ constants.SORT_BY_PLATFORM_DESC }}">️️️️&#8593;</a></th>
+                <th>
+                    <a href="{{ request.path }}?sort_by={{ constants.SORT_BY_PLATFORM_DESC }}&exclude={{ exclude }}">️️️️Platform &#8595;</a>
+                </th>
+            {% elif sort_by == constants.SORT_BY_PLATFORM_DESC %}
+                <th>
+                    <a href="{{ request.path }}?sort_by={{ constants.SORT_BY_PLATFORM }}&exclude={{ exclude }}">Platform &#8593;</a>
+                </th>
             {% else %}
-                <th>Platform <a href="{{ request.path }}?sort_by={{ constants.SORT_BY_PLATFORM }}">&#8595;</a></th>
+                <th>
+                    <a href="{{ request.path }}?sort_by={{ constants.SORT_BY_PLATFORM }}&exclude={{ exclude }}">Platform</a>
+                </th>
             {% endif %}
 
             {% if sort_by == constants.SORT_BY_YEAR %}
-                <th>Year <a href="{{ request.path }}?sort_by={{ constants.SORT_BY_YEAR_DESC }}">&#8593;</a></th>
+                <th>
+                    <a href="{{ request.path }}?sort_by={{ constants.SORT_BY_YEAR_DESC }}">Year &#8595;</a>
+                </th>
+            {% elif sort_by == constants.SORT_BY_YEAR_DESC %}
+                <th>
+                    <a href="{{ request.path }}?sort_by={{ constants.SORT_BY_YEAR }}">Year &#8593;</a>
+                </th>
             {% else %}
-                <th>Year <a href="{{ request.path }}?sort_by={{ constants.SORT_BY_YEAR }}">&#8595;</a></th>
+                <th>
+                    <a href="{{ request.path }}?sort_by={{ constants.SORT_BY_YEAR }}">Year</a>
+                </th>
             {% endif %}
 
-            <th>
-                {% if sort_by == constants.SORT_BY_CURRENTLY_PLAYING %}
-                    <a href="{{ request.path }}?sort_by={{ constants.SORT_BY_CURRENTLY_PLAYING_DESC }}"><i class="nes-icon snes-pad" title="Currently playing"></i>&#8593;</a>
-                {% else %}
-                    <a href="{{ request.path }}?sort_by={{ constants.SORT_BY_CURRENTLY_PLAYING }}"><i class="nes-icon snes-pad" title="Currently playing"></i>&#8595;</a>
-                {% endif %}
-                {% if sort_by == constants.SORT_BY_NO_LONGER_OWNED %}
-                    <a href="{{ request.path }}?sort_by={{ constants.SORT_BY_NO_LONGER_OWNED_DESC }}"><i class="nes-icon snes-pad is-disabled" title="No longer owned"></i>&#8593;</a>
-                {% else %}
-                    <a href="{{ request.path }}?sort_by={{ constants.SORT_BY_NO_LONGER_OWNED }}"><i class="nes-icon snes-pad is-disabled" title="No longer owned"></i>&#8595;</a>
-                {% endif %}
-            </th>
+            {% status_filters_headers sort_by exclude request.path enabled_statuses %}
 
             {% if user.is_authenticated %}
                 <th>Actions</th>
@@ -53,24 +66,17 @@
             <td>
                 <a href="{% url 'game_details' item.game.id %}">{{ item.game.name }}</a>
             </td>
+
             <td class="is-centered">
                 {{ item.platform.shortname }}
             </td>
+
             <td class="is-centered">
                 {{ item.year_finished }}
             </td>
-            <td class="is-centered">
-                {% if item.currently_playing %}
-                    <i class="nes-icon snes-pad" title="Currently playing"></i>
-                {% else %}
-                    <i class="nes-icon snes-pad is-empty is-half-transparent" title="Not currently playing"></i>
-                {% endif %}
-                {% if item.no_longer_owned %}
-                    <i class="nes-icon snes-pad is-disabled" title="No longer owned"></i>
-                {% else %}
-                    <i class="nes-icon snes-pad is-empty is-half-transparent" title="Owned"></i>
-                {% endif %}
-            </td>
+
+            {% status_filters_row item enabled_statuses %}
+
             {% if user.is_authenticated %}
                 {% render_actions user item.game.id item.platform.id authenticated_user_catalog %}
             {% endif %}

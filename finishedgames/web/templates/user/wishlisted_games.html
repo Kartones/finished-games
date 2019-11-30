@@ -12,15 +12,31 @@
     <thead>
         <tr>
             {% if sort_by == constants.SORT_BY_GAME_NAME %}
-                <th>Name <a href="{{ request.path }}?sort_by={{ constants.SORT_BY_GAME_NAME_DESC }}">&#8593;</a></th>
+                <th>
+                    <a href="{{ request.path }}?sort_by={{ constants.SORT_BY_GAME_NAME_DESC }}&exclude={{ exclude }}">Name &#8595;</a>
+                </th>
+            {% elif sort_by == constants.SORT_BY_GAME_NAME_DESC %}
+                <th>
+                    <a href="{{ request.path }}?sort_by={{ constants.SORT_BY_GAME_NAME }}&exclude={{ exclude }}">Name &#8593;</a>
+                </th>
             {% else %}
-                <th>Name <a href="{{ request.path }}?sort_by={{ constants.SORT_BY_GAME_NAME }}">&#8595;</a></th>
+                <th>
+                    <a href="{{ request.path }}?sort_by={{ constants.SORT_BY_GAME_NAME }}&exclude={{ exclude }}">Name</a>
+                </th>
             {% endif %}
 
             {% if sort_by == constants.SORT_BY_PLATFORM %}
-                <th>Platform <a href="{{ request.path }}?sort_by={{ constants.SORT_BY_PLATFORM_DESC }}">️️️️&#8593;</a></th>
+                <th>
+                    <a href="{{ request.path }}?sort_by={{ constants.SORT_BY_PLATFORM_DESC }}&exclude={{ exclude }}">️️️️Platform &#8595;</a>
+                </th>
+            {% elif sort_by == constants.SORT_BY_PLATFORM_DESC %}
+                <th>
+                    <a href="{{ request.path }}?sort_by={{ constants.SORT_BY_PLATFORM }}&exclude={{ exclude }}">Platform &#8593;</a>
+                </th>
             {% else %}
-                <th>Platform <a href="{{ request.path }}?sort_by={{ constants.SORT_BY_PLATFORM }}">&#8595;</a></th>
+                <th>
+                    <a href="{{ request.path }}?sort_by={{ constants.SORT_BY_PLATFORM }}&exclude={{ exclude }}">Platform</a>
+                </th>
             {% endif %}
 
             {% if user.is_authenticated %}
