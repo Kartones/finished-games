@@ -22,7 +22,6 @@ urlpatterns = [
     path("search/game-autocomplete/", search.GameAutocompleteView.as_view(), name="game_autocomplete"),
     path("users/", user.users, name="users"),
     path("users/<slug:username>/", user.catalog, name="user_catalog"),
-    path("users/<slug:username>/profile/", user.profile, name="user_profile"),
     path("users/<slug:username>/games/", user.GamesView.as_view(), name="user_games"),
     path("users/<slug:username>/platforms/", user.platforms, name="user_platforms"),
     path(

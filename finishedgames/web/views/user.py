@@ -4,7 +4,6 @@ from typing import Any, Callable, Dict, Optional, Tuple  # NOQA: F401
 from core.managers import CatalogManager
 from core.models import Platform, UserGame, WishlistedUserGame
 from django.contrib.auth import get_user_model
-from django.contrib.auth.decorators import login_required
 from django.db.models.functions import Lower
 from django.db.models.query import QuerySet
 from django.http import Http404, HttpRequest, HttpResponse
@@ -113,16 +112,6 @@ def platforms(request: HttpRequest, username: str) -> HttpResponse:
     }
 
     return render(request, "user/platforms.html", context)
-
-
-@login_required
-def profile(request: HttpRequest, username: str) -> HttpResponse:
-    if username != request.user.get_username():
-        raise Http404("Invalid URL")
-
-    context = {}  # type: Dict
-
-    return render(request, "user/profile.html", context)
 
 
 class NoLongerOwnedGamesView(View):
