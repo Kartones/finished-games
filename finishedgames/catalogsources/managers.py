@@ -23,11 +23,11 @@ class ImportManager:
 
     @staticmethod
     def import_fetched_game(
-        name: str,
-        publish_date_string: str,
-        dlc_or_expansion: bool,
         platforms: List[int],
         fetched_game_id: int,
+        name: Optional[str] = None,
+        publish_date_string: Optional[str] = None,
+        dlc_or_expansion: Optional[bool] = None,
         game_id: Optional[int] = None,
         parent_game_id: Optional[int] = None,
         source_display_name: Optional[str] = None,
@@ -43,10 +43,16 @@ class ImportManager:
 
         # cast is like a NOP outside type checking
         if include_all_fields or "name" in cast(List[str], update_fields_filter):
+            if not name:
+                raise GameImportSaveError("Name field missing")
             game.name = clean_string_field(name)
         if include_all_fields or "publish_date" in cast(List[str], update_fields_filter):
+            if not publish_date_string:
+                raise GameImportSaveError("Publish Date field missing")
             game.publish_date = publish_date_string
         if include_all_fields or "dlc_or_expansion" in cast(List[str], update_fields_filter):
+            if dlc_or_expansion is None:
+                raise GameImportSaveError("DLC field missing")
             game.dlc_or_expansion = dlc_or_expansion
         if include_all_fields or "parent_game" in cast(List[str], update_fields_filter):
             if parent_game_id:
@@ -75,7 +81,8 @@ class ImportManager:
         # Update always linked game
         fetched_game = FetchedGame.objects.filter(id=fetched_game_id).get()
         fetched_game.fg_game_id = game.id
-        fetched_game.save(update_fields=["fg_game_id"])
+        fetched_game.mark_as_synchronized()
+        fetched_game.save(update_fields=["fg_game_id", "last_sync_date"])
 
     @staticmethod
     def import_fetched_platform(
@@ -240,6 +247,42 @@ class ImportManager:
                     )
 
         return errors
+
+    @classmethod
+    def sync_fetched_games_publish_date_and_platforms(cls, fetched_game_ids: List[int]) -> Tuple[int, int]:
+        source_display_names = {
+            key: settings.CATALOG_SOURCES_ADAPTERS[key][constants.ADAPTER_DISPLAY_NAME]
+            for key in settings.CATALOG_SOURCES_ADAPTERS.keys()
+        }
+        count_synced = 0
+        count_skipped = 0
+
+        for fetched_game_id in fetched_game_ids:
+            fetched_game = FetchedGame.objects.filter(id=fetched_game_id).get()
+
+            if not fetched_game.can_sync or fetched_game.is_sync:
+                count_skipped += 1
+                continue
+
+            available_platform_ids = []  # List[int]
+            for platform in fetched_game.platforms.all():
+                if platform.fg_platform:
+                    available_platform_ids.append(platform.fg_platform.id)
+
+            source_display_name = source_display_names[fetched_game.source_id]
+
+            cls.import_fetched_game(
+                publish_date_string=str(fetched_game.publish_date),
+                platforms=available_platform_ids,
+                game_id=fetched_game.fg_game.id,
+                fetched_game_id=fetched_game_id,
+                source_display_name=source_display_name,
+                source_url=fetched_game.source_url,
+                update_fields_filter=["publish_date", "platforms"],
+            )
+            count_synced += 1
+
+        return count_synced, count_skipped
 
     @classmethod
     def _attempt_import(

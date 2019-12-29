@@ -11,6 +11,7 @@ class FetchedGame(BaseGame):
     last_modified_date = models.DateTimeField(
         "Last data modification", null=True, default=None, blank=True, db_index=True
     )
+    last_sync_date = models.DateTimeField("Last synchronization", null=True, default=None, blank=True, db_index=True)
     source_game_id = models.CharField("Source game identifier", max_length=50, db_index=True)
     source_url = models.CharField("Resource source URI", max_length=255)
     change_hash = models.CharField("Marker to detect data changes after fetch", max_length=32)
@@ -25,6 +26,19 @@ class FetchedGame(BaseGame):
     @property
     def platforms_list(self) -> str:
         return ", ".join((platform.shortname for platform in self.platforms.all()))
+
+    def mark_as_synchronized(self) -> None:
+        self.last_sync_date = self.last_modified_date
+
+    @property
+    def is_sync(self) -> bool:
+        if self.fg_game and self.last_sync_date == self.last_modified_date:
+            return True
+        return False
+
+    @property
+    def can_sync(self) -> bool:
+        return True if self.fg_game else False
 
     def save(self, *args: Any, **kwargs: Any) -> None:
         new_changes_hash = self._get_changes_hash()

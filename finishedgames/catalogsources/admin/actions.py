@@ -83,3 +83,21 @@ def import_fetched_games_link_automatically_if_name_and_year_matches(
 import_fetched_games_link_automatically_if_name_and_year_matches.short_description = (  # type:ignore # NOQA: E305, E501
     "Import game(s) - link if name & date match"
 )
+
+
+def sync_fetched_games_publish_date_and_platforms(
+    modeladmin: admin.ModelAdmin, request: HttpRequest, QuerySet: QuerySet
+) -> None:
+    count_synced, count_skipped = ImportManager.sync_fetched_games_publish_date_and_platforms(
+        [int(id) for id in request.POST.getlist(admin.ACTION_CHECKBOX_NAME)]
+    )
+
+    if count_skipped:
+        messages.warning(request, "Imported: {} Skipped: {}".format(count_synced, count_skipped))
+    else:
+        messages.success(request, "Synced: {} games".format(count_synced))
+
+
+sync_fetched_games_publish_date_and_platforms.short_description = (  # type:ignore # NOQA: E305, E501
+    "Sync imported game(s)"
+)

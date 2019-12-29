@@ -6,6 +6,7 @@ from catalogsources.admin.actions import (
     import_fetched_games_fixing_duplicates_appending_publish_date,
     import_fetched_games_link_automatically_if_name_and_year_matches,
     import_fetched_items,
+    sync_fetched_games_publish_date_and_platforms,
 )
 from catalogsources.admin.decorators import hyperlink_fg_game, hyperlink_fg_platform, hyperlink_source_url
 from catalogsources.admin.filters import (
@@ -13,6 +14,7 @@ from catalogsources.admin.filters import (
     HiddenByDefaultFilter,
     NotImportedFetchedGames,
     NotImportedFetchedPlatforms,
+    SyncedFetchedGames,
 )
 from catalogsources.admin.views import FetchedGameAdminViewsMixin, FetchedPlatformAdminViewsMixin
 from catalogsources.models import FetchedGame, FetchedPlatform
@@ -34,6 +36,7 @@ class FetchedGameAdmin(FetchedGameAdminViewsMixin, FGModelAdmin):
         "platforms_list",
         "dlc_or_expansion",
         hyperlink_source_url,
+        "is_sync",
         "last_modified_date",
         "source_id",
         "hidden",
@@ -41,6 +44,7 @@ class FetchedGameAdmin(FetchedGameAdminViewsMixin, FGModelAdmin):
     list_filter = [
         HiddenByDefaultFilter,
         NotImportedFetchedGames,
+        SyncedFetchedGames,
         "last_modified_date",
         "source_id",
         CustomPlatformsFilter,
@@ -62,6 +66,7 @@ class FetchedGameAdmin(FetchedGameAdminViewsMixin, FGModelAdmin):
         import_fetched_games_fixing_duplicates_appending_platform,
         import_fetched_games_fixing_duplicates_appending_publish_date,
         import_fetched_games_link_automatically_if_name_and_year_matches,
+        sync_fetched_games_publish_date_and_platforms,
     ]
     autocomplete_fields = [
         "fg_game",

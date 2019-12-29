@@ -3,6 +3,7 @@ from typing import Generator, Tuple
 from catalogsources.models import FetchedPlatform
 from django.contrib import admin
 from django.contrib.admin.views.main import ChangeList
+from django.db.models import F
 from django.db.models.query import QuerySet
 from django.http import HttpRequest
 from django.utils.translation import ugettext_lazy as _
@@ -56,6 +57,32 @@ class HiddenByDefaultFilter(admin.SimpleListFilter):
             return queryset.filter(hidden=False)
         elif self.value() == "True":
             return queryset.filter(hidden=True)
+
+
+class SyncedFetchedGames(admin.SimpleListFilter):
+    title = "Synced"
+    parameter_name = "is_sync"
+
+    def lookups(self, request: HttpRequest, model_admin: admin.ModelAdmin) -> Tuple:
+        return (
+            (None, _("All")),
+            ("True", _("True")),
+            ("False", _("False")),
+        )
+
+    def choices(self, changelist: ChangeList) -> Generator:
+        for lookup, title in self.lookup_choices:
+            yield {
+                "selected": self.value() == lookup,
+                "query_string": changelist.get_query_string({self.parameter_name: lookup}, []),
+                "display": title,
+            }
+
+    def queryset(self, request: HttpRequest, queryset: QuerySet) -> QuerySet:
+        if self.value() == "True":
+            return queryset.exclude(fg_game__isnull=True).filter(last_sync_date=F("last_modified_date"))
+        elif self.value() == "False":
+            return queryset.exclude(last_sync_date=F("last_modified_date"))
 
 
 class NotImportedFetchedGames(admin.SimpleListFilter):
