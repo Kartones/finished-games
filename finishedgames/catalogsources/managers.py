@@ -21,6 +21,9 @@ class ImportManager:
     # Games that have no date at a source catalog get the minimum accepted date (we always need a date)
     UNKNOWN_DATE = 1970
 
+    # Cap certain heavy operations to a reasonable number of items
+    MAX_IMPORT_ITEMS = 100
+
     @staticmethod
     def import_fetched_game(
         platforms: List[int],

@@ -21,7 +21,7 @@ hide_fetched_items.short_description = "Hide item(s)"  # type:ignore # NOQA: E30
 def import_fetched_items(
     modeladmin: admin.ModelAdmin, request: HttpRequest, queryset: QuerySet
 ) -> HttpResponseRedirect:
-    if request.POST.get("select_across", "0") == "1":
+    if request.POST["select_across"] == "1":
         ids = constants.ALL_IDS
     else:
         ids = ",".join(request.POST.getlist(admin.ACTION_CHECKBOX_NAME))
@@ -34,9 +34,13 @@ import_fetched_items.short_description = "Import item(s) into catalog"  # type:i
 def import_fetched_games_fixing_duplicates_appending_platform(
     modeladmin: admin.ModelAdmin, request: HttpRequest, queryset: QuerySet
 ) -> None:
-    errors = ImportManager.import_fetched_games_fixing_duplicates_appending_platform(
-        [int(id) for id in request.POST.getlist(admin.ACTION_CHECKBOX_NAME)]
-    )
+    try:
+        game_ids = selected_fetched_game_ids(request, modeladmin)
+    except ValueError as error:
+        messages.error(request, error)
+        return
+
+    errors = ImportManager.import_fetched_games_fixing_duplicates_appending_platform(game_ids)
 
     if errors:
         messages.error(request, "Errors importing Fetched Games: {errors}".format(errors=", ".join(errors)))
@@ -52,9 +56,13 @@ import_fetched_games_fixing_duplicates_appending_platform.short_description = ( 
 def import_fetched_games_fixing_duplicates_appending_publish_date(
     modeladmin: admin.ModelAdmin, request: HttpRequest, queryset: QuerySet
 ) -> None:
-    errors = ImportManager.import_fetched_games_fixing_duplicates_appending_publish_date(
-        [int(id) for id in request.POST.getlist(admin.ACTION_CHECKBOX_NAME)]
-    )
+    try:
+        game_ids = selected_fetched_game_ids(request, modeladmin)
+    except ValueError as error:
+        messages.error(request, error)
+        return
+
+    errors = ImportManager.import_fetched_games_fixing_duplicates_appending_publish_date(game_ids)
 
     if errors:
         messages.error(request, "Errors importing Fetched Games: {errors}".format(errors=", ".join(errors)))
@@ -70,9 +78,13 @@ import_fetched_games_fixing_duplicates_appending_publish_date.short_description 
 def import_fetched_games_link_automatically_if_name_and_year_matches(
     modeladmin: admin.ModelAdmin, request: HttpRequest, queryset: QuerySet
 ) -> None:
-    errors = ImportManager.import_fetched_games_linking_if_name_and_year_matches(
-        [int(id) for id in request.POST.getlist(admin.ACTION_CHECKBOX_NAME)]
-    )
+    try:
+        game_ids = selected_fetched_game_ids(request, modeladmin)
+    except ValueError as error:
+        messages.error(request, error)
+        return
+
+    errors = ImportManager.import_fetched_games_linking_if_name_and_year_matches(game_ids)
 
     if errors:
         messages.error(request, "Errors importing Fetched Games: {errors}".format(errors=", ".join(errors)))
@@ -90,8 +102,8 @@ def sync_fetched_games_publish_date_and_platforms(
 ) -> None:
     try:
         game_ids = selected_fetched_game_ids(request, modeladmin)
-    except ValueError as e:
-        messages.error(request, e)
+    except ValueError as error:
+        messages.error(request, error)
         return
 
     count_synced, count_skipped = ImportManager.sync_fetched_games_publish_date_and_platforms(game_ids)

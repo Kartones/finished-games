@@ -27,9 +27,6 @@ class FetchedGame(BaseGame):
     def platforms_list(self) -> str:
         return ", ".join((platform.shortname for platform in self.platforms.all()))
 
-    def mark_as_synchronized(self) -> None:
-        self.last_sync_date = self.last_modified_date
-
     @property
     def is_sync(self) -> bool:
         if self.fg_game and self.last_sync_date == self.last_modified_date:
@@ -39,6 +36,12 @@ class FetchedGame(BaseGame):
     @property
     def can_sync(self) -> bool:
         return True if self.fg_game else False
+
+    def mark_as_synchronized(self) -> None:
+        if not self.can_sync:
+            raise ValueError("Cannot synchronize a not imported game")
+
+        self.last_sync_date = self.last_modified_date
 
     def save(self, *args: Any, **kwargs: Any) -> None:
         new_changes_hash = self._get_changes_hash()
@@ -60,12 +63,13 @@ class FetchedGame(BaseGame):
         else:
             platforms = ""
 
-        return "{name}-{publish_date}-{dlc}-{platforms}-{parent}-{source_game_id}-{source_url}".format(
+        return "{name}-{publish_date}-{dlc}-{platforms}-{parent}-{fg_game_id}-{source_game_id}-{source_url}".format(
             name=self.name,
             publish_date=self.publish_date,
             dlc=self.dlc_or_expansion,
             platforms=platforms,
             parent=self.parent_game,
+            fg_game_id=self.fg_game if self.fg_game else "",
             source_game_id=self.source_game_id,
             source_url=self.source_url,
         )
@@ -108,10 +112,11 @@ class FetchedPlatform(BasePlatform):
         return md5_hash.hexdigest()
 
     def _get_fields_for_hash(self) -> str:
-        return "{name}-{shortname}-{publish_date}-{source_platform_id}-{source_url}".format(
+        return "{name}-{shortname}-{publish_date}-{fg_platform}-{source_platform_id}-{source_url}".format(
             name=self.name,
             shortname=self.shortname,
             publish_date=self.publish_date,
+            fg_platform=self.fg_platform if self.fg_platform else "",
             source_platform_id=self.source_platform_id,
             source_url=self.source_url,
         )

@@ -179,6 +179,17 @@ class FetchedGameAdminViewsMixin(BaseFetchedModelAdmin):
                 fetched_games = FetchedGame.objects.filter(id__in=selected_ids).prefetch_related(
                     "platforms", "fg_game", "parent_game"
                 )
+
+            if fetched_games.count() > ImportManager.MAX_IMPORT_ITEMS:
+                self.message_user(
+                    request,
+                    "Too many games to import from the web (max. is {max_items}). Can also use admin commands.".format(
+                        max_items=ImportManager.MAX_IMPORT_ITEMS
+                    ),
+                    level="error",
+                )
+                return HttpResponseRedirect(reverse("admin:catalogsources_fetchedgame_changelist"))
+
             fg_platform_ids_dict = {
                 str(fetched_game.id): ",".join(
                     (
@@ -192,7 +203,7 @@ class FetchedGameAdminViewsMixin(BaseFetchedModelAdmin):
             # django templates don't allow array item access, so build a list of tuples which can be easily iterated
             fetched_games_data = [
                 (fetched_game, fg_platform_ids_dict[str(fetched_game.id)], source_display_names[fetched_game.source_id])
-                for fetched_game in fetched_games
+                for fetched_game in fetched_games.only("id", "source_id")
             ]
 
             context.update(
