@@ -120,5 +120,4 @@ CATALOG_SOURCES_ADAPTERS = {}  # type: Dict
 # Remember to setup a user agent at prod settings
 CATALOG_SOURCES_ADAPTER_USER_AGENT = None
 
-# Until paged load of list items is ready, this controls the maximum games to render with a single query
-MAXIMUM_GAMES_PER_PLATFORM_NON_PAGED = 3000
+PAGINATION_ITEMS_PER_PAGE = 100

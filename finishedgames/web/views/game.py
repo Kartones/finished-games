@@ -3,6 +3,7 @@ from typing import Any
 
 from core.models import Game, Platform
 from django.conf import settings
+from django.core.paginator import Paginator
 from django.db.models.functions import Lower
 from django.http import HttpRequest, HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
@@ -31,23 +32,18 @@ class GamesByPlatformView(View):
     def get(self, request: HttpRequest, platform_id: int, *args: Any, **kwargs: Any) -> HttpResponse:
         platform = get_object_or_404(Platform, pk=platform_id)
 
-        games_count = Game.objects.filter(platforms__id=platform_id).count()
+        games = Game.objects.only("id", "name").filter(platforms__id=platform_id).order_by(Lower("name"))
 
-        if games_count > settings.MAXIMUM_GAMES_PER_PLATFORM_NON_PAGED:
-            context = {
-                "platform": platform,
-                "games_count": games_count,
-                "cant_display_so_many_games": True,
-            }
-        else:
-            games = Game.objects.only("id", "name").filter(platforms__id=platform_id).order_by(Lower("name")).all()
+        paginator = Paginator(games, settings.PAGINATION_ITEMS_PER_PAGE)
+        page_number = request.GET.get("page", 1)
+        games = paginator.get_page(page_number)
 
-            context = {
-                "platform": platform,
-                "games": games,
-                "games_count": games_count,
-                "authenticated_user_catalog": kwargs["authenticated_user_catalog"],
-            }
+        context = {
+            "platform": platform,
+            "games": games,
+            "games_count": paginator.count,
+            "authenticated_user_catalog": kwargs["authenticated_user_catalog"],
+        }
 
         return render(request, "games_by_platform.html", context)
 
@@ -85,20 +81,22 @@ class GamesStartingWithCharacterView(View):
         ):
             return HttpResponseRedirect(reverse("games"))
 
-        if character != constants.CHARACTER_FILTER_NON_ALPHANUMERIC:
-            games = Game.objects.only("id", "name").filter(name__istartswith=character).order_by(Lower("name"))
-        else:
-            all_games = Game.objects.only("id", "name").order_by(Lower("name")).all()
+        if character == constants.CHARACTER_FILTER_NON_ALPHANUMERIC:
+            all_games = Game.objects.only("id", "name").order_by(Lower("name"))
             # Non-optimal but ORM doesn't easily supports substring operations to build a complex filter
             # This will have more values as games starting with other non-alphanumeric appear in the main catalog
             games = [game for game in all_games if game.name.startswith(".")]
+        else:
+            games = Game.objects.only("id", "name").filter(name__istartswith=character).order_by(Lower("name"))
 
-        games_count = len(games)
+        paginator = Paginator(games, settings.PAGINATION_ITEMS_PER_PAGE)
+        page_number = request.GET.get("page", 1)
+        games = paginator.get_page(page_number)
 
         context = {
             "character": character,
             "games": games,
-            "games_count": games_count,
+            "games_count": paginator.count,
             "non_alphanumeric_constant": constants.CHARACTER_FILTER_NON_ALPHANUMERIC,
         }
         return render(request, "games_filtered_by_starting_character.html", context)

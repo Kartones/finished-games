@@ -1,10 +1,11 @@
 from functools import lru_cache
-from typing import Dict, List, cast
+from typing import Any, Dict, List, cast
 
 from core.helpers import generic_id as generic_id_helper
 from core.models import UserGame
 from django import template
 from django.conf import settings
+from django.http import HttpRequest
 from django.utils.safestring import mark_safe
 from web import constants
 
@@ -31,23 +32,23 @@ def render_actions(
 
 
 @register.inclusion_tag("templatetags/field_filters_headers.html")
-def field_filters_headers(sort_by: str, exclude: str, request_path: str, enabled_fields: List[str]) -> Dict:
+def field_filters_headers(request: HttpRequest, sort_by: str, exclude: str, enabled_fields: List[str]) -> Dict:
     # NOTE: Name column is implicitly enabled
     return {
+        "request": request,
         "sort_by": sort_by,
         "exclude": exclude,
-        "request_path": request_path,
         "enabled_fields": enabled_fields,
         "constants": constants,
     }
 
 
 @register.inclusion_tag("templatetags/status_filters_headers.html")
-def status_filters_headers(sort_by: str, exclude: str, request_path: str, enabled_statuses: List[str]) -> Dict:
+def status_filters_headers(request: HttpRequest, sort_by: str, exclude: str, enabled_statuses: List[str]) -> Dict:
     return {
+        "request": request,
         "sort_by": sort_by,
         "exclude": exclude,
-        "request_path": request_path,
         "enabled_statuses": enabled_statuses,
         "constants": constants,
     }
@@ -65,6 +66,19 @@ def status_filters_row(user_game: UserGame, enabled_statuses: List[str]) -> Dict
 @register.simple_tag
 def send_action_data(action_id: str, item_generic_id: str) -> str:
     return cast(str, mark_safe(_build_action_data(action_id).format(item_generic_id=item_generic_id)))
+
+
+# Source: https://stackoverflow.com/a/24658162
+@register.simple_tag
+def query_update(request: HttpRequest, **kwargs: Any) -> str:
+    updated = request.GET.copy()
+    for key, value in kwargs.items():
+        # we can live with this small hack, as else cannot do empty assignments like 'sort_by=' when using the tag
+        if value == "None":
+            updated[key] = None
+        else:
+            updated[key] = value
+    return cast(str, updated.urlencode())
 
 
 @lru_cache(maxsize=12)

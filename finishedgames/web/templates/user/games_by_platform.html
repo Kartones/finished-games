@@ -11,9 +11,9 @@
 <table class="nes-table is-bordered">
     <thead>
         <tr>
-            {% field_filters_headers sort_by exclude request.path enabled_fields %}
+            {% field_filters_headers request sort_by exclude enabled_fields %}
 
-            {% status_filters_headers sort_by exclude request.path enabled_statuses %}
+            {% status_filters_headers request sort_by exclude enabled_statuses %}
 
             {% if user.is_authenticated %}
                 <th>Actions</th>
@@ -36,6 +36,34 @@
         {% endfor %}
     </tbody>
 </table>
+
+{% if user_games.paginator.num_pages > 1 %}
+    <section class="nes-container">
+        <div>
+            <span>
+                {% if user_games.has_previous %}
+                    <a class="nes-btn" href="?{% query_update request page=1 %}">&laquo; first</a>
+                    <a class="nes-btn" href="?{% query_update request page=user_games.previous_page_number %}">previous</a>
+                {% else %}
+                    <a class="nes-btn is-disabled" href="#">&laquo; first</a>
+                    <a class="nes-btn is-disabled" href="#">previous</a>
+                {% endif %}
+
+                <span>
+                    Page <strong>{{ user_games.number }}</strong> of <strong>{{ user_games.paginator.num_pages }}</strong>
+                </span>
+
+                {% if user_games.has_next %}
+                    <a class="nes-btn" href="?{% query_update request page=user_games.next_page_number %}">next</a>
+                    <a class="nes-btn" href="?{% query_update request page=user_games.paginator.num_pages %}">last &raquo;</a>
+                {% else %}
+                    <a class="nes-btn is-disabled" href="#">next</a>
+                    <a class="nes-btn is-disabled" href="#">last &raquo;</a>
+                {% endif %}
+            </span>
+        </div>
+    </section>
+{% endif %}
 
 <section class="nes-container with-title">
     <h3 class="title">Stats</h3>

@@ -218,8 +218,9 @@ Important note: package versions are not pinned on purpose to test compatibility
 #### Django features
 
 - Django >= 2.2
-- Extensive ORM usage, including `select_related()` and `prefetch_related()`, query optimizations (`only()`)
+- Extensive ORM usage, including `select_related()` and `prefetch_related()`, query optimizations (`only()`, `values_list()`, ...)
 - custom model managers
+- `Paginator` component for pagination
 - custom management commands
 - custom template tags (with and without rendering templates) and filters
 - admin custom ordering, filters, fieldsets, readonly fields, search fields...
@@ -227,16 +228,6 @@ Important note: package versions are not pinned on purpose to test compatibility
 - `django-debug-toolbar`: Disabled on production for security
 - `django-autocomplete-light`: `Select2` based configurable autofill both for the admin and for normal views
 
-
-## Roadmap
-
-### MVP 1.1
-
-~~Adding CircleCI integration (free for public repos), bugfixes and some additions like wishlisting games and removing games from wishlist or from the user catalog.~~ Data ingestion should be solid, and have at least two sources.
-
-### MVP 2
-
-Game covers, user avatars?, some 3rd party API integrations to fetch your games from them (Steam, etc.), export profile...
 
 ## License
 
