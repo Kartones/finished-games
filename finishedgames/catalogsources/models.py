@@ -52,7 +52,7 @@ class FetchedGame(BaseGame):
         super().save(*args, **kwargs)
 
     def _get_changes_hash(self) -> str:
-        md5_hash = hashlib.md5()
+        md5_hash = hashlib.md5()  # nosec
         md5_hash.update(str.encode(self._get_fields_for_hash()))
         return md5_hash.hexdigest()
 
@@ -107,7 +107,7 @@ class FetchedPlatform(BasePlatform):
         super().save(*args, **kwargs)
 
     def _get_changes_hash(self) -> str:
-        md5_hash = hashlib.md5()
+        md5_hash = hashlib.md5()  # nosec
         md5_hash.update(str.encode(self._get_fields_for_hash()))
         return md5_hash.hexdigest()
 

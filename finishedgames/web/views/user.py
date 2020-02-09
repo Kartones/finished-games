@@ -292,7 +292,7 @@ class GamesPendingView(View):
             "pending_games_count": paginator.count,
             "constants": constants,
             "sort_by": sort_by,
-            "enabled_statuses": [constants.KEY_GAMES_CURRENTLY_PLAYING, constants.KEY_GAMES_NO_LONGER_OWNED],
+            "enabled_statuses": [constants.KEY_GAMES_CURRENTLY_PLAYING],
             "enabled_fields": [constants.KEY_FIELD_PLATFORM],
             "authenticated_user_catalog": kwargs["authenticated_user_catalog"],
         }

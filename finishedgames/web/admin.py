@@ -114,7 +114,7 @@ class GameAdmin(FGModelAdmin):
         return cast(
             str,
             format_html_join(
-                mark_safe("<br>"),
+                mark_safe("<br>"),  # nosec
                 "{}: <a href='{}' target='_blank'>{}</a>",
                 ((name, url, url) for name, url in instance.urls_dict.items()),
             ),

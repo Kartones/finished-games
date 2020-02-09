@@ -38,7 +38,7 @@ def create_game(
 
 
 def create_user(username: Optional[str] = None, username_slug: Optional[str] = None) -> settings.AUTH_USER_MODEL:
-    user = get_user_model().objects.create_user(
+    user = get_user_model().objects.create_user(  # nosec
         username=username if username else str(uuid.uuid4()),
         email="an_irrelevant_email@test.test",
         password="a password",
