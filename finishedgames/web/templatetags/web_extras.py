@@ -65,7 +65,7 @@ def status_filters_row(user_game: UserGame, enabled_statuses: List[str]) -> Dict
 
 @register.simple_tag
 def send_action_data(action_id: str, item_generic_id: str) -> str:
-    return cast(str, mark_safe(_build_action_data(action_id).format(item_generic_id=item_generic_id)))
+    return cast(str, mark_safe(_build_action_data(action_id).format(item_generic_id=item_generic_id)))  # nosec
 
 
 # Source: https://stackoverflow.com/a/24658162
