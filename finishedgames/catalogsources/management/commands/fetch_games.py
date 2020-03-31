@@ -53,29 +53,34 @@ class Command(BaseCommand):
 
             if initial_offset > 0:
                 adapter.set_offset(initial_offset)
-            for platform_id in platforms:
-                # For now at least, if fails gathering a platform, try with next one
-                while adapter.has_more_items() and not had_errors:
-                    if adapter.total_results != adapter.UNKOWN_TOTAL_RESULTS_VALUE:
-                        total = adapter.total_results
-                    else:
-                        total = "-"
-                    self.stdout.write(
-                        "\n> Fetch call (platform_id {id}): {current}/{total}".format(
-                            id=platform_id, current=adapter.next_offset, total=total
+
+            try:
+                for platform_id in platforms:
+                    # For now at least, if fails gathering a platform, try with next one
+                    while adapter.has_more_items() and not had_errors:
+                        if adapter.total_results != adapter.UNKOWN_TOTAL_RESULTS_VALUE:
+                            total = adapter.total_results
+                        else:
+                            total = "-"
+                        self.stdout.write(
+                            "\n> Fetch call (platform_id {id}): {current}/{total}".format(
+                                id=platform_id, current=adapter.next_offset, total=total
+                            )
                         )
-                    )
 
-                    with TimeProfiler(use_performance_counter=True) as profiler:
-                        games = adapter.fetch_games_block(platform_id=platform_id)
-                        self._upsert_results(results=games)
-                    had_errors = adapter.has_errored()
-                    wait_if_needed(profiler.duration)
+                        with TimeProfiler(use_performance_counter=True) as profiler:
+                            games = adapter.fetch_games_block(platform_id=platform_id)
+                            self._upsert_results(results=games)
+                        had_errors = adapter.has_errored()
+                        wait_if_needed(profiler.duration)
 
-                adapter.reset()
-                had_errors = False
+                    adapter.reset()
+                    had_errors = False
 
-            self.stdout.write("")
+                self.stdout.write("")
+            except KeyboardInterrupt:
+                had_errors = True
+                self.stdout.write(self.style.WARNING("> Keyboard interrupt issued"))
 
         if had_errors:
             self.stdout.write(self.style.WARNING("> Finished fetching '{}' with errors".format(source_id)))

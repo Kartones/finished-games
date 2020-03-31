@@ -73,7 +73,9 @@ class ImportManager:
         if include_all_fields or "platforms" in cast(List[str], update_fields_filter):
             try:
                 platforms = Platform.objects.filter(id__in=platforms)
-                game.platforms.set(platforms)
+                # Add new platforms if proceed, not removing existing ones (and if already added, nothing happens).
+                # Also, because one catalog source might only include a subset of the platforms for a game.
+                game.platforms.add(*platforms)
                 game.save()
             except Exception as error:
                 raise GameImportSaveError(str(error))
