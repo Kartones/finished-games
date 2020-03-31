@@ -2,6 +2,7 @@ from typing import Any, Dict, cast
 
 from catalogsources.managers import GameImportSaveError, ImportManager
 from catalogsources.models import FetchedGame
+from core.models import UNKNOWN_PUBLISH_DATE
 from django.conf import settings
 from django.core.management.base import BaseCommand, CommandParser
 from finishedgames import constants
@@ -12,18 +13,29 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser: CommandParser) -> None:
         parser.add_argument("max_items", type=int)
+        parser.add_argument(
+            "--exclude_unreleased",
+            action="store_true",
+            help="Exclude titles whose release date is unknown (set to 1970)",
+        )
 
     def handle(self, *args: Any, **options: Dict) -> None:
-        self.import_games(max_items=cast(int, options["max_items"]))
+        self.import_games(
+            max_items=cast(int, options["max_items"]), exclude_unreleased=bool(options.get("exclude_unreleased", False))
+        )
 
-    def import_games(self, max_items: int) -> None:
+    def import_games(self, max_items: int, exclude_unreleased: bool) -> None:
         imports_ok_count = 0
         imports_ko_count = 0
 
         if max_items < 1:
             max_items = 1
 
-        fetched_games = FetchedGame.objects.filter(fg_game__isnull=True, hidden=False)[:max_items]
+        fetched_games = FetchedGame.objects.filter(fg_game__isnull=True, hidden=False)
+        if exclude_unreleased:
+            fetched_games.filter(publish_date__gt=UNKNOWN_PUBLISH_DATE)
+            self.stdout.write("> Excluding unreleased or unknown release date Fetched Games")
+        fetched_games = fetched_games[:max_items]
 
         self.stdout.write("> Going to import {} new Fetched Games:".format(self.style.WARNING(str(len(fetched_games)))))
 

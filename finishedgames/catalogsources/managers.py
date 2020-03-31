@@ -3,7 +3,7 @@ from typing import List, Optional, Tuple, cast
 
 from catalogsources.helpers import clean_string_field
 from catalogsources.models import FetchedGame, FetchedPlatform
-from core.models import Game, Platform
+from core.models import UNKNOWN_PUBLISH_DATE, Game, Platform
 from django.conf import settings
 from finishedgames import constants
 
@@ -17,9 +17,6 @@ class PlatformImportSaveError(Exception):
 
 
 class ImportManager:
-
-    # Games that have no date at a source catalog get the minimum accepted date (we always need a date)
-    UNKNOWN_DATE = 1970
 
     # Cap certain heavy operations to a reasonable number of items
     MAX_IMPORT_ITEMS = 100
@@ -231,7 +228,7 @@ class ImportManager:
                 errors.append(error_message)
 
             # If we don't know the date, don't touch it
-            if should_retry_import and fetched_game.publish_date != cls.UNKNOWN_DATE:
+            if should_retry_import and fetched_game.publish_date != UNKNOWN_PUBLISH_DATE:
                 existing_game = Game.objects.only("id").filter(name=fetched_game.name).get()
                 game_id = existing_game.id
 

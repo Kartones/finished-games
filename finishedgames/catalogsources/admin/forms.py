@@ -1,5 +1,5 @@
 from catalogsources.admin.form_fields import SimpleArrayField
-from core.models import Game, Platform
+from core.models import UNKNOWN_PUBLISH_DATE, Game, Platform
 from dal import autocomplete
 from django import forms
 from django.core.validators import MaxValueValidator, MinValueValidator
@@ -15,7 +15,9 @@ class SingleFetchedPlatformImportForm(forms.Form):
     fetched_name = forms.CharField(label="Name", max_length=100, disabled=True)
     fetched_shortname = forms.CharField(label="Shortname", max_length=40, disabled=True)
     fetched_publish_date = forms.IntegerField(
-        label="Year published", validators=[MinValueValidator(1970), MaxValueValidator(3000)], disabled=True,
+        label="Year published",
+        validators=[MinValueValidator(UNKNOWN_PUBLISH_DATE), MaxValueValidator(3000)],
+        disabled=True,
     )
     source_id = forms.CharField(label="Source", max_length=50, disabled=True)
     source_platform_id = forms.CharField(label="Source platform identifier", max_length=50, disabled=True)
@@ -40,7 +42,7 @@ class SinglePlatformImportForm(forms.Form):
     )
     publish_date = forms.IntegerField(
         label="Year published",
-        validators=[MinValueValidator(1970), MaxValueValidator(3000)],
+        validators=[MinValueValidator(UNKNOWN_PUBLISH_DATE), MaxValueValidator(3000)],
         widget=forms.NumberInput(attrs={"class": "vIntegerField"}),
     )
 
@@ -62,7 +64,9 @@ class SingleFetchedGameImportForm(forms.Form):
 
     fetched_name = forms.CharField(label="Name", max_length=200, disabled=True)
     fetched_publish_date = forms.IntegerField(
-        label="Year published", validators=[MinValueValidator(1970), MaxValueValidator(3000)], disabled=True,
+        label="Year published",
+        validators=[MinValueValidator(UNKNOWN_PUBLISH_DATE), MaxValueValidator(3000)],
+        disabled=True,
     )
     fg_platform_ids = forms.CharField(label="Fetched Platform Ids", disabled=True)
     fg_platforms = forms.CharField(label="Fetched Platforms", disabled=True)
@@ -87,7 +91,7 @@ class SingleGameImportForm(forms.Form):
     )
     publish_date = forms.IntegerField(
         label="Year published",
-        validators=[MinValueValidator(1970), MaxValueValidator(3000)],
+        validators=[MinValueValidator(UNKNOWN_PUBLISH_DATE), MaxValueValidator(3000)],
         widget=forms.NumberInput(attrs={"class": "vIntegerField"}),
     )
     platforms = forms.ModelMultipleChoiceField(queryset=Platform.objects.order_by(Lower("name")))

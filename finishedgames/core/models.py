@@ -9,11 +9,16 @@ from django.db import models
 URLS_KEY_VALUE_GLUE = "||"
 URLS_ITEMS_GLUE = "@@"
 
+# Games that have no date at a source catalog get the minimum accepted date (we always need a date)
+UNKNOWN_PUBLISH_DATE = 1970
+
 
 class BasePlatform(models.Model):
     name = models.CharField("Name", max_length=100, unique=True, db_index=True)
     shortname = models.CharField("Shortname", max_length=40, unique=True, default=None)
-    publish_date = models.IntegerField("Year published", validators=[MinValueValidator(1970), MaxValueValidator(3000)],)
+    publish_date = models.IntegerField(
+        "Year published", validators=[MinValueValidator(UNKNOWN_PUBLISH_DATE), MaxValueValidator(3000)]
+    )
 
     class Meta:
         abstract = True
@@ -27,7 +32,7 @@ class Platform(BasePlatform):
 class BaseGame(models.Model):
     name = models.CharField("Name", max_length=200, unique=True, db_index=True)
     publish_date = models.IntegerField(
-        "Year first published", validators=[MinValueValidator(1970), MaxValueValidator(3000)],
+        "Year first published", validators=[MinValueValidator(UNKNOWN_PUBLISH_DATE), MaxValueValidator(3000)],
     )
     dlc_or_expansion = models.BooleanField("DLC/Expansion", default=False)
     platforms = models.ManyToManyField(Platform)
@@ -89,7 +94,7 @@ class UserGame(BaseUserGame):
         null=True,
         default=None,
         blank=True,
-        validators=[MinValueValidator(1970), MaxValueValidator(3000)],
+        validators=[MinValueValidator(UNKNOWN_PUBLISH_DATE), MaxValueValidator(3000)],
         db_index=True,
     )
     no_longer_owned = models.BooleanField("No longer owned", default=False, db_index=True)
