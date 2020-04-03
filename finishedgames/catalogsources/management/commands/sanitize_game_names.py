@@ -1,11 +1,10 @@
 from typing import Any, Dict, List, Union
 
-from django.core.management.base import BaseCommand, CommandParser
-from django.db.utils import IntegrityError
-
 from catalogsources.helpers import clean_string_field
 from catalogsources.models import FetchedGame
 from core.models import Game
+from django.core.management.base import BaseCommand, CommandParser
+from django.db.utils import IntegrityError
 
 
 class Command(BaseCommand):
