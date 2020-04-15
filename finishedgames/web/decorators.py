@@ -40,7 +40,7 @@ def authenticated_user_games(wrapped_function: Callable) -> Any:
             games.append(item.generic_id)
             if item.currently_playing:
                 currently_playing_games.append(item.generic_id)
-            if item.finished():
+            if item.finished:
                 finished_games.append(item.generic_id)
             if item.no_longer_owned:
                 no_longer_owned_games.append(item.generic_id)

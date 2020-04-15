@@ -8,11 +8,9 @@ class GameTests(TestCase):
         a_url = "an irrelevant url"
 
         game = Game()
-
         self.assertEqual(game.urls_dict, {})
 
         game.upsert_url(display_name=a_display_name, url=a_url)
-
         self.assertEqual(game.urls_dict, {a_display_name: a_url})
 
     def test_can_add_new_url_to_existing_urls_list(self):

@@ -19,7 +19,6 @@ class UserGameTests(TestCase):
         }
 
         user_game = UserGame(**user_game_data)
-        user_game.full_clean()
         user_game.save()
 
         user_game = UserGame(**user_game_data)
@@ -37,12 +36,10 @@ class UserGameTests(TestCase):
         }
 
         user_game = UserGame(**user_game_data)
-        user_game.full_clean()
         user_game.save()
 
         user_game_data["user_id"] = another_user.id
         user_game = UserGame(**user_game_data)
-        user_game.full_clean()
         user_game.save()
 
     def test_can_own_same_title_on_different_platforms(self):
@@ -53,12 +50,10 @@ class UserGameTests(TestCase):
         }
 
         user_game = UserGame(**user_game_data)
-        user_game.full_clean()
         user_game.save()
 
         user_game_data["platform_id"] = self.platform_2.id
         user_game = UserGame(**user_game_data)
-        user_game.full_clean()
         user_game.save()
 
     def test_cannot_own_game_on_unavailable_platform(self):

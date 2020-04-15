@@ -100,6 +100,7 @@ class UserGame(BaseUserGame):
     no_longer_owned = models.BooleanField("No longer owned", default=False, db_index=True)
     abandoned = models.BooleanField("Abandoned", default=False, db_index=True)
 
+    @property
     def finished(self) -> bool:
         return self.year_finished is not None
 

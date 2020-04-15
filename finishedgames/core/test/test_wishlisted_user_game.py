@@ -18,7 +18,6 @@ class WishlistedUserGameTests(TestCase):
             "platform_id": self.platform_1.id,
         }
         wishlist_game = WishlistedUserGame(**wishlist_game_data)
-        wishlist_game.full_clean()
         wishlist_game.save()
 
         wishlist_game = WishlistedUserGame(**wishlist_game_data)
@@ -36,12 +35,10 @@ class WishlistedUserGameTests(TestCase):
         }
 
         wishlist_game = WishlistedUserGame(**wishlist_game_data)
-        wishlist_game.full_clean()
         wishlist_game.save()
 
         wishlist_game_data["user_id"] = another_user.id
         wishlist_game = WishlistedUserGame(**wishlist_game_data)
-        wishlist_game.full_clean()
         wishlist_game.save()
 
     def test_can_wishlist_same_title_on_different_platforms(self):
@@ -52,12 +49,10 @@ class WishlistedUserGameTests(TestCase):
         }
 
         wishlist_game = WishlistedUserGame(**wishlist_game_data)
-        wishlist_game.full_clean()
         wishlist_game.save()
 
         wishlist_game_data["platform_id"] = self.platform_2.id
         wishlist_game = WishlistedUserGame(**wishlist_game_data)
-        wishlist_game.full_clean()
         wishlist_game.save()
 
     def test_cannot_wishlist_game_on_unavailable_platform(self):
