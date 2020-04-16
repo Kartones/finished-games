@@ -200,12 +200,10 @@ class GamesView(View):
                 user=request.user, game_id=int(request.POST["game"]), platform_id=int(request.POST["platform"])
             )
         else:
-            CatalogManager.add_game_to_catalog(
-                user=request.user,
-                form_user_id=int(request.POST["user"]),
-                game_id=int(request.POST["game"]),
-                platform_id=int(request.POST["platform"]),
-            )
+            if int(request.POST["user"]) == request.user.id:
+                CatalogManager.add_game_to_catalog(
+                    user=request.user, game_id=int(request.POST["game"]), platform_id=int(request.POST["platform"]),
+                )
 
         return HttpResponse(status=204)
 
@@ -478,11 +476,9 @@ class GamesWishlistedView(View):
                 user=request.user, game_id=int(request.POST["game"]), platform_id=int(request.POST["platform"])
             )
         else:
-            CatalogManager.mark_game_as_wishlisted(
-                user=request.user,
-                form_user_id=int(request.POST["user"]),
-                game_id=int(request.POST["game"]),
-                platform_id=int(request.POST["platform"]),
-            )
+            if int(request.POST["user"]) == request.user.id:
+                CatalogManager.mark_game_as_wishlisted(
+                    user=request.user, game_id=int(request.POST["game"]), platform_id=int(request.POST["platform"]),
+                )
 
         return HttpResponse(status=204)

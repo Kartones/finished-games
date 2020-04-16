@@ -69,3 +69,20 @@ class UserGameTests(TestCase):
         with self.assertRaises(ValidationError) as error:
             user_game.full_clean()
         self.assertTrue("not available in platform" in str(error.exception))
+
+    def test_object_equality(self):
+        user_game_data = {
+            "user_id": self.user.id,
+            "game_id": self.game_1.id,
+            "platform_id": self.platform_1.id,
+        }
+
+        user_game_1 = UserGame(**user_game_data)
+        user_game_1.save()
+
+        user_game_data["platform_id"] = self.platform_2.id
+        user_game_2 = UserGame(**user_game_data)
+        user_game_2.save()
+
+        self.assertNotEqual(user_game_1.id, user_game_2.id)
+        self.assertNotEqual(user_game_1, user_game_2)

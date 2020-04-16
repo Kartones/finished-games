@@ -50,26 +50,22 @@ class CatalogManager:
         user_game.save(update_fields=["currently_playing"])
 
     @staticmethod
-    def mark_game_as_wishlisted(
-        user: settings.AUTH_USER_MODEL, form_user_id: int, game_id: int, platform_id: int
-    ) -> None:
-        if form_user_id == user.id:
-            wishlist_game = WishlistedUserGame(user_id=form_user_id, game_id=game_id, platform_id=platform_id)
-            wishlist_game.full_clean()
-            wishlist_game.save()
+    def mark_game_as_wishlisted(user: settings.AUTH_USER_MODEL, game_id: int, platform_id: int) -> None:
+        wishlist_game = WishlistedUserGame(user_id=user.id, game_id=game_id, platform_id=platform_id)
+        wishlist_game.full_clean()
+        wishlist_game.save()
 
     @staticmethod
     def remove_game_from_wishlisted(user: settings.AUTH_USER_MODEL, game_id: int, platform_id: int) -> None:
         WishlistedUserGame.objects.filter(user=user, game_id=game_id, platform_id=platform_id).delete()
 
     @staticmethod
-    def add_game_to_catalog(user: settings.AUTH_USER_MODEL, form_user_id: int, game_id: int, platform_id: int) -> None:
-        if form_user_id == user.id:
-            user_game = UserGame(user_id=form_user_id, game_id=game_id, platform_id=platform_id)
-            user_game.full_clean()
-            user_game.save()
+    def add_game_to_catalog(user: settings.AUTH_USER_MODEL, game_id: int, platform_id: int) -> None:
+        user_game = UserGame(user_id=user.id, game_id=game_id, platform_id=platform_id)
+        user_game.full_clean()
+        user_game.save()
 
-            CatalogManager.remove_game_from_wishlisted(user=user, game_id=game_id, platform_id=platform_id)
+        CatalogManager.remove_game_from_wishlisted(user=user, game_id=game_id, platform_id=platform_id)
 
     @staticmethod
     def remove_game_from_catalog(user: settings.AUTH_USER_MODEL, game_id: int, platform_id: int) -> None:
