@@ -40,5 +40,23 @@
         </p>
     </div>
 </section>
+{% if user.is_authenticated and user == viewed_user %}
+    <section class="nes-container with-title">
+        <h3 class="title">Options</h3>
+        <div>
+            <p>
+                <form action="{% url 'user_options' user.get_username %}" method="POST" id="user_options">
+                    {% csrf_token %}
+                    <label>
+                        <input id="always_exclude_option" type="checkbox" class="nes-checkbox"
+                            {% if options_auto_exclude %}checked{% endif %}
+                            onChange="this.form.submit()" />
+                        <span>Always filter out abandoned games</span>
+                    </label>
+                </form>
+            </p>
+        </div>
+    </section>
+{% endif %}
 
 {% endblock content %}

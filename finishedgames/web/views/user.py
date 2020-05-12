@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Any, Callable, Dict, Optional, Tuple  # NOQA: F401
+from typing import Any, Callable, Dict, List, Optional, Tuple  # NOQA: F401
 
 from core.managers import CatalogManager
 from core.models import Platform, UserGame, WishlistedUserGame
@@ -28,24 +28,80 @@ def progress_bar_class(progress: int) -> str:
         return "is-success"
 
 
-def filter_and_exclude_games(user_games: QuerySet, request: HttpRequest) -> Tuple[QuerySet, str, str]:
+def filter_games(user_games: QuerySet, request: HttpRequest) -> Tuple[QuerySet, str, List[str]]:
     sort_by = request.GET.get("sort_by", constants.SORT_BY_GAME_NAME)
     try:
         order_by = constants.SORT_FIELDS_MAPPING[sort_by]
     except KeyError:
         order_by = constants.SORT_FIELDS_MAPPING[constants.SORT_BY_GAME_NAME]
 
-    exclude = request.GET.get("exclude", None)
+    usergames_queryset = user_games.order_by(*order_by)
+
+    return usergames_queryset, sort_by, order_by
+
+
+def filter_and_exclude_games(user_games: QuerySet, request: HttpRequest) -> Tuple[QuerySet, QuerySet, str, str]:
+    usergames_queryset, sort_by, order_by = filter_games(user_games, request)
+
+    # Querystring takes precedence to allow explicit sorting/showing back even if cookie is set
+    exclude = request.GET.get("exclude", None) or request.COOKIES.get(constants.USER_OPTIONS_EXCLUDE_COOKIE_NAME, None)
+    try:
+        exclude_kwargs = constants.EXCLUDE_FIELDS_MAPPING[exclude]  # type: Optional[Dict]
+    except KeyError:
+        exclude = None
+        exclude_kwargs = None
+
+    if exclude:
+        return user_games.exclude(**exclude_kwargs).order_by(*order_by), usergames_queryset, sort_by, exclude
+    else:
+        return usergames_queryset, usergames_queryset, sort_by, ""
+
+
+def _filter_and_exclude_games(user_games: QuerySet, request: HttpRequest) -> Tuple[QuerySet, QuerySet, str, str]:
+    sort_by = request.GET.get("sort_by", constants.SORT_BY_GAME_NAME)
+    try:
+        order_by = constants.SORT_FIELDS_MAPPING[sort_by]
+    except KeyError:
+        order_by = constants.SORT_FIELDS_MAPPING[constants.SORT_BY_GAME_NAME]
+
+    # Querystring takes precedence to allow explicit sorting/showing back even if cookie is set
+    exclude = request.GET.get("exclude", None) or request.COOKIES.get(constants.USER_OPTIONS_EXCLUDE_COOKIE_NAME, None)
     exclude_kwargs = None  # type: Any
     try:
         exclude_kwargs = constants.EXCLUDE_FIELDS_MAPPING[exclude]
     except KeyError:
         exclude = None
 
+    usergames_queryset = user_games.order_by(*order_by)
+
     if exclude:
-        return user_games.exclude(**exclude_kwargs).order_by(*order_by), sort_by, exclude
+        return user_games.exclude(**exclude_kwargs).order_by(*order_by), usergames_queryset, sort_by, exclude
     else:
-        return user_games.order_by(*order_by), sort_by, ""
+        return usergames_queryset, usergames_queryset, sort_by, ""
+
+
+def calculate_progress_counters(unfiltered_user_games: QuerySet) -> Tuple[int, int, int, int, int, int, int]:
+    # counters use unfiltered list
+    unfiltered_games_count = unfiltered_user_games.count()
+    currently_playing_games_count = unfiltered_user_games.filter(currently_playing=True).count()
+    finished_games_count = unfiltered_user_games.exclude(year_finished__isnull=True).count()
+    abandoned_games_count = unfiltered_user_games.filter(abandoned=True).count()
+    completed_games_count = finished_games_count + abandoned_games_count
+    pending_games_count = unfiltered_games_count - completed_games_count
+    if unfiltered_games_count > 0:
+        completed_games_progress = int(completed_games_count * 100 / unfiltered_games_count)
+    else:
+        completed_games_progress = 0
+
+    return (
+        unfiltered_games_count,
+        currently_playing_games_count,
+        finished_games_count,
+        abandoned_games_count,
+        completed_games_count,
+        pending_games_count,
+        completed_games_progress,
+    )
 
 
 def users(request: HttpRequest) -> HttpResponse:
@@ -86,6 +142,11 @@ def catalog(request: HttpRequest, username: str) -> HttpResponse:
         completed_games_progress = 0
     wishlisted_games_count = WishlistedUserGame.objects.filter(user=viewed_user).count()
 
+    if request.user.is_authenticated and request.user == viewed_user:
+        options_auto_exclude = request.COOKIES.get(constants.USER_OPTIONS_EXCLUDE_COOKIE_NAME, None) is not None
+    else:
+        options_auto_exclude = False
+
     context = {
         "viewed_user": viewed_user,
         "user_games_count": user_games_count,
@@ -98,6 +159,7 @@ def catalog(request: HttpRequest, username: str) -> HttpResponse:
         "abandoned_games_count": abandoned_games_count,
         "progress_class": progress_bar_class(completed_games_progress),
         "wishlisted_games_count": wishlisted_games_count,
+        "options_auto_exclude": options_auto_exclude,
     }
 
     return render(request, "user/catalog.html", context)
@@ -119,6 +181,25 @@ def platforms(request: HttpRequest, username: str) -> HttpResponse:
     }
 
     return render(request, "user/platforms.html", context)
+
+
+class Options(View):
+    def post(self, request: HttpRequest, username: str, *args: Any, **kwargs: Any) -> HttpResponse:
+        if username != request.user.get_username() or request.method != "POST":
+            raise Http404("Invalid URL")
+
+        response = HttpResponse(status=204)
+
+        if request.COOKIES.get(constants.USER_OPTIONS_EXCLUDE_COOKIE_NAME, None) is not None:
+            response.delete_cookie(constants.USER_OPTIONS_EXCLUDE_COOKIE_NAME)
+        else:
+            response.set_cookie(
+                key=constants.USER_OPTIONS_EXCLUDE_COOKIE_NAME,
+                value=constants.EXCLUDE_ABANDONED,
+                max_age=constants.USER_OPTIONS_COOKIE_AGE,
+            )
+
+        return response
 
 
 class NoLongerOwnedGamesView(View):
@@ -146,21 +227,22 @@ class GamesView(View):
         if not viewed_user:
             raise Http404("Invalid URL")
 
-        user_games, sort_by, exclude = filter_and_exclude_games(UserGame.objects.filter(user=viewed_user), request)
+        user_games, unfiltered_user_games, sort_by, exclude = filter_and_exclude_games(
+            UserGame.objects.filter(user=viewed_user), request
+        )
         user_games = user_games.select_related("game", "platform")
 
         paginator = Paginator(user_games, settings.PAGINATION_ITEMS_PER_PAGE)
-        games_count = paginator.count
 
-        currently_playing_games_count = user_games.filter(currently_playing=True).count()
-        finished_games_count = user_games.exclude(year_finished__isnull=True).count()
-        abandoned_games_count = user_games.filter(abandoned=True).count()
-        completed_games_count = finished_games_count + abandoned_games_count
-        pending_games_count = games_count - completed_games_count
-        if games_count > 0:
-            completed_games_progress = int(completed_games_count * 100 / games_count)
-        else:
-            completed_games_progress = 0
+        (
+            games_count,
+            currently_playing_games_count,
+            finished_games_count,
+            abandoned_games_count,
+            completed_games_count,
+            pending_games_count,
+            completed_games_progress,
+        ) = calculate_progress_counters(unfiltered_user_games)
 
         page_number = request.GET.get("page", 1)
         user_games = paginator.get_page(page_number)
@@ -217,23 +299,22 @@ class GamesByPlatformView(View):
             raise Http404("Invalid URL")
 
         platform = get_object_or_404(Platform, pk=platform_id)
-        user_games, sort_by, exclude = filter_and_exclude_games(
+        user_games, unfiltered_user_games, sort_by, exclude = filter_and_exclude_games(
             UserGame.objects.filter(user=viewed_user, platform=platform), request
         )
         user_games = user_games.select_related("game")
 
         paginator = Paginator(user_games, settings.PAGINATION_ITEMS_PER_PAGE)
-        games_count = paginator.count
 
-        currently_playing_games_count = user_games.filter(currently_playing=True).count()
-        finished_games_count = user_games.exclude(year_finished__isnull=True).count()
-        abandoned_games_count = user_games.filter(abandoned=True).count()
-        completed_games_count = finished_games_count + abandoned_games_count
-        pending_games_count = games_count - completed_games_count
-        if games_count > 0:
-            completed_games_progress = int(completed_games_count * 100 / games_count)
-        else:
-            completed_games_progress = 0
+        (
+            games_count,
+            currently_playing_games_count,
+            finished_games_count,
+            abandoned_games_count,
+            completed_games_count,
+            pending_games_count,
+            completed_games_progress,
+        ) = calculate_progress_counters(unfiltered_user_games)
 
         page_number = request.GET.get("page", 1)
         user_games = paginator.get_page(page_number)
@@ -274,7 +355,7 @@ class GamesPendingView(View):
         if not viewed_user:
             raise Http404("Invalid URL")
 
-        pending_games, sort_by, exclude = filter_and_exclude_games(
+        pending_games, _, sort_by, exclude = filter_and_exclude_games(
             UserGame.objects.filter(user=viewed_user).exclude(year_finished__isnull=False).exclude(abandoned=True),
             request,
         )
@@ -306,7 +387,7 @@ class GamesFinishedView(View):
         if not viewed_user:
             raise Http404("Invalid URL")
 
-        finished_games, sort_by, exclude = filter_and_exclude_games(
+        finished_games, _, sort_by, exclude = filter_and_exclude_games(
             UserGame.objects.filter(user=viewed_user).exclude(year_finished__isnull=True), request
         )
         finished_games = finished_games.select_related("game", "platform")
@@ -355,7 +436,7 @@ class GamesAbandonedView(View):
         if not viewed_user:
             raise Http404("Invalid URL")
 
-        abandoned_Games, sort_by, exclude = filter_and_exclude_games(
+        abandoned_Games, sort_by, _ = filter_games(
             UserGame.objects.filter(user=viewed_user).filter(abandoned=True), request
         )
         abandoned_Games = abandoned_Games.select_related("game", "platform")
@@ -400,7 +481,7 @@ class GamesCurrentlyPlayingView(View):
         if not viewed_user:
             raise Http404("Invalid URL")
 
-        currently_playing_games, sort_by, exclude = filter_and_exclude_games(
+        currently_playing_games, _, sort_by, exclude = filter_and_exclude_games(
             UserGame.objects.filter(user=viewed_user, currently_playing=True), request
         )
         currently_playing_games = currently_playing_games.select_related("game", "platform")
@@ -446,9 +527,7 @@ class GamesWishlistedView(View):
         if not viewed_user:
             raise Http404("Invalid URL")
 
-        wishlisted_games, sort_by, exclude = filter_and_exclude_games(
-            WishlistedUserGame.objects.filter(user=viewed_user), request
-        )
+        wishlisted_games, sort_by, _ = filter_games(WishlistedUserGame.objects.filter(user=viewed_user), request)
         wishlisted_games = wishlisted_games.select_related("game", "platform")
 
         paginator = Paginator(wishlisted_games, settings.PAGINATION_ITEMS_PER_PAGE)
