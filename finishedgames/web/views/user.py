@@ -106,7 +106,7 @@ def calculate_progress_counters(unfiltered_user_games: QuerySet) -> Tuple[int, i
 
 def users(request: HttpRequest) -> HttpResponse:
     # For security reasons, no superadmins should have normal site profiles
-    users = get_user_model().objects.all()  # .filter(is_active=True, is_superuser=False)
+    users = get_user_model().objects.filter(is_active=True, is_superuser=False)
 
     paginator = Paginator(users, settings.PAGINATION_ITEMS_PER_PAGE)
     page_number = request.GET.get("page", 1)
