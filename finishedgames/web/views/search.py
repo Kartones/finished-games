@@ -8,7 +8,7 @@ class GameAutocompleteView(autocomplete.Select2QuerySetView):
     def get_queryset(self) -> QuerySet:
         queryset = Game.objects.all()
         if self.q:
-            queryset = queryset.filter(name__icontains=self.q)
+            queryset = queryset.filter(name__icontains=self.q.strip())
         queryset = queryset.order_by(Length("name"), Lower("name"))
 
         return queryset

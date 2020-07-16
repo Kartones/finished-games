@@ -46,10 +46,10 @@
             <span>
                 {% if user_games.has_previous %}
                     <a class="nes-btn" href="?{% query_update request page=1 %}">&laquo; first</a>
-                    <a class="nes-btn" href="?{% query_update request page=user_games.previous_page_number %}">previous</a>
+                    <a class="nes-btn" href="?{% query_update request page=user_games.previous_page_number %}">prev</a>
                 {% else %}
                     <a class="nes-btn is-disabled" href="#">&laquo; first</a>
-                    <a class="nes-btn is-disabled" href="#">previous</a>
+                    <a class="nes-btn is-disabled" href="#">prev</a>
                 {% endif %}
 
                 <span>
