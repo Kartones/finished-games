@@ -318,16 +318,14 @@ class FetchedGameAdminViewsMixin(BaseFetchedModelAdmin):
             if len(imports_ok) > 0:
                 self.message_user(
                     request,
-                    "Some Fetched Game imports failed... Imports OK: {} ... Imports KO: {}".format(
-                        ",".join(imports_ok), ",".join(imports_ko)
+                    "Some Fetched Game imports failed ({num_ko}/{num_ok}). Imports KO: {list_ko}".format(
+                        num_ko=len(imports_ko), num_ok=len(imports_ok), list_ko=",".join(imports_ko)
                     ),
                     level="warning",
                 )
             else:
                 self.message_user(
-                    request,
-                    "All imports from the following Fetched Games failed: {}".format(",".join(imports_ko)),
-                    level="error",
+                    request, "All Fetched Game imports failed: {}".format(",".join(imports_ko)), level="error",
                 )
         else:
             self.message_user(request, "Fetched Games imported successfully: {}".format(",".join(imports_ok)))
@@ -508,16 +506,14 @@ class FetchedPlatformAdminViewsMixin(BaseFetchedModelAdmin):
             if len(imports_ok) > 0:
                 self.message_user(
                     request,
-                    "Some Fetched Platform imports failed... Imports OK: {} ... Imports KO: {}".format(
-                        ",".join(imports_ok), ",".join(imports_ko)
+                    "Some Fetched Platform imports failed ({num_ko}/{num_ok}). Imports KO: {list_ko}".format(
+                        num_ko=len(imports_ko), num_ok=len(imports_ok), list_ko=",".join(imports_ko)
                     ),
                     level="warning",
                 )
             else:
                 self.message_user(
-                    request,
-                    "All imports from the following Fetched Platforms failed: {}".format(",".join(imports_ko)),
-                    level="error",
+                    request, "All Fetched Platforms failed: {}".format(",".join(imports_ko)), level="error",
                 )
         else:
             self.message_user(request, "Fetched Platforms imported successfully: {}".format(",".join(imports_ok)))

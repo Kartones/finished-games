@@ -10,22 +10,25 @@
     <h3 class="title">Stats</h3>
     <div>
         <p>
-            <i class="nes-icon star is-small"></i> <a href="{% url 'user_games' viewed_user.get_username %}"><strong>{{ user_games_count }}</strong> game{{ user_games_count|pluralize }} total</a>
-        </p>
-        <p>
-            <i class="nes-icon star is-small"></i> <a href="{% url 'user_platforms' viewed_user.get_username %}"><strong>{{ user_platforms_count }}</strong> platform{{ user_platforms_count|pluralize }} played in</a>
+            <i class="nes-icon star is-small"></i> <a href="{% url 'user_games' viewed_user.get_username %}"><strong>{{ user_games_count }}</strong> game{{ user_games_count|pluralize }}</a> total, from <a href="{% url 'user_platforms' viewed_user.get_username %}"><strong>{{ user_platforms_count }}</strong> platform{{ user_platforms_count|pluralize }}</a>
         </p>
         <p>
             <i class="nes-icon snes-pad is-small"></i> <a href="{% url 'user_currently_playing_games' viewed_user.get_username %}"><strong>{{ currently_playing_games_count }}</strong> currently playing game{{ currently_playing_games_count|pluralize }}</a>
         </p>
         <p>
-            <i class="nes-icon trophy is-small"></i> <a href="{% url 'user_finished_games' viewed_user.get_username %}"><strong>{{ finished_games_count }}</strong> finished game{{ finished_games_count|pluralize }}</a>, <i class="nes-icon trophy is-empty is-small"></i> <a href="{% url 'user_pending_games' viewed_user.get_username %}"><strong>{{ pending_games_count }}</strong> pending game{{ pending_games_count|pluralize }}</a> and <i class="nes-icon skull is-small"></i> <a href="{% url 'user_abandoned_games' viewed_user.get_username %}"><strong>{{ abandoned_games_count }}</strong> abandoned game{{ abandoned_games_count|pluralize }}</a>
+            <i class="nes-icon trophy is-small"></i> <a href="{% url 'user_finished_games' viewed_user.get_username %}"><strong>{{ finished_games_count }}</strong> finished game{{ finished_games_count|pluralize }}</a>
+        </p>
+        <p>
+            <i class="nes-icon trophy is-empty is-small"></i> <a href="{% url 'user_pending_games' viewed_user.get_username %}"><strong>{{ pending_games_count }}</strong> pending game{{ pending_games_count|pluralize }}</a>
+        </p>
+        <p>
+             <i class="nes-icon skull is-small"></i> <a href="{% url 'user_abandoned_games' viewed_user.get_username %}"><strong>{{ abandoned_games_count }}</strong> abandoned game{{ abandoned_games_count|pluralize }}</a>
         </p>
         <p>
             {% if user.is_authenticated and user == viewed_user %}
                 You've completed {{ completed_games_progress }}% of your catalog
             {% else %}
-                {{ viewed_user.get_username.capitalize }} has completed {{ completed_games_progress }}% of his/her catalog.
+                {{ viewed_user.get_username.capitalize }} has completed {{ completed_games_progress }}% of his/her catalog
             {% endif %}
             <br/>
             <progress
