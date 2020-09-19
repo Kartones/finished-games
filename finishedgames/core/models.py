@@ -1,4 +1,4 @@
-from typing import Dict, cast
+from typing import Any, Dict, cast
 
 from core.helpers import generic_id as generic_id_helper
 from django.conf import settings
@@ -44,6 +44,9 @@ class BaseGame(models.Model):
 
 class Game(BaseGame):
     urls = models.CharField("URLs", max_length=2000, blank=True, default="")
+    name_for_search = models.CharField(
+        "Simplified name for searches", max_length=200, blank=True, default="", db_index=True
+    )
 
     @property
     def platforms_list(self) -> str:
@@ -67,6 +70,13 @@ class Game(BaseGame):
         self.urls = URLS_ITEMS_GLUE.join(
             ("{}{}{}".format(key, URLS_KEY_VALUE_GLUE, _urls_dict[key]) for key in _urls_dict.keys())
         )
+
+    def save(self, *args: Any, **kwargs: Any) -> None:
+        self.name_for_search = "".join(
+            [char for char in self.name.lower() if any([char.isalnum(), char in ["-", ".", " "]])]
+        )
+
+        super().save(*args, **kwargs)
 
     def __str__(self) -> str:
         dlc_fragment = " [DLC/Expansion]" if self.dlc_or_expansion else ""

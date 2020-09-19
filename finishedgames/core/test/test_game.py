@@ -39,3 +39,24 @@ class GameTests(TestCase):
 
         game.upsert_url(display_name=a_display_name, url=a_new_url)
         self.assertEqual(game.urls_dict, {a_display_name: a_new_url, another_display_name: another_url})
+
+    def test_stores_searchable_name_on_creation(self):
+        name = "F.E.A.R.: Perseus Mandate"
+        expected_searchable_name = "f.e.a.r. perseus mandate"
+
+        game = Game(name=name, publish_date=1970)
+        game.save()
+        self.assertEqual(game.name_for_search, expected_searchable_name)
+
+    def test_updates_searchable_name_on_modification(self):
+        initial_name = "F.E.A.R.: Perseus Mandate"
+        updated_name = "F.E.A.R.: First Encounter Assault Recon"
+        expected_searchable_name = "f.e.a.r. first encounter assault recon"
+
+        game = Game(name=initial_name, publish_date=1970)
+        game.save()
+
+        game.name = updated_name
+        game.save()
+
+        self.assertEqual(game.name_for_search, expected_searchable_name)
