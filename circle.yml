@@ -1,8 +1,13 @@
-version: 2
+version: 2.1
+
+workflows:
+  build-and-test:
+    jobs:
+      - build:
+          context: dockerauth
+
 jobs:
   build:
-    context:
-      - docker-auth
     docker:
       - image: circleci/python:3.8
         auth:
