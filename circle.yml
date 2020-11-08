@@ -1,8 +1,13 @@
 version: 2
 jobs:
   build:
+    context:
+      - docker-auth
     docker:
-      - image: circleci/python:3.6.1
+      - image: circleci/python:3.8
+        auth:
+          username: $DOCKERHUB_USERNAME
+          password: $DOCKERHUB_PASSWORD
     steps:
       - checkout
 
