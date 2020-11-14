@@ -36,3 +36,25 @@ class ModelsTests(TestCase):
         fetched_game.name = "another_irrelevant_name"
         fetched_game.save()
         self.assertFalse(fetched_game.is_sync)
+
+    def test_keeps_synced_if_not_modified(self):
+        name = "an_irrelevant_name"
+        publish_date = AN_IRRELEVANT_YEAR
+
+        game = Game(publish_date=publish_date, name=name)
+        game.save()
+        fetched_game = FetchedGame(publish_date=publish_date, name=name)
+        fetched_game.fg_game = game
+        # As it is a new entity, upon saving its modified date will change, so need to sync afterwards
+        fetched_game.save()
+        fetched_game.mark_as_synchronized()
+        fetched_game.save()
+        self.assertTrue(fetched_game.is_sync)
+
+        fetched_game.name = name
+        fetched_game.save()
+        self.assertTrue(fetched_game.is_sync)
+
+        fetched_game.publish_date = publish_date
+        fetched_game.save()
+        self.assertTrue(fetched_game.is_sync)

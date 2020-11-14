@@ -24,7 +24,7 @@ class UserGameTests(TestCase):
         self.user_game.abandoned = True
         self.user_game.save()
 
-        CatalogManager.mark_game_as_no_longer_owned(self.user, self.game.id, self.platform.id)
+        CatalogManager.mark_as_no_longer_owned(self.user, self.game.id, self.platform.id)
 
         self.user_game.refresh_from_db()
         self.assertTrue(self.user_game.no_longer_owned)
@@ -32,9 +32,9 @@ class UserGameTests(TestCase):
         self.assertFalse(self.user_game.abandoned)
 
     def test_unmark_user_game_as_no_longer_owner_unsets_proper_field(self):
-        CatalogManager.mark_game_as_no_longer_owned(self.user, self.game.id, self.platform.id)
+        CatalogManager.mark_as_no_longer_owned(self.user, self.game.id, self.platform.id)
 
-        CatalogManager.unmark_game_from_no_longer_owned(self.user, self.game.id, self.platform.id)
+        CatalogManager.unmark_as_no_longer_owned(self.user, self.game.id, self.platform.id)
 
         self.user_game.refresh_from_db()
         self.assertFalse(self.user_game.no_longer_owned)
@@ -45,7 +45,7 @@ class UserGameTests(TestCase):
         self.user_game.abandoned = True
         self.user_game.save()
 
-        CatalogManager.mark_game_as_finished(self.user, self.game.id, self.platform.id, an_irrelevant_year)
+        CatalogManager.mark_as_finished(self.user, self.game.id, self.platform.id, an_irrelevant_year)
 
         self.user_game.refresh_from_db()
         self.assertTrue(self.user_game.finished)
@@ -54,9 +54,9 @@ class UserGameTests(TestCase):
 
     def test_unmark_user_game_as_finished_unsets_proper_field(self):
         an_irrelevant_year = 2000
-        CatalogManager.mark_game_as_finished(self.user, self.game.id, self.platform.id, an_irrelevant_year)
+        CatalogManager.mark_as_finished(self.user, self.game.id, self.platform.id, an_irrelevant_year)
 
-        CatalogManager.unmark_game_from_finished(self.user, self.game.id, self.platform.id)
+        CatalogManager.unmark_as_finished(self.user, self.game.id, self.platform.id)
 
         self.user_game.refresh_from_db()
         self.assertFalse(self.user_game.finished)
@@ -67,7 +67,7 @@ class UserGameTests(TestCase):
         self.user_game.abandoned = True
         self.user_game.save()
 
-        CatalogManager.mark_game_as_currently_playing(self.user, self.game.id, self.platform.id)
+        CatalogManager.mark_as_currently_playing(self.user, self.game.id, self.platform.id)
 
         self.user_game.refresh_from_db()
         self.assertTrue(self.user_game.currently_playing)
@@ -75,15 +75,15 @@ class UserGameTests(TestCase):
         self.assertFalse(self.user_game.abandoned)
 
     def test_unmark_user_game_as_currently_playing_unsets_proper_field(self):
-        CatalogManager.mark_game_as_currently_playing(self.user, self.game.id, self.platform.id)
+        CatalogManager.mark_as_currently_playing(self.user, self.game.id, self.platform.id)
 
-        CatalogManager.unmark_game_from_currently_playing(self.user, self.game.id, self.platform.id)
+        CatalogManager.unmark_as_currently_playing(self.user, self.game.id, self.platform.id)
 
         self.user_game.refresh_from_db()
         self.assertFalse(self.user_game.currently_playing)
 
     def test_mark_user_game_as_wishlisted(self):
-        CatalogManager.mark_game_as_wishlisted(self.user, self.game.id, self.platform.id)
+        CatalogManager.mark_as_wishlisted(self.user, self.game.id, self.platform.id)
 
         wishlisted_user_game = WishlistedUserGame.objects.get(
             user=self.user.id, game_id=self.game.id, platform_id=self.platform.id
@@ -91,9 +91,9 @@ class UserGameTests(TestCase):
         self.assertTrue(wishlisted_user_game is not None)
 
     def test_remove_user_game_from_wishlisted(self):
-        CatalogManager.mark_game_as_wishlisted(self.user, self.game.id, self.platform.id)
+        CatalogManager.mark_as_wishlisted(self.user, self.game.id, self.platform.id)
 
-        CatalogManager.remove_game_from_wishlisted(self.user, self.game.id, self.platform.id)
+        CatalogManager.unmark_as_wishlisted(self.user, self.game.id, self.platform.id)
 
         with self.assertRaises(WishlistedUserGame.DoesNotExist) as error:
             WishlistedUserGame.objects.get(user=self.user.id, game_id=self.game.id, platform_id=self.platform.id)
@@ -108,7 +108,7 @@ class UserGameTests(TestCase):
         self.assertTrue("does not exist" in str(error.exception))
 
         # Add new game, new platform
-        CatalogManager.add_game_to_catalog(self.user, another_game.id, another_platform.id)
+        CatalogManager.add_to_catalog(self.user, another_game.id, another_platform.id)
 
         user_game_1 = UserGame.objects.get(user=self.user.id, game_id=another_game.id, platform_id=another_platform.id)
         self.assertTrue(user_game_1 is not None)
@@ -116,7 +116,7 @@ class UserGameTests(TestCase):
         self.assertEqual(user_game_1.platform.id, another_platform.id)
 
         # Can also add it with the other platform, and it's a different association
-        CatalogManager.add_game_to_catalog(self.user, another_game.id, self.platform.id)
+        CatalogManager.add_to_catalog(self.user, another_game.id, self.platform.id)
 
         user_game_2 = UserGame.objects.get(user=self.user.id, game_id=another_game.id, platform_id=self.platform.id)
         self.assertTrue(user_game_2 is not None)
@@ -127,13 +127,13 @@ class UserGameTests(TestCase):
     def test_cant_add_twice_same_game_to_user_catalog(self):
         # setup() already added this without the CatalogManager
         with self.assertRaises(ValidationError) as error:
-            CatalogManager.add_game_to_catalog(self.user, self.game.id, self.platform.id)
+            CatalogManager.add_to_catalog(self.user, self.game.id, self.platform.id)
         self.assertTrue("already exists" in str(error.exception))
 
     def different_users_can_add_same_game_to_their_catalog(self):
         another_user = create_user()
 
-        CatalogManager.add_game_to_catalog(another_user, self.game.id, self.platform.id)
+        CatalogManager.add_to_catalog(another_user, self.game.id, self.platform.id)
 
         another_user_game = UserGame.objects.get(
             user=another_user.id, game_id=self.game.id, platform_id=self.platform.id
@@ -145,9 +145,9 @@ class UserGameTests(TestCase):
 
     def test_adding_game_to_catalog_removes_from_wishlisted_if_present(self):
         another_game = create_game(platforms=[self.platform])
-        CatalogManager.mark_game_as_wishlisted(self.user, another_game.id, self.platform.id)
+        CatalogManager.mark_as_wishlisted(self.user, another_game.id, self.platform.id)
 
-        CatalogManager.add_game_to_catalog(self.user, another_game.id, self.platform.id)
+        CatalogManager.add_to_catalog(self.user, another_game.id, self.platform.id)
 
         with self.assertRaises(WishlistedUserGame.DoesNotExist) as error:
             WishlistedUserGame.objects.get(user=self.user.id, game_id=another_game.id, platform_id=self.platform.id)
@@ -157,11 +157,11 @@ class UserGameTests(TestCase):
         another_platform = create_platform()
         another_game = create_game(platforms=[self.platform, another_platform])
         another_user = create_user()
-        CatalogManager.add_game_to_catalog(self.user, another_game.id, self.platform.id)
-        CatalogManager.add_game_to_catalog(self.user, another_game.id, another_platform.id)
-        CatalogManager.add_game_to_catalog(another_user, another_game.id, self.platform.id)
+        CatalogManager.add_to_catalog(self.user, another_game.id, self.platform.id)
+        CatalogManager.add_to_catalog(self.user, another_game.id, another_platform.id)
+        CatalogManager.add_to_catalog(another_user, another_game.id, self.platform.id)
 
-        CatalogManager.remove_game_from_catalog(self.user, another_game.id, self.platform.id)
+        CatalogManager.remove_from_catalog(self.user, another_game.id, self.platform.id)
 
         with self.assertRaises(UserGame.DoesNotExist) as error:
             UserGame.objects.get(user=self.user.id, game_id=another_game.id, platform_id=self.platform.id)
@@ -173,23 +173,23 @@ class UserGameTests(TestCase):
         # and similar association but for other users also still exists
         UserGame.objects.get(user=another_user.id, game_id=another_game.id, platform_id=self.platform.id)
 
-    def test_mark_game_as_abandoned_sets_and_unsets_proper_fields(self):
+    def test_mark_as_abandoned_sets_and_unsets_proper_fields(self):
         an_irrelevant_year = 2000
         self.user_game.currently_playing = True
         self.user_game.year_finished = an_irrelevant_year
         self.user_game.save()
 
-        CatalogManager.mark_game_as_abandoned(self.user, self.game.id, self.platform.id)
+        CatalogManager.mark_as_abandoned(self.user, self.game.id, self.platform.id)
 
         self.user_game.refresh_from_db()
         self.assertTrue(self.user_game.abandoned)
         self.assertFalse(self.user_game.currently_playing)
         self.assertFalse(self.user_game.finished)
 
-    def test_unmark_game_from_abandoned_sets_proper_field(self):
-        CatalogManager.mark_game_as_abandoned(self.user, self.game.id, self.platform.id)
+    def test_unmark_as_abandoned_sets_proper_field(self):
+        CatalogManager.mark_as_abandoned(self.user, self.game.id, self.platform.id)
 
-        CatalogManager.unmark_game_from_abandoned(self.user, self.game.id, self.platform.id)
+        CatalogManager.unmark_as_abandoned(self.user, self.game.id, self.platform.id)
 
         self.user_game.refresh_from_db()
         self.assertFalse(self.user_game.abandoned)

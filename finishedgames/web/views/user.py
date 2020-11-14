@@ -208,11 +208,11 @@ class NoLongerOwnedGamesView(View):
             raise Http404("Invalid URL")
 
         if request.POST.get("_method") == constants.FORM_METHOD_DELETE:
-            CatalogManager.unmark_game_from_no_longer_owned(
+            CatalogManager.unmark_as_no_longer_owned(
                 user=request.user, game_id=int(request.POST["game"]), platform_id=int(request.POST["platform"])
             )
         else:
-            CatalogManager.mark_game_as_no_longer_owned(
+            CatalogManager.mark_as_no_longer_owned(
                 user=request.user, game_id=int(request.POST["game"]), platform_id=int(request.POST["platform"])
             )
 
@@ -278,12 +278,12 @@ class GamesView(View):
             raise Http404("Invalid URL")
 
         if request.POST.get("_method") == constants.FORM_METHOD_DELETE:
-            CatalogManager.remove_game_from_catalog(
+            CatalogManager.remove_from_catalog(
                 user=request.user, game_id=int(request.POST["game"]), platform_id=int(request.POST["platform"])
             )
         else:
             if int(request.POST["user"]) == request.user.id:
-                CatalogManager.add_game_to_catalog(
+                CatalogManager.add_to_catalog(
                     user=request.user, game_id=int(request.POST["game"]), platform_id=int(request.POST["platform"]),
                 )
 
@@ -414,11 +414,11 @@ class GamesFinishedView(View):
             raise Http404("Invalid URL")
 
         if request.POST.get("_method") == constants.FORM_METHOD_DELETE:
-            CatalogManager.unmark_game_from_finished(
+            CatalogManager.unmark_as_finished(
                 user=request.user, game_id=int(request.POST["game"]), platform_id=int(request.POST["platform"])
             )
         else:
-            CatalogManager.mark_game_as_finished(
+            CatalogManager.mark_as_finished(
                 user=request.user,
                 game_id=int(request.POST["game"]),
                 platform_id=int(request.POST["platform"]),
@@ -462,11 +462,11 @@ class GamesAbandonedView(View):
             raise Http404("Invalid URL")
 
         if request.POST.get("_method") == constants.FORM_METHOD_DELETE:
-            CatalogManager.unmark_game_from_abandoned(
+            CatalogManager.unmark_as_abandoned(
                 user=request.user, game_id=int(request.POST["game"]), platform_id=int(request.POST["platform"])
             )
         else:
-            CatalogManager.mark_game_as_abandoned(
+            CatalogManager.mark_as_abandoned(
                 user=request.user, game_id=int(request.POST["game"]), platform_id=int(request.POST["platform"])
             )
 
@@ -508,11 +508,11 @@ class GamesCurrentlyPlayingView(View):
             raise Http404("Invalid URL")
 
         if request.POST.get("_method") == constants.FORM_METHOD_DELETE:
-            CatalogManager.unmark_game_from_currently_playing(
+            CatalogManager.unmark_as_currently_playing(
                 user=request.user, game_id=int(request.POST["game"]), platform_id=int(request.POST["platform"])
             )
         else:
-            CatalogManager.mark_game_as_currently_playing(
+            CatalogManager.mark_as_currently_playing(
                 user=request.user, game_id=int(request.POST["game"]), platform_id=int(request.POST["platform"])
             )
 
@@ -551,12 +551,12 @@ class GamesWishlistedView(View):
             raise Http404("Invalid URL")
 
         if request.POST.get("_method") == constants.FORM_METHOD_DELETE:
-            CatalogManager.remove_game_from_wishlisted(
+            CatalogManager.unmark_as_wishlisted(
                 user=request.user, game_id=int(request.POST["game"]), platform_id=int(request.POST["platform"])
             )
         else:
             if int(request.POST["user"]) == request.user.id:
-                CatalogManager.mark_game_as_wishlisted(
+                CatalogManager.mark_as_wishlisted(
                     user=request.user, game_id=int(request.POST["game"]), platform_id=int(request.POST["platform"]),
                 )
 
