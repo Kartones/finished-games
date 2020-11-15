@@ -22,6 +22,7 @@ class FetchedGame(BaseGame):
     name = models.CharField("Name", max_length=200, unique=False, db_index=True)
     platforms = models.ManyToManyField("FetchedPlatform")
     parent_game = models.ForeignKey("FetchedGame", on_delete=models.CASCADE, null=True, default=None, blank=True)
+    cover = models.CharField("Cover filename", max_length=100, null=True, default=None, blank=True)
 
     @property
     def platforms_list(self) -> str:
@@ -63,7 +64,7 @@ class FetchedGame(BaseGame):
         else:
             platforms = ""
 
-        return "{name}-{publish_date}-{dlc}-{platforms}-{parent}-{fg_game_id}-{source_game_id}-{source_url}".format(
+        return "{name}-{publish_date}-{dlc}-{platforms}-{parent}-{fg_game_id}-{source_game_id}-{source_url}-{cover}".format(  # NOQA: E501
             name=self.name,
             publish_date=self.publish_date,
             dlc=self.dlc_or_expansion,
@@ -72,6 +73,7 @@ class FetchedGame(BaseGame):
             fg_game_id=self.fg_game if self.fg_game else "",
             source_game_id=self.source_game_id,
             source_url=self.source_url,
+            cover=self.cover if self.cover else "",
         )
 
     def __str__(self) -> str:
