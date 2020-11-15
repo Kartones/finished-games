@@ -15,6 +15,7 @@ pytest_cache/*
 .settings/*
 *.db.sqlite3
 finishedgames/web/templates/google-validation.html
+finishedgames/catalogsources/static/img/covers/*.png
 # prod config
 finishedgames/finishedgames/settings/prod.py
 finishedgames/finishedgames/settings/local.py

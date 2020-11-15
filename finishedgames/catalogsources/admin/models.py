@@ -52,6 +52,7 @@ class FetchedGameAdmin(FetchedGameAdminViewsMixin, FGModelAdmin):
     ]
     search_fields = ["name"]
     readonly_fields = [
+        "cover",
         "last_modified_date",
         "change_hash",
     ]
@@ -80,6 +81,7 @@ class FetchedGameAdmin(FetchedGameAdminViewsMixin, FGModelAdmin):
         "dlc_or_expansion",
         "parent_game",
         "hidden",
+        "cover",
         "fg_game",
         "source_game_id",
         ("source_id", "source_url"),

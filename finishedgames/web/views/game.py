@@ -23,6 +23,7 @@ class GameDetailsView(View):
         context = {
             "game": game,
             "authenticated_user_catalog": kwargs["authenticated_user_catalog"],
+            "covers_path": settings.COVERS_URL_PATH,
         }
         return render(request, "game_details.html", context)
 

@@ -121,3 +121,13 @@ CATALOG_SOURCES_ADAPTERS = {}  # type: Dict
 CATALOG_SOURCES_ADAPTER_USER_AGENT = None
 
 PAGINATION_ITEMS_PER_PAGE = 100
+
+# before visual rescaling (in pixelated mode)
+COVER_IMAGE_HEIGHT = 80
+
+# subpath relative to statics path
+COVERS_URL_PATH = "img/covers/"
+
+COVERS_IMPORT_PATH = os.path.join(
+    os.path.join(os.path.join(os.path.join(BASE_DIR, "catalogsources"), "static"), "img"), "covers"
+)

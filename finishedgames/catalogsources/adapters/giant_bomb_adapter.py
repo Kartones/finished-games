@@ -1,4 +1,5 @@
 import json
+import os
 import time
 from typing import Any, Callable, Dict, List, Optional, Tuple, cast  # NOQA: F401
 
@@ -10,6 +11,7 @@ from django.conf import settings
 from django.core.management.base import OutputWrapper
 from django.core.management.color import Style
 from finishedgames import constants
+from PIL import Image
 
 
 # Decorator
@@ -150,7 +152,7 @@ class GiantBombAdapter(BaseAdapter):
 
         # Limit is implicitly 100
         # `platforms` parameter is actually a single platform id filter
-        url = "https://www.giantbomb.com/api/games/?api_key={api_key}&format=json&limit={limit}&offset={offset}&platforms={platform}&field_list=id,name,aliases,platforms,original_release_date,expected_release_year,dlcs,site_detail_url".format(  # NOQA: E501
+        url = "https://www.giantbomb.com/api/games/?api_key={api_key}&format=json&limit={limit}&offset={offset}&platforms={platform}&field_list=id,name,aliases,platforms,original_release_date,expected_release_year,dlcs,site_detail_url,image".format(  # NOQA: E501
             api_key=self.api_key, offset=self.offset, platform=platform_id, limit=self._batch_size
         )
         request = requests.get(url, headers={"user-agent": settings.CATALOG_SOURCES_ADAPTER_USER_AGENT})
@@ -247,6 +249,7 @@ class GiantBombAdapter(BaseAdapter):
                 "source_url": result["site_detail_url"],
                 # TODO: Handle DLCs and parent games
             }
+
             if result["original_release_date"]:
                 # Cheating here, instead of parsing as datetime and extracting year. sample: `1985-07-23 00:00:00`
                 data["publish_date"] = int(result["original_release_date"].split("-")[0])
@@ -259,6 +262,11 @@ class GiantBombAdapter(BaseAdapter):
 
             game = FetchedGame(**data)
 
+            if result["image"] and result["image"]["thumb_url"]:
+                cover_filename = self._fetch_cover(result["image"]["thumb_url"], game.name_for_cover())
+                if cover_filename:
+                    game.cover = cover_filename
+
             platforms = []  # type: List[FetchedPlatform]
             for platform_result in result["platforms"]:
                 # NOTE: Only platforms not hidden will be linked
@@ -269,6 +277,40 @@ class GiantBombAdapter(BaseAdapter):
             entities.append((game, platforms,))
 
         return entities
+
+    def _fetch_cover(self, url: str, filename: str) -> Optional[str]:
+        response = requests.get(url, headers={"user-agent": settings.CATALOG_SOURCES_ADAPTER_USER_AGENT}, stream=True)
+
+        original_path = os.path.join(settings.COVERS_IMPORT_PATH, "o_{}{}".format(filename, url[url.rfind(".") :]))
+        cover_path = os.path.join(settings.COVERS_IMPORT_PATH, filename + ".png")
+
+        if response.status_code == 200:
+            # already have a cover, assume is ok and skip
+            if os.path.exists(cover_path):
+                return filename
+
+            try:
+                with open(original_path, "wb") as file_handle:
+                    for content_chunk in response.iter_content(1024):
+                        file_handle.write(content_chunk)
+
+                # TODO: could read from memory? and avoid lots of IO
+                image = Image.open(original_path)
+                original_size = image.size
+                ratio = settings.COVER_IMAGE_HEIGHT * 100 / original_size[1]
+                new_width = round(original_size[0] * ratio / 100)
+                output_image = image.resize((new_width, settings.COVER_IMAGE_HEIGHT))
+                output_image.save(cover_path, "PNG", optimize=True)
+                os.unlink(original_path)
+
+                self.stdout.write(self.stdout_style.SUCCESS(cover_path))
+                return filename
+            except Exception as error:
+                self.stdout.write(
+                    self.stdout_style.WARNING("Error {} downloading & readying cover from {}".format(error, url))
+                )
+
+        return None
 
     def _get_platform_cached(self, source_platform_id: int) -> Optional[FetchedPlatform]:
         if source_platform_id not in self.platforms_cache:

@@ -9,7 +9,7 @@
 
     {% if game.cover %}
     <div style="min-height: 200px;">
-        <img class="game-cover" src="{% get_static_prefix %}img/cover/{{ game.cover }}.png" width="160" />
+        <img class="game-cover" src="{% get_static_prefix %}{{ covers_path }}{{ game.cover }}.png" height="160" />
     {% endif %}
 
     <h2>{{ game.name }}</h2>
