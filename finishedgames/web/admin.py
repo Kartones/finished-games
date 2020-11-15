@@ -89,7 +89,7 @@ class PlatformAdmin(FGModelAdmin):
 class GameAdmin(FGModelAdmin):
     form = GameForm
     fieldsets = [
-        ("Basic Info", {"fields": ["name", "platforms", "publish_date", "game_url"]}),
+        ("Basic Info", {"fields": ["name", "platforms", "publish_date", "cover", "game_url"]}),
         ("DLCs & Expansions", {"fields": ["dlc_or_expansion", "parent_game"]}),
         ("Advanced", {"fields": ["urls_list", "urls"]}),
     ]

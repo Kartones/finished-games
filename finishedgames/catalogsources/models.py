@@ -44,6 +44,10 @@ class FetchedGame(BaseGame):
 
         self.last_sync_date = self.last_modified_date
 
+    # this is very similar to core.Game.name_for_search but here no need to store it, rather compute on demand
+    def name_for_cover(self) -> str:
+        return "".join([char for char in self.name.lower() if any([char.isalnum(), char in ["-", ".", " "]])])
+
     def save(self, *args: Any, **kwargs: Any) -> None:
         new_changes_hash = self._get_changes_hash()
         if new_changes_hash != self.change_hash:

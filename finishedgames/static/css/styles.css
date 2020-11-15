@@ -116,3 +116,19 @@ a:hover {
 .is-half-transparent {
     opacity: 0.5;
 }
+
+img.game-cover {
+    /* from fallback to browser specific to CSS proposals */
+    image-rendering: optimizeSpeed;
+    image-rendering: -moz-crisp-edges;
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: optimize-contrast;
+    image-rendering: crisp-edges;
+    image-rendering: pixelated;
+    float: left;
+    vertical-align: middle;
+    border: black solid 4px;
+    margin-right: 12px;
+    border-radius: 4px;
+
+}

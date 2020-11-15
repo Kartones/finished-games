@@ -1,18 +1,28 @@
 {% extends "base_with_menu.html" %}
 
+{% load static %}
 {% load web_extras %}
 
 {% block title %}{{ game.name }} - {{ block.super }}{% endblock title %}
 
 {% block content %}
 
-<h2>Game: {{ game.name }}</h2>
+    {% if game.cover %}
+    <div style="min-height: 200px;">
+        <img class="game-cover" src="{% get_static_prefix %}img/cover/{{ game.cover }}.png" width="160" />
+    {% endif %}
 
-{% if game.dlc_or_expansion %}
-    <p><strong>DLC/Expansion of</strong>: <a href="{% url 'game_details' game.parent_game.id %}">{{ game.parent_game.name }}</a></p>
+    <h2>{{ game.name }}</h2>
+
+    {% if game.dlc_or_expansion %}
+        <p><strong>DLC/Expansion of</strong>: <a href="{% url 'game_details' game.parent_game.id %}">{{ game.parent_game.name }}</a></p>
+    {% endif %}
+
+    <p><strong>Year first published</strong>: {{ game.publish_date }}</p>
+
+{% if game.cover %}
+    </div>
 {% endif %}
-
-<p><strong>Year first published</strong>: {{ game.publish_date }}</p>
 
 <p><strong>Available on</strong>:</p>
 <table class="nes-table is-bordered">
