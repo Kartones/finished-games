@@ -128,8 +128,8 @@ COVER_IMAGE_HEIGHT = 80
 # subpath relative to statics path
 COVERS_URL_PATH = "img/covers/"
 
-COVERS_PATH = os.path.join(os.path.join(STATICFILES_DIRS[0], "img"), "covers")
+# source path
+COVERS_IMPORT_PATH = os.path.join(os.path.join(BASE_DIR, "catalogsources"), "import")
 
-COVERS_IMPORT_PATH = os.path.join(
-    os.path.join(os.path.join(os.path.join(BASE_DIR, "catalogsources"), "static"), "img"), "covers"
-)
+# destination path
+COVERS_PATH = os.path.join(os.path.join(STATICFILES_DIRS[0], "img"), "covers")
