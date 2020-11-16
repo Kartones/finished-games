@@ -106,6 +106,7 @@ class FetchedGameAdminViewsMixin(BaseFetchedModelAdmin):
                 "fg_platform_ids": fg_platform_ids,
                 "fg_platforms": "",
                 "fetched_dlc_or_expansion": fetched_game.dlc_or_expansion,
+                "fetched_cover": fetched_game.cover,
                 "source_id": fetched_game.source_id,
                 "source_game_id": fetched_game.source_game_id,
                 "source_url": fetched_game.source_url,
@@ -140,6 +141,7 @@ class FetchedGameAdminViewsMixin(BaseFetchedModelAdmin):
                         "publish_date": fetched_game.fg_game.publish_date,
                         "platforms": platforms_list,
                         "dlc_or_expansion": fetched_game.fg_game.dlc_or_expansion,
+                        "cover": fetched_game.fg_game.cover,
                     }
                 )
 
@@ -165,7 +167,9 @@ class FetchedGameAdminViewsMixin(BaseFetchedModelAdmin):
             context.update({"fetched_game_form": fetched_game_form, "game_form": game_form})
 
             return TemplateResponse(request, "single_game_import_form.html", context)
-        else:
+
+        else:  # if not import_all_games and len(selected_ids) == 1
+
             games_form = GamesImportForm()
 
             if import_all_games:
@@ -238,6 +242,7 @@ class FetchedGameAdminViewsMixin(BaseFetchedModelAdmin):
                 name=name,
                 publish_date_string=game_form.cleaned_data["publish_date"],
                 dlc_or_expansion=game_form.cleaned_data["dlc_or_expansion"],
+                cover=game_form.cleaned_data["cover"],
                 platforms=game_form.cleaned_data["platforms"],
                 fetched_game_id=game_form.cleaned_data["fetched_game_id"],
                 game_id=game_form.cleaned_data["game_id"],
@@ -402,7 +407,9 @@ class FetchedPlatformAdminViewsMixin(BaseFetchedModelAdmin):
             )
 
             return TemplateResponse(request, "single_platform_import_form.html", context)
-        else:
+
+        else:  # if not import_all_platforms and len(selected_ids) == 1
+
             platforms_form = PlatformsImportForm()
 
             if import_all_platforms:

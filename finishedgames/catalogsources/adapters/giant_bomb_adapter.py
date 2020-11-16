@@ -279,16 +279,35 @@ class GiantBombAdapter(BaseAdapter):
         return entities
 
     def _fetch_cover(self, url: str, filename: str) -> Optional[str]:
+        # Upon import, original files will be pre-prended with the source id to avoid collisions.
+        # However, once processed the name is generic and considers only the game name,
+        # so first source to add a cover "wins"
+
+        cover_path = os.path.join(settings.COVERS_IMPORT_PATH, filename + ".png")
+        # already have a cover, assume is ok and skip not even fetching
+        if os.path.exists(cover_path):
+            return filename
+
         response = requests.get(url, headers={"user-agent": settings.CATALOG_SOURCES_ADAPTER_USER_AGENT}, stream=True)
 
-        original_path = os.path.join(settings.COVERS_IMPORT_PATH, "o_{}{}".format(filename, url[url.rfind(".") :]))
-        cover_path = os.path.join(settings.COVERS_IMPORT_PATH, filename + ".png")
+        extension = url[url.rfind(".") :].lower()
+        if len(extension) not in [".png", ".jpg", ".jpeg"]:
+            # Their CDN doesn't contain image extension in the URL
+            if "image/jpeg" in response.headers["content-type"]:
+                extension = ".jpg"
+            elif "image/png" in response.headers["content-type"]:
+                extension = ".png"
+            else:
+                return None
+
+        original_path = os.path.join(
+            settings.COVERS_IMPORT_PATH,
+            "{prefix}_{name}{extension}".format(
+                prefix=GiantBombAdapter.source_id(), name=filename, extension=extension
+            ),
+        )
 
         if response.status_code == 200:
-            # already have a cover, assume is ok and skip
-            if os.path.exists(cover_path):
-                return filename
-
             try:
                 with open(original_path, "wb") as file_handle:
                     for content_chunk in response.iter_content(1024):
