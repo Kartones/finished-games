@@ -273,6 +273,7 @@ class FetchedGameAdminViewsMixin(BaseFetchedModelAdmin):
             "dlcs_or_expansions": [
                 (True if dlc == "true" else False) for dlc in request.POST.getlist("dlcs_or_expansions")
             ],
+            "covers": request.POST.getlist("covers"),
             "platforms_lists": request.POST.getlist("platforms_lists"),
             "parent_game_ids": request.POST.getlist("parent_game_ids"),
             "source_display_names": request.POST.getlist("source_display_names"),
@@ -305,6 +306,7 @@ class FetchedGameAdminViewsMixin(BaseFetchedModelAdmin):
                     name=name,
                     publish_date_string=games_form.cleaned_data["publish_date_strings"][index],
                     dlc_or_expansion=games_form.cleaned_data["dlcs_or_expansions"][index],
+                    cover=games_form.cleaned_data["covers"][index],
                     platforms=platforms,
                     fetched_game_id=games_form.cleaned_data["fetched_game_ids"][index],
                     game_id=game_id,

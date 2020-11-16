@@ -45,7 +45,8 @@ class FetchedGame(BaseGame):
         self.last_sync_date = self.last_modified_date
 
     def name_for_cover(self) -> str:
-        return "".join([char for char in self.name.lower() if any([char.isalnum(), char in [" "]])]).replace(" ", "_")
+        name = "".join([char for char in self.name.lower() if any([char.isalnum(), char in [" "]])]).replace(" ", "_")
+        return name.replace("%20", "_").replace("%", "")
 
     def save(self, *args: Any, **kwargs: Any) -> None:
         new_changes_hash = self._get_changes_hash()

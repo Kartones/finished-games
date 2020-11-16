@@ -292,7 +292,7 @@ class GiantBombAdapter(BaseAdapter):
 
         extension = url[url.rfind(".") :].lower()
         if len(extension) not in [".png", ".jpg", ".jpeg"]:
-            # Their CDN doesn't contain image extension in the URL
+            # Their CDN doesn't contain image extension in the URL sometimes
             if "image/jpeg" in response.headers["content-type"]:
                 extension = ".jpg"
             elif "image/png" in response.headers["content-type"]:
@@ -319,7 +319,8 @@ class GiantBombAdapter(BaseAdapter):
                 ratio = settings.COVER_IMAGE_HEIGHT * 100 / original_size[1]
                 new_width = round(original_size[0] * ratio / 100)
                 output_image = image.resize((new_width, settings.COVER_IMAGE_HEIGHT))
-                output_image.save(cover_path, "PNG", optimize=True)
+                # fixes error 'cannot write mode CMYK as PNG'
+                output_image.convert("RGB").save(cover_path, "PNG", optimize=True)
                 os.unlink(original_path)
 
                 self.stdout.write(self.stdout_style.SUCCESS(cover_path))
