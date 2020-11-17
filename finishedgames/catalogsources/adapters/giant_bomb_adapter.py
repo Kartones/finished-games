@@ -264,7 +264,7 @@ class GiantBombAdapter(BaseAdapter):
 
             if result["image"] and result["image"]["thumb_url"]:
                 cover_filename = self._fetch_cover(result["image"]["thumb_url"], game.name_for_cover())
-                if cover_filename:
+                if cover_filename is not None:
                     game.cover = cover_filename
 
             platforms = []  # type: List[FetchedPlatform]
@@ -290,6 +290,9 @@ class GiantBombAdapter(BaseAdapter):
 
         response = requests.get(url, headers={"user-agent": settings.CATALOG_SOURCES_ADAPTER_USER_AGENT}, stream=True)
 
+        if self._is_placeholder_cover(response):
+            return None
+
         extension = url[url.rfind(".") :].lower()
         if len(extension) not in [".png", ".jpg", ".jpeg"]:
             # Their CDN doesn't contain image extension in the URL sometimes
@@ -308,27 +311,49 @@ class GiantBombAdapter(BaseAdapter):
         )
 
         if response.status_code == 200:
-            try:
-                with open(original_path, "wb") as file_handle:
-                    for content_chunk in response.iter_content(1024):
-                        file_handle.write(content_chunk)
+            return self._resize_cover(response, filename, original_path, cover_path)
 
-                # TODO: could read from memory? and avoid lots of IO
-                image = Image.open(original_path)
-                original_size = image.size
-                ratio = settings.COVER_IMAGE_HEIGHT * 100 / original_size[1]
-                new_width = round(original_size[0] * ratio / 100)
-                output_image = image.resize((new_width, settings.COVER_IMAGE_HEIGHT))
-                # fixes error 'cannot write mode CMYK as PNG'
-                output_image.convert("RGB").save(cover_path, "PNG", optimize=True)
-                os.unlink(original_path)
+        return None
 
-                self.stdout.write(self.stdout_style.SUCCESS(cover_path))
-                return filename
-            except Exception as error:
-                self.stdout.write(
-                    self.stdout_style.WARNING("Error {} downloading & readying cover from {}".format(error, url))
+    def _is_placeholder_cover(self, response: requests.Response) -> bool:
+        return response.headers.get("etag", "") in [
+            "57c944b54644e25ec5695a8a50a44d00",
+            '"57c944b54644e25ec5695a8a50a44d00"',
+        ]
+
+    def _resize_cover(
+        self, response: requests.Response, filename: str, original_path: str, destination_path: str
+    ) -> Optional[str]:
+        try:
+            with open(original_path, "wb") as file_handle:
+                for content_chunk in response.iter_content(1024):
+                    file_handle.write(content_chunk)
+
+            # TODO: could read from memory? and avoid lots of IO
+            image = Image.open(original_path)
+
+            source_width, source_height = image.size
+            if source_width // source_height > 1:
+                new_width = settings.COVER_IMAGE_WIDTH
+                ratio = settings.COVER_IMAGE_WIDTH * 100 // source_width
+                new_height = source_height * ratio // 100
+            else:
+                new_height = settings.COVER_IMAGE_HEIGHT
+                ratio = settings.COVER_IMAGE_HEIGHT * 100 // source_height
+                new_width = source_width * ratio // 100
+            output_image = image.resize((new_width, new_height))
+            # fixes error 'cannot write mode CMYK as PNG'
+            output_image.convert("RGB").save(destination_path, "PNG", optimize=True)
+            os.unlink(original_path)
+
+            self.stdout.write(self.stdout_style.SUCCESS(destination_path))
+            return filename
+        except Exception as error:
+            self.stdout.write(
+                self.stdout_style.WARNING(
+                    "Error {} downloading & readying cover from {}".format(error, response.request.url)
                 )
+            )
 
         return None
 

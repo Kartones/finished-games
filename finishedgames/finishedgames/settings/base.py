@@ -124,6 +124,8 @@ PAGINATION_ITEMS_PER_PAGE = 100
 
 # before visual rescaling (in pixelated mode)
 COVER_IMAGE_HEIGHT = 80
+# for those covers in landscape mode
+COVER_IMAGE_WIDTH = 80
 
 # subpath relative to statics path
 COVERS_URL_PATH = "img/covers/"

@@ -5,7 +5,7 @@ from django.core.management.base import BaseCommand, CommandParser
 
 
 class Command(BaseCommand):
-    help = "Saves and Resyncs all Fetched Games that unsync due to the saving"
+    help = "Resets (removes) covers from all fetched games"
 
     def add_arguments(self, parser: CommandParser) -> None:
         pass
@@ -13,22 +13,20 @@ class Command(BaseCommand):
     def handle(self, *args: Any, **options: Dict) -> None:
         block_size = 100
 
-        fetched_games = FetchedGame.objects.filter(hidden=False)
+        # at least don't unsync those without cover
+        fetched_games = FetchedGame.objects.filter(cover__isnull=False)
 
-        self.sanitize(fetched_games=fetched_games, block_size_for_feedback=block_size)
+        self.reset_cover(fetched_games=fetched_games, block_size_for_feedback=block_size)
 
         self.stdout.write("> Finished")
 
-    def sanitize(self, fetched_games: List[FetchedGame], block_size_for_feedback: int) -> None:
+    def reset_cover(self, fetched_games: List[FetchedGame], block_size_for_feedback: int) -> None:
         count = 0
-        self.stdout.write(self.style.WARNING("> Going to sanitize fetched games"))
+        self.stdout.write(self.style.WARNING("> Going to reset cover of fetched games (doesn't delete cover images)"))
         for fetched_game in fetched_games:
+            fetched_game.cover = None
             # this will update change hash and last modified date if proceeds
             fetched_game.save()
-
-            if not fetched_game.is_sync and fetched_game.can_sync:
-                fetched_game.mark_as_synchronized()
-                fetched_game.save()
 
             count += 1
             if count % block_size_for_feedback == 0:

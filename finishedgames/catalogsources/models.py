@@ -46,6 +46,8 @@ class FetchedGame(BaseGame):
 
     def name_for_cover(self) -> str:
         name = "".join([char for char in self.name.lower() if any([char.isalnum(), char in [" "]])]).replace(" ", "_")
+        if len(name) < 1:
+            name = "{}_{}".format(self.source_id, self.source_game_id)
         return name.replace("%20", "_").replace("%", "")
 
     def save(self, *args: Any, **kwargs: Any) -> None:
