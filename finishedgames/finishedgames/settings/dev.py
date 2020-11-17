@@ -1,3 +1,5 @@
+import os
+
 from .base import *  # NOQA: F401, F403
 
 # To mess around with configuration without ever commiting it to the repository (but neither using prod settings)
@@ -29,3 +31,11 @@ if DJANGO_DEBUG_TOOLBAR_ENABLED:
         "debug_toolbar.panels.sql.SQLPanel",
         # 'debug_toolbar.panels.cache.CachePanel',
     ]
+
+# Static files location for development
+STATICFILES_DIRS = [
+    #  serve first from 'static' (CSS, JS, etc.)
+    os.path.join(BASE_DIR, "static"),  # NOQA: F405
+    # but for example cover images from 'statics'
+    os.path.join(BASE_DIR, "statics"),  # NOQA: F405
+]

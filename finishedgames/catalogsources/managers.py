@@ -1,4 +1,6 @@
+import os
 import re
+from shutil import copyfile
 from typing import List, Optional, Tuple, cast
 
 from catalogsources.helpers import clean_string_field
@@ -28,6 +30,7 @@ class ImportManager:
         name: Optional[str] = None,
         publish_date_string: Optional[str] = None,
         dlc_or_expansion: Optional[bool] = None,
+        cover: Optional[str] = None,
         game_id: Optional[int] = None,
         parent_game_id: Optional[int] = None,
         source_display_name: Optional[str] = None,
@@ -59,6 +62,17 @@ class ImportManager:
                 game.parent_game_id = parent_game_id
             else:
                 game.parent_game = None
+        if include_all_fields or "cover" in cast(List[str], update_fields_filter):
+            # do not error if 'cover' empty (source import might not have it)
+            # Remark: only sets cover if not had one, never updates it
+            if game.cover is None and cover:
+                try:
+                    source_path = os.path.join(settings.COVERS_IMPORT_PATH, cover + ".png")
+                    destination_path = os.path.join(settings.COVERS_PATH, cover + ".png")
+                    copyfile(source_path, destination_path)
+                except Exception as error:
+                    raise GameImportSaveError(str(error))
+                game.cover = cover
 
         # update always the url for this source
         if source_display_name and source_url:
@@ -149,6 +163,7 @@ class ImportManager:
                         name=fixed_name,
                         publish_date_string=str(fetched_game.publish_date),
                         dlc_or_expansion=fetched_game.dlc_or_expansion,
+                        cover=fetched_game.cover,
                         platforms=available_platform_ids,
                         fetched_game_id=fetched_game_id,
                         # TODO: include parent_game
@@ -193,6 +208,7 @@ class ImportManager:
                         name=fixed_name,
                         publish_date_string=str(fetched_game.publish_date),
                         dlc_or_expansion=fetched_game.dlc_or_expansion,
+                        cover=fetched_game.cover,
                         platforms=available_platform_ids,
                         fetched_game_id=fetched_game_id,
                         # TODO: include parent_game
@@ -239,6 +255,7 @@ class ImportManager:
                         name=fetched_game.name,
                         publish_date_string=str(fetched_game.publish_date),
                         dlc_or_expansion=fetched_game.dlc_or_expansion,
+                        cover=fetched_game.cover,
                         platforms=available_platform_ids,
                         game_id=game_id,
                         fetched_game_id=fetched_game_id,
@@ -251,7 +268,7 @@ class ImportManager:
         return errors
 
     @classmethod
-    def sync_fetched_games_publish_date_and_platforms(cls, fetched_game_ids: List[int]) -> Tuple[int, int]:
+    def sync_fetched_games_base_fields(cls, fetched_game_ids: List[int]) -> Tuple[int, int]:
         source_display_names = {
             key: settings.CATALOG_SOURCES_ADAPTERS[key][constants.ADAPTER_DISPLAY_NAME]
             for key in settings.CATALOG_SOURCES_ADAPTERS.keys()
@@ -276,11 +293,12 @@ class ImportManager:
             cls.import_fetched_game(
                 publish_date_string=str(fetched_game.publish_date),
                 platforms=available_platform_ids,
+                cover=fetched_game.cover,
                 game_id=fetched_game.fg_game.id,
                 fetched_game_id=fetched_game_id,
                 source_display_name=source_display_name,
                 source_url=fetched_game.source_url,
-                update_fields_filter=["publish_date", "platforms"],
+                update_fields_filter=["publish_date", "platforms", "cover"],
             )
             count_synced += 1
 
@@ -302,6 +320,7 @@ class ImportManager:
                 name=fetched_game.name,
                 publish_date_string=str(fetched_game.publish_date),
                 dlc_or_expansion=fetched_game.dlc_or_expansion,
+                cover=fetched_game.cover,
                 platforms=available_platform_ids,
                 fetched_game_id=fetched_game_id,
                 # TODO: include parent_game

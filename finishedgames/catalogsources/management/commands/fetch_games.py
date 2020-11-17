@@ -99,6 +99,8 @@ class Command(BaseCommand):
             try:
                 existing_game = FetchedGame.objects.get(source_game_id=game.source_game_id, source_id=game.source_id)
                 existing_game.name = game.name
+                if not existing_game.cover and game.cover is not None:
+                    existing_game.cover = game.cover
                 existing_game.source_game_id = game.source_game_id
                 existing_game.source_id = game.source_id
                 existing_game.source_url = game.source_url

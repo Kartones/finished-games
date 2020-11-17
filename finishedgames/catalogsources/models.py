@@ -22,6 +22,7 @@ class FetchedGame(BaseGame):
     name = models.CharField("Name", max_length=200, unique=False, db_index=True)
     platforms = models.ManyToManyField("FetchedPlatform")
     parent_game = models.ForeignKey("FetchedGame", on_delete=models.CASCADE, null=True, default=None, blank=True)
+    cover = models.CharField("Cover filename", max_length=100, null=True, default=None, blank=True)
 
     @property
     def platforms_list(self) -> str:
@@ -43,6 +44,12 @@ class FetchedGame(BaseGame):
 
         self.last_sync_date = self.last_modified_date
 
+    def name_for_cover(self) -> str:
+        name = "".join([char for char in self.name.lower() if any([char.isalnum(), char in [" "]])]).replace(" ", "_")
+        if len(name) < 1:
+            name = "{}_{}".format(self.source_id, self.source_game_id)
+        return name.replace("%20", "_").replace("%", "")
+
     def save(self, *args: Any, **kwargs: Any) -> None:
         new_changes_hash = self._get_changes_hash()
         if new_changes_hash != self.change_hash:
@@ -63,7 +70,7 @@ class FetchedGame(BaseGame):
         else:
             platforms = ""
 
-        return "{name}-{publish_date}-{dlc}-{platforms}-{parent}-{fg_game_id}-{source_game_id}-{source_url}".format(
+        return "{name}-{publish_date}-{dlc}-{platforms}-{parent}-{fg_game_id}-{source_game_id}-{source_url}-{cover}".format(  # NOQA: E501
             name=self.name,
             publish_date=self.publish_date,
             dlc=self.dlc_or_expansion,
@@ -72,6 +79,7 @@ class FetchedGame(BaseGame):
             fg_game_id=self.fg_game if self.fg_game else "",
             source_game_id=self.source_game_id,
             source_url=self.source_url,
+            cover=self.cover if self.cover else "",
         )
 
     def __str__(self) -> str:

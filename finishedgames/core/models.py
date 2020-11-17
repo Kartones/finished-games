@@ -47,6 +47,7 @@ class Game(BaseGame):
     name_for_search = models.CharField(
         "Simplified name for searches", max_length=200, blank=True, default="", db_index=True
     )
+    cover = models.CharField("Cover filename", max_length=100, null=True, default=None, blank=True)
 
     @property
     def platforms_list(self) -> str:

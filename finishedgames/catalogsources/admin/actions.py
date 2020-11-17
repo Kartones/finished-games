@@ -97,16 +97,14 @@ import_fetched_games_link_automatically_if_name_and_year_matches.short_descripti
 )
 
 
-def sync_fetched_games_publish_date_and_platforms(
-    modeladmin: admin.ModelAdmin, request: HttpRequest, queryset: QuerySet
-) -> None:
+def sync_fetched_games_base_fields(modeladmin: admin.ModelAdmin, request: HttpRequest, queryset: QuerySet) -> None:
     try:
         game_ids = selected_fetched_game_ids(request, modeladmin)
     except ValueError as error:
         messages.error(request, error)
         return
 
-    count_synced, count_skipped = ImportManager.sync_fetched_games_publish_date_and_platforms(game_ids)
+    count_synced, count_skipped = ImportManager.sync_fetched_games_base_fields(game_ids)
 
     if count_skipped:
         messages.warning(
@@ -117,8 +115,8 @@ def sync_fetched_games_publish_date_and_platforms(
         messages.success(request, "Synced: {} games".format(count_synced))
 
 
-sync_fetched_games_publish_date_and_platforms.short_description = (  # type:ignore # NOQA: E305, E501
-    "Sync imported game(s)"
+sync_fetched_games_base_fields.short_description = (  # type:ignore # NOQA: E305, E501
+    "Sync imported game(s) base fields"
 )
 
 

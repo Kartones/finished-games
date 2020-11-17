@@ -6,7 +6,7 @@ from catalogsources.admin.actions import (
     import_fetched_games_fixing_duplicates_appending_publish_date,
     import_fetched_games_link_automatically_if_name_and_year_matches,
     import_fetched_items,
-    sync_fetched_games_publish_date_and_platforms,
+    sync_fetched_games_base_fields,
 )
 from catalogsources.admin.decorators import hyperlink_fg_game, hyperlink_fg_platform, hyperlink_source_url
 from catalogsources.admin.filters import (
@@ -52,6 +52,7 @@ class FetchedGameAdmin(FetchedGameAdminViewsMixin, FGModelAdmin):
     ]
     search_fields = ["name"]
     readonly_fields = [
+        "cover",
         "last_modified_date",
         "change_hash",
     ]
@@ -66,7 +67,7 @@ class FetchedGameAdmin(FetchedGameAdminViewsMixin, FGModelAdmin):
         import_fetched_games_fixing_duplicates_appending_platform,
         import_fetched_games_fixing_duplicates_appending_publish_date,
         import_fetched_games_link_automatically_if_name_and_year_matches,
-        sync_fetched_games_publish_date_and_platforms,
+        sync_fetched_games_base_fields,
     ]
     autocomplete_fields = [
         "fg_game",
@@ -80,6 +81,7 @@ class FetchedGameAdmin(FetchedGameAdminViewsMixin, FGModelAdmin):
         "dlc_or_expansion",
         "parent_game",
         "hidden",
+        "cover",
         "fg_game",
         "source_game_id",
         ("source_id", "source_url"),

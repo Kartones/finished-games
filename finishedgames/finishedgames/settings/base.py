@@ -1,6 +1,6 @@
 """
-For more information on this file, see https://docs.djangoproject.com/en/2.1/topics/settings/
-For the full list of settings and their values, see https://docs.djangoproject.com/en/2.1/ref/settings/
+For more information on this file, see https://docs.djangoproject.com/en/2.2/topics/settings/
+For the full list of settings and their values, see https://docs.djangoproject.com/en/2.2/ref/settings/
 """
 
 import os
@@ -11,7 +11,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__fil
 
 
 # Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/2.1/howto/deployment/checklist/
+# See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = "[8x6?[zLKSKjp?HVU=WVlOjj$B.6n6JljFtG*nS #Ugu=Wh[?1@vmkMcL8nt#t61*G#0X]ju4-by;s.i;:#M){k*o"  # nosec
@@ -74,12 +74,12 @@ TEMPLATES = [
 WSGI_APPLICATION = "finishedgames.wsgi.application"
 
 
-# Database https://docs.djangoproject.com/en/2.1/ref/settings/#databases
+# Database https://docs.djangoproject.com/en/2.2/ref/settings/#databases
 
 DATABASES = {"default": {"ENGINE": "django.db.backends.sqlite3", "NAME": os.path.join(BASE_DIR, "fg-dev.db.sqlite3")}}
 
 
-# Password validation https://docs.djangoproject.com/en/2.1/ref/settings/#auth-password-validators
+# Password validation https://docs.djangoproject.com/en/2.2/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
@@ -88,7 +88,7 @@ AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
 ]
 
-# Internationalization https://docs.djangoproject.com/en/2.1/topics/i18n/
+# Internationalization https://docs.djangoproject.com/en/2.2/topics/i18n/
 LANGUAGE_CODE = "en-us"
 
 TIME_ZONE = "Europe/Madrid"
@@ -96,7 +96,7 @@ USE_I18N = True
 USE_L10N = True
 USE_TZ = True
 
-# Static files (CSS, JavaScript, Images) https://docs.djangoproject.com/en/2.1/howto/static-files/
+# Static files (CSS, JavaScript, Images) https://docs.djangoproject.com/en/2.2/howto/static-files/
 STATIC_URL = "/static/"
 # Static files location for development
 STATICFILES_DIRS = [
@@ -121,3 +121,17 @@ CATALOG_SOURCES_ADAPTERS = {}  # type: Dict
 CATALOG_SOURCES_ADAPTER_USER_AGENT = None
 
 PAGINATION_ITEMS_PER_PAGE = 100
+
+# before visual rescaling (in pixelated mode)
+COVER_IMAGE_HEIGHT = 80
+# for those covers in landscape mode
+COVER_IMAGE_WIDTH = 80
+
+# subpath relative to statics path
+COVERS_URL_PATH = "img/covers/"
+
+# source path
+COVERS_IMPORT_PATH = os.path.join(os.path.join(BASE_DIR, "catalogsources"), "import")
+
+# destination path
+COVERS_PATH = os.path.join(os.path.join(STATICFILES_DIRS[0], "img"), "covers")
