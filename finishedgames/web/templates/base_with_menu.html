@@ -10,7 +10,7 @@
             <a class="nes-btn" href="{% url 'users' %}" title="Users">Users</a>
             {% if user.is_authenticated %}
                 <a class="nes-btn is-right" href="{% url 'logout' %}" title="Logout">Logout</a>
-                <a class="nes-btn is-right" href="{% url 'help' %}" title="Help">?</a>
+                <a class="nes-btn is-right" href="{% url 'help' %}" title="Help">Help</a>
                 <a class="nes-btn is-right" href="{% url 'user_catalog' user.get_username %}" title="Profile">Profile</a>
             {% else %}
                 <a class="nes-btn is-success is-right" href="{% url 'login' %}" title="Login">Login</a>

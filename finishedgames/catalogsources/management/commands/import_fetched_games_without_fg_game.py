@@ -37,7 +37,7 @@ class Command(BaseCommand):
             self.stdout.write("> Excluding unreleased or unknown release date Fetched Games")
         fetched_games = fetched_games[:max_items]
 
-        self.stdout.write("> Going to import {} new Fetched Games:".format(self.style.WARNING(str(len(fetched_games)))))
+        self.stdout.write("> Going to import new Fetched Games")
 
         source_display_names = {
             key: settings.CATALOG_SOURCES_ADAPTERS[key][constants.ADAPTER_DISPLAY_NAME]

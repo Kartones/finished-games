@@ -19,7 +19,7 @@ class Command(BaseCommand):
 
     def sanitize(self, games: List[Union[FetchedGame, Game]], model_name: str, block_size_for_feedback: int) -> None:
         count = 0
-        self.stdout.write(self.style.WARNING("> Going to sanitize {} {}".format(len(games), model_name)))
+        self.stdout.write(self.style.WARNING("> Going to sanitize {}".format(model_name)))
         for game in games:
             game.name = clean_string_field(game.name)
             try:
