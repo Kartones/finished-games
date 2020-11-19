@@ -27,7 +27,7 @@ A user catalog page:
 ![User catalog](finishedgames/doc/user_catalog.png)
 
 User games catalog filtered by platform:
-![User catalog - games filtered by platform](finishedgames/doc/use_games_filtered_by_platform.png)
+![User catalog - games filtered by platform](finishedgames/doc/user_games_filtered_by_platform.png)
 
 Django admin views to manage `Games` and `Platforms`:
 ![Game edit admin view](finishedgames/doc/game_edit.png)
@@ -203,7 +203,8 @@ Also remember that you need to [setup the statics](https://docs.djangoproject.co
 #### Libraries and tools
 
 - `Docker`: for development and testing, partially done for production
-- `requests`
+- `requests`: for fetching APIs and game covers
+- `pillow`: to manipulate and convert game covers
 - `pytest`: configured to run django `TestCase` tests, including code coverage generation and `pytest-randomly` to shuffle test suites order
 - `mypy`: Fully typed code, including django classes
 - Rate-limiting (custom implementation based on a token bucket algorithm)
