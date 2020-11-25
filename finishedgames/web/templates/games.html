@@ -37,11 +37,11 @@
 {# https://developer.mozilla.org/en-US/docs/Web/API/WindowEventHandlers/onbeforeunload #}
 {# purpose of the cleanup is to avoid back button leaving last search typed in in the form #}
 <script type="text/javascript">
-    window.addEventListener('beforeunload', function (e) {
-        delete e['returnValue'];
-        $('#id_{{ game_search_form.game.html_name }}').val(null);
+    window.addEventListener("beforeunload", function (e) {
+        delete e["returnValue"];
+        $("#id_{{ game_search_form.game.html_name }}").val(null);
     });
-    $('#id_{{ game_search_form.game.html_name }}').on('select2:select', function (e) {
+    $("#id_{{ game_search_form.game.html_name }}").on("select2:select", function (e) {
         document.forms["game_search"].submit();
     });
 </script>

@@ -8,12 +8,14 @@ from django.contrib.auth import get_user_model
 from django.core.paginator import Paginator
 from django.db.models.functions import Lower
 from django.db.models.query import QuerySet
-from django.http import Http404, HttpRequest, HttpResponse
+from django.http import Http404, HttpRequest, HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
+from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.views import View
 from web import constants
 from web.decorators import authenticated_user_games, viewed_user
+from web.forms import WishlistedPlatformFilterForm
 
 
 def progress_bar_class(progress: int) -> str:
@@ -527,8 +529,33 @@ class GamesWishlistedView(View):
         if not viewed_user:
             raise Http404("Invalid URL")
 
-        wishlisted_games, sort_by, _ = filter_games(WishlistedUserGame.objects.filter(user=viewed_user), request)
+        platform_filter = request.GET.get("platform")
+
+        queryset = WishlistedUserGame.objects.filter(user=viewed_user)
+        if platform_filter is not None:
+            queryset = queryset.filter(platform__id=platform_filter)
+
+        wishlisted_games, sort_by, _ = filter_games(queryset, request)
         wishlisted_games = wishlisted_games.select_related("game", "platform")
+
+        platform_filter_form = WishlistedPlatformFilterForm()
+
+        platform_filter_form.initial["username"] = viewed_user.username
+        # Django 1.9+ 's disabled doesn't plays well with autocomplete-light
+        platform_filter_form.fields["username"].widget.attrs["readonly"] = True
+        platform_filter_form.fields["filter_type"].widget.attrs["readonly"] = True
+
+        platform_filter_form.fields["platform"].queryset = (
+            Platform.objects.filter(
+                id__in=WishlistedUserGame.objects.filter(user=viewed_user)
+                .values_list("platform__id", flat=True)
+                .distinct()
+            )
+            .only("id", "shortname")
+            .order_by(Lower("shortname"))
+        )
+        if platform_filter is not None:
+            platform_filter_form.initial["platform"] = platform_filter
 
         paginator = Paginator(wishlisted_games, settings.PAGINATION_ITEMS_PER_PAGE)
         page_number = request.GET.get("page", 1)
@@ -542,6 +569,7 @@ class GamesWishlistedView(View):
             "sort_by": sort_by,
             "enabled_fields": [constants.KEY_FIELD_PLATFORM],
             "authenticated_user_catalog": kwargs["authenticated_user_catalog"],
+            "platform_filter_form": platform_filter_form,
         }
 
         return render(request, "user/wishlisted_games.html", context)
@@ -561,3 +589,17 @@ class GamesWishlistedView(View):
                 )
 
         return HttpResponse(status=204)
+
+
+class WishlistedPlatformFilter(View):
+    def get(self, request: HttpRequest, username: str, *args: Any, **kwargs: Any) -> HttpResponse:
+        platform_filter_form = WishlistedPlatformFilterForm(request.GET)
+        if platform_filter_form.is_valid():
+            return HttpResponseRedirect(
+                "{url}?platform={querystring}".format(
+                    url=reverse("user_wishlisted_games", args=[username]),
+                    querystring=platform_filter_form.cleaned_data["platform"].id,
+                )
+            )
+        else:
+            return HttpResponseRedirect(reverse("user_wishlisted_games", args=[username]))

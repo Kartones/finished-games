@@ -15,7 +15,7 @@ UNKNOWN_PUBLISH_DATE = 1970
 
 class BasePlatform(models.Model):
     name = models.CharField("Name", max_length=100, unique=True, db_index=True)
-    shortname = models.CharField("Shortname", max_length=40, unique=True, default=None)
+    shortname = models.CharField("Shortname", max_length=40, unique=True, default=None, db_index=True)
     publish_date = models.IntegerField(
         "Year published", validators=[MinValueValidator(UNKNOWN_PUBLISH_DATE), MaxValueValidator(3000)]
     )

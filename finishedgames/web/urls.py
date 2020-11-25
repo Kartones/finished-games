@@ -20,6 +20,7 @@ urlpatterns = [
     path("platforms/<int:platform_id>/", platform.platform_details, name="platform_details"),
     path("platforms/<int:platform_id>/games/", game.GamesByPlatformView.as_view(), name="games_by_platform"),
     path("search/game-autocomplete/", search.GameAutocompleteView.as_view(), name="game_autocomplete"),
+    path("search/platform-autocomplete/", search.PlatformAutocompleteView.as_view(), name="platform_autocomplete"),
     path("users/", user.users, name="users"),
     path("users/<slug:username>/", user.catalog, name="user_catalog"),
     path("users/<slug:username>/games/", user.GamesView.as_view(), name="user_games"),
@@ -33,6 +34,11 @@ urlpatterns = [
     path("users/<slug:username>/games/pending/", user.GamesPendingView.as_view(), name="user_pending_games"),
     path("users/<slug:username>/games/abandoned/", user.GamesAbandonedView.as_view(), name="user_abandoned_games"),
     path("users/<slug:username>/games/wishlisted/", user.GamesWishlistedView.as_view(), name="user_wishlisted_games"),
+    path(
+        "users/<slug:username>/platforms/search/",
+        user.WishlistedPlatformFilter.as_view(),
+        name="wishlisted_games_platform_filter",
+    ),
     path(
         "users/<slug:username>/platforms/<int:platform_id>/games/",
         user.GamesByPlatformView.as_view(),
