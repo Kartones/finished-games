@@ -1,9 +1,10 @@
 from typing import Any, Optional
 
-from core.models import Game, Platform, WishlistedUserGame
+from core.models import Game, Platform, UserGame, WishlistedUserGame
 from dal import autocomplete
 from django.db.models.functions import Length, Lower
 from django.db.models.query import QuerySet
+from web import constants
 
 
 class GameAutocompleteView(autocomplete.Select2QuerySetView):
@@ -26,20 +27,48 @@ class PlatformAutocompleteView(autocomplete.Select2QuerySetView):
         return item.shortname
 
     def get_queryset(self) -> Optional[QuerySet]:
-        if not self.q:
+        # if in the future used from other places, remove the username present requirement
+        username = self.forwarded.get("username")
+        if not self.q or not username:
             return None
 
         queryset = Platform.objects.all().filter(shortname__contains=self.q.strip().lower())
 
-        # see WishlistedPlatformFilterForm
-        if self.forwarded.get("filter_type", "") == "wishlisted":
-            username = self.forwarded.get("username", None)
-            if username:
-                queryset = queryset.filter(
-                    id__in=WishlistedUserGame.objects.filter(user__username=username)
-                    .values_list("platform__id", flat=True)
-                    .distinct()
-                )
+        # comes from PlatformFilterform
+        filter_type = self.forwarded.get("filter_type", "")
+
+        if filter_type == constants.PLATFORM_FILTER_WISHLISTED:
+            queryset = queryset.filter(
+                id__in=WishlistedUserGame.objects.filter(user__username=username)
+                .values_list("platform__id", flat=True)
+                .distinct()
+            )
+        elif filter_type == constants.PLATFORM_FILTER_FINISHED:
+            queryset = queryset.filter(
+                id__in=UserGame.objects.filter(user__username=username, year_finished__isnull=False)
+                .values_list("platform__id", flat=True)
+                .distinct()
+            )
+        elif filter_type == constants.PLATFORM_FILTER_PENDING:
+            queryset = queryset.filter(
+                id__in=UserGame.objects.filter(user__username=username)
+                .exclude(year_finished__isnull=False)
+                .exclude(abandoned=True)
+                .values_list("platform__id", flat=True)
+                .distinct()
+            )
+        elif filter_type == constants.PLATFORM_FILTER_ABANDONED:
+            queryset = queryset.filter(
+                id__in=UserGame.objects.filter(user__username=username, abandoned=True)
+                .values_list("platform__id", flat=True)
+                .distinct()
+            )
+        elif filter_type == constants.PLATFORM_FILTER_CURRENTLY_PLAYING:
+            queryset = queryset.filter(
+                id__in=UserGame.objects.filter(user__username=username, currently_playing=True)
+                .values_list("platform__id", flat=True)
+                .distinct()
+            )
 
         queryset = queryset.only("id", "shortname").order_by(Length("shortname"), Lower("shortname"))
 

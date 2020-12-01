@@ -1,5 +1,6 @@
 {% extends "base_with_menu.html" %}
 
+{% load static %}
 {% load web_extras %}
 
 {% block title %}{{ viewed_user.get_username.capitalize }} Currently playing games list - {{ block.super }}{% endblock title %}
@@ -9,6 +10,15 @@
 <h2>
     <i class="nes-icon snes-pad is-medium" title="Currently Playing"></i> <span style="vertical-align:text-bottom">{{ viewed_user.get_username.capitalize }} Currently playing games list</span>
 </h2>
+
+<p>
+    <form id="platform_filter" action="{% url 'user_games_platform_filter' viewed_user.get_username %}" method="get">
+        {{ platform_filter_form.platform.label_tag }}
+        {{ platform_filter_form.platform }}
+        {{ platform_filter_form.username }}
+        {{ platform_filter_form.filter_type }}
+    </form>
+</p>
 
 <table class="nes-table is-bordered">
     <thead>
@@ -78,5 +88,17 @@
         </p>
     </div>
 </section>
+
+{{ platform_filter_form.media }}
+
+<script type="text/javascript">
+    let platformFilter = $("#id_{{ platform_filter_form.platform.html_name }}");
+    platformFilter.on("select2:select", function (e) {
+        document.forms["platform_filter"].submit();
+    });
+    platformFilter.on("select2:clearing", function (e) {
+        document.forms["platform_filter"].submit();
+    });
+</script>
 
 {% endblock content %}

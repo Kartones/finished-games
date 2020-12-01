@@ -15,7 +15,7 @@ from django.utils.decorators import method_decorator
 from django.views import View
 from web import constants
 from web.decorators import authenticated_user_games, viewed_user
-from web.forms import WishlistedPlatformFilterForm
+from web.forms import PlatformFilterform
 
 
 def progress_bar_class(progress: int) -> str:
@@ -357,11 +357,36 @@ class GamesPendingView(View):
         if not viewed_user:
             raise Http404("Invalid URL")
 
-        pending_games, _, sort_by, exclude = filter_and_exclude_games(
-            UserGame.objects.filter(user=viewed_user).exclude(year_finished__isnull=False).exclude(abandoned=True),
-            request,
+        queryset = (
+            UserGame.objects.filter(user=viewed_user).exclude(year_finished__isnull=False).exclude(abandoned=True)
         )
+
+        platform_filter = request.GET.get("platform")
+        if platform_filter is not None:
+            queryset = queryset.filter(platform__id=platform_filter)
+
+        pending_games, _, sort_by, exclude = filter_and_exclude_games(queryset, request)
         pending_games = pending_games.select_related("game", "platform")
+
+        platform_filter_form = PlatformFilterform()
+        platform_filter_form.initial["username"] = viewed_user.username
+        platform_filter_form.initial["filter_type"] = constants.PLATFORM_FILTER_PENDING
+        # Django 1.9+ 's disabled doesn't plays well with autocomplete-light
+        platform_filter_form.fields["username"].widget.attrs["readonly"] = True
+        platform_filter_form.fields["filter_type"].widget.attrs["readonly"] = True
+        platform_filter_form.fields["platform"].queryset = (
+            Platform.objects.filter(
+                id__in=UserGame.objects.filter(user=viewed_user)
+                .exclude(year_finished__isnull=False)
+                .exclude(abandoned=True)
+                .values_list("platform__id", flat=True)
+                .distinct()
+            )
+            .only("id", "shortname")
+            .order_by(Lower("shortname"))
+        )
+        if platform_filter is not None:
+            platform_filter_form.initial["platform"] = platform_filter
 
         paginator = Paginator(pending_games, settings.PAGINATION_ITEMS_PER_PAGE)
         page_number = request.GET.get("page", 1)
@@ -376,6 +401,7 @@ class GamesPendingView(View):
             "enabled_statuses": [constants.KEY_GAMES_CURRENTLY_PLAYING],
             "enabled_fields": [constants.KEY_FIELD_PLATFORM],
             "authenticated_user_catalog": kwargs["authenticated_user_catalog"],
+            "platform_filter_form": platform_filter_form,
         }
 
         return render(request, "user/pending_games.html", context)
@@ -389,10 +415,32 @@ class GamesFinishedView(View):
         if not viewed_user:
             raise Http404("Invalid URL")
 
-        finished_games, _, sort_by, exclude = filter_and_exclude_games(
-            UserGame.objects.filter(user=viewed_user).exclude(year_finished__isnull=True), request
-        )
+        queryset = UserGame.objects.filter(user=viewed_user).exclude(year_finished__isnull=True)
+
+        platform_filter = request.GET.get("platform")
+        if platform_filter is not None:
+            queryset = queryset.filter(platform__id=platform_filter)
+
+        finished_games, _, sort_by, exclude = filter_and_exclude_games(queryset, request)
         finished_games = finished_games.select_related("game", "platform")
+
+        platform_filter_form = PlatformFilterform()
+        platform_filter_form.initial["username"] = viewed_user.username
+        platform_filter_form.initial["filter_type"] = constants.PLATFORM_FILTER_FINISHED
+        # Django 1.9+ 's disabled doesn't plays well with autocomplete-light
+        platform_filter_form.fields["username"].widget.attrs["readonly"] = True
+        platform_filter_form.fields["filter_type"].widget.attrs["readonly"] = True
+        platform_filter_form.fields["platform"].queryset = (
+            Platform.objects.filter(
+                id__in=UserGame.objects.filter(user=viewed_user, year_finished__isnull=False)
+                .values_list("platform__id", flat=True)
+                .distinct()
+            )
+            .only("id", "shortname")
+            .order_by(Lower("shortname"))
+        )
+        if platform_filter is not None:
+            platform_filter_form.initial["platform"] = platform_filter
 
         paginator = Paginator(finished_games, settings.PAGINATION_ITEMS_PER_PAGE)
         page_number = request.GET.get("page", 1)
@@ -407,6 +455,7 @@ class GamesFinishedView(View):
             "enabled_statuses": [constants.KEY_GAMES_CURRENTLY_PLAYING, constants.KEY_GAMES_NO_LONGER_OWNED],
             "authenticated_user_catalog": kwargs["authenticated_user_catalog"],
             "enabled_fields": [constants.KEY_FIELD_PLATFORM, constants.KEY_FIELD_YEAR],
+            "platform_filter_form": platform_filter_form,
         }
 
         return render(request, "user/finished_games.html", context)
@@ -438,10 +487,32 @@ class GamesAbandonedView(View):
         if not viewed_user:
             raise Http404("Invalid URL")
 
-        abandoned_Games, sort_by, _ = filter_games(
-            UserGame.objects.filter(user=viewed_user).filter(abandoned=True), request
-        )
+        queryset = UserGame.objects.filter(user=viewed_user, abandoned=True)
+
+        platform_filter = request.GET.get("platform")
+        if platform_filter is not None:
+            queryset = queryset.filter(platform__id=platform_filter)
+
+        abandoned_Games, sort_by, _ = filter_games(queryset, request)
         abandoned_Games = abandoned_Games.select_related("game", "platform")
+
+        platform_filter_form = PlatformFilterform()
+        platform_filter_form.initial["username"] = viewed_user.username
+        platform_filter_form.initial["filter_type"] = constants.PLATFORM_FILTER_ABANDONED
+        # Django 1.9+ 's disabled doesn't plays well with autocomplete-light
+        platform_filter_form.fields["username"].widget.attrs["readonly"] = True
+        platform_filter_form.fields["filter_type"].widget.attrs["readonly"] = True
+        platform_filter_form.fields["platform"].queryset = (
+            Platform.objects.filter(
+                id__in=UserGame.objects.filter(user=viewed_user, abandoned=True)
+                .values_list("platform__id", flat=True)
+                .distinct()
+            )
+            .only("id", "shortname")
+            .order_by(Lower("shortname"))
+        )
+        if platform_filter is not None:
+            platform_filter_form.initial["platform"] = platform_filter
 
         paginator = Paginator(abandoned_Games, settings.PAGINATION_ITEMS_PER_PAGE)
         page_number = request.GET.get("page", 1)
@@ -455,6 +526,7 @@ class GamesAbandonedView(View):
             "sort_by": sort_by,
             "enabled_fields": [constants.KEY_FIELD_PLATFORM],
             "authenticated_user_catalog": kwargs["authenticated_user_catalog"],
+            "platform_filter_form": platform_filter_form,
         }
 
         return render(request, "user/abandoned_games.html", context)
@@ -483,10 +555,32 @@ class GamesCurrentlyPlayingView(View):
         if not viewed_user:
             raise Http404("Invalid URL")
 
-        currently_playing_games, _, sort_by, exclude = filter_and_exclude_games(
-            UserGame.objects.filter(user=viewed_user, currently_playing=True), request
-        )
+        queryset = UserGame.objects.filter(user=viewed_user, currently_playing=True)
+
+        platform_filter = request.GET.get("platform")
+        if platform_filter is not None:
+            queryset = queryset.filter(platform__id=platform_filter)
+
+        currently_playing_games, _, sort_by, exclude = filter_and_exclude_games(queryset, request)
         currently_playing_games = currently_playing_games.select_related("game", "platform")
+
+        platform_filter_form = PlatformFilterform()
+        platform_filter_form.initial["username"] = viewed_user.username
+        platform_filter_form.initial["filter_type"] = constants.PLATFORM_FILTER_CURRENTLY_PLAYING
+        # Django 1.9+ 's disabled doesn't plays well with autocomplete-light
+        platform_filter_form.fields["username"].widget.attrs["readonly"] = True
+        platform_filter_form.fields["filter_type"].widget.attrs["readonly"] = True
+        platform_filter_form.fields["platform"].queryset = (
+            Platform.objects.filter(
+                id__in=UserGame.objects.filter(user=viewed_user, currently_playing=True)
+                .values_list("platform__id", flat=True)
+                .distinct()
+            )
+            .only("id", "shortname")
+            .order_by(Lower("shortname"))
+        )
+        if platform_filter is not None:
+            platform_filter_form.initial["platform"] = platform_filter
 
         paginator = Paginator(currently_playing_games, settings.PAGINATION_ITEMS_PER_PAGE)
         page_number = request.GET.get("page", 1)
@@ -501,6 +595,7 @@ class GamesCurrentlyPlayingView(View):
             "authenticated_user_catalog": kwargs["authenticated_user_catalog"],
             "enabled_statuses": [constants.KEY_GAMES_FINISHED],
             "enabled_fields": [constants.KEY_FIELD_PLATFORM],
+            "platform_filter_form": platform_filter_form,
         }
 
         return render(request, "user/currently_playing_games.html", context)
@@ -529,22 +624,21 @@ class GamesWishlistedView(View):
         if not viewed_user:
             raise Http404("Invalid URL")
 
-        platform_filter = request.GET.get("platform")
-
         queryset = WishlistedUserGame.objects.filter(user=viewed_user)
+
+        platform_filter = request.GET.get("platform")
         if platform_filter is not None:
             queryset = queryset.filter(platform__id=platform_filter)
 
         wishlisted_games, sort_by, _ = filter_games(queryset, request)
         wishlisted_games = wishlisted_games.select_related("game", "platform")
 
-        platform_filter_form = WishlistedPlatformFilterForm()
-
+        platform_filter_form = PlatformFilterform()
         platform_filter_form.initial["username"] = viewed_user.username
+        platform_filter_form.initial["filter_type"] = constants.PLATFORM_FILTER_WISHLISTED
         # Django 1.9+ 's disabled doesn't plays well with autocomplete-light
         platform_filter_form.fields["username"].widget.attrs["readonly"] = True
         platform_filter_form.fields["filter_type"].widget.attrs["readonly"] = True
-
         platform_filter_form.fields["platform"].queryset = (
             Platform.objects.filter(
                 id__in=WishlistedUserGame.objects.filter(user=viewed_user)
@@ -591,15 +685,27 @@ class GamesWishlistedView(View):
         return HttpResponse(status=204)
 
 
-class WishlistedPlatformFilter(View):
+class PlatformFilterSearch(View):
     def get(self, request: HttpRequest, username: str, *args: Any, **kwargs: Any) -> HttpResponse:
-        platform_filter_form = WishlistedPlatformFilterForm(request.GET)
+        filter_type = request.GET.get("filter_type", "wishlisted")
+        if filter_type == constants.PLATFORM_FILTER_FINISHED:
+            destination = "user_finished_games"
+        elif filter_type == constants.PLATFORM_FILTER_PENDING:
+            destination = "user_pending_games"
+        elif filter_type == constants.PLATFORM_FILTER_ABANDONED:
+            destination = "user_abandoned_games"
+        elif filter_type == constants.PLATFORM_FILTER_CURRENTLY_PLAYING:
+            destination = "user_currently_playing_games"
+        else:
+            destination = "user_wishlisted_games"
+
+        platform_filter_form = PlatformFilterform(request.GET)
         if platform_filter_form.is_valid():
             return HttpResponseRedirect(
                 "{url}?platform={querystring}".format(
-                    url=reverse("user_wishlisted_games", args=[username]),
+                    url=reverse(destination, args=[username]),
                     querystring=platform_filter_form.cleaned_data["platform"].id,
                 )
             )
         else:
-            return HttpResponseRedirect(reverse("user_wishlisted_games", args=[username]))
+            return HttpResponseRedirect(reverse(destination, args=[username]))

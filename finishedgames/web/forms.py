@@ -20,7 +20,7 @@ class GameSearchForm(forms.Form):
     )
 
 
-class WishlistedPlatformFilterForm(forms.Form):
+class PlatformFilterform(forms.Form):
     platform = forms.ModelChoiceField(
         label="Filter by platform",
         queryset=Platform.objects.only("id", "shortname").order_by(Lower("shortname")),
@@ -37,4 +37,4 @@ class WishlistedPlatformFilterForm(forms.Form):
         ),
     )
     username = forms.CharField(max_length=100, widget=forms.HiddenInput)
-    filter_type = forms.CharField(initial="wishlisted", min_length=10, max_length=10, widget=forms.HiddenInput)
+    filter_type = forms.CharField(min_length=7, max_length=10, widget=forms.HiddenInput)

@@ -1,7 +1,6 @@
 {% extends "base_with_menu.html" %}
 
 {% load static %}
-
 {% load web_extras %}
 
 {% block title %}{{ viewed_user.get_username.capitalize }} wishlisted games list - {{ block.super }}{% endblock title %}
@@ -13,14 +12,13 @@
 </h2>
 
 <p>
-    <form id="platform_filter" action="{% url 'wishlisted_games_platform_filter' viewed_user.get_username %}" method="get">
+    <form id="platform_filter" action="{% url 'user_games_platform_filter' viewed_user.get_username %}" method="get">
         {{ platform_filter_form.platform.label_tag }}
         {{ platform_filter_form.platform }}
         {{ platform_filter_form.username }}
         {{ platform_filter_form.filter_type }}
     </form>
 </p>
-
 
 <table class="nes-table is-bordered">
     <thead>

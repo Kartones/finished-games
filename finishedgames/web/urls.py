@@ -36,8 +36,8 @@ urlpatterns = [
     path("users/<slug:username>/games/wishlisted/", user.GamesWishlistedView.as_view(), name="user_wishlisted_games"),
     path(
         "users/<slug:username>/platforms/search/",
-        user.WishlistedPlatformFilter.as_view(),
-        name="wishlisted_games_platform_filter",
+        user.PlatformFilterSearch.as_view(),
+        name="user_games_platform_filter",
     ),
     path(
         "users/<slug:username>/platforms/<int:platform_id>/games/",
