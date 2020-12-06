@@ -12,8 +12,10 @@
 
 <body>
     <header>
-        <h1><a href="{% url 'index' %}">Finished Games</a></h1>
-        <p>Track your playing history</p>
+        <div class="header">
+            <h1><a href="{% url 'index' %}">Finished Games</a></h1>
+            <p>Track your playing history</p>
+        </div>
         {% block menu %}{% endblock menu %}
     </header>
 

@@ -1,6 +1,7 @@
 body {
     padding: 0 1.5rem;
     margin: 1.5rem;
+    min-width: 960px;
 }
 
 footer {
@@ -74,6 +75,10 @@ h3.nes-title span {
     margin-bottom: 12px;
 }
 
+.nes-container {
+    padding: 1.25rem 1.5rem;
+}
+
 td.actions {
     display: flex;
 }
@@ -131,4 +136,13 @@ img.game-cover {
     margin-right: 12px;
     border-radius: 4px;
 
+}
+
+div.header {
+    display: inline-flex;
+}
+
+div.header p {
+    margin: auto;
+    margin-left: 2em;
 }
