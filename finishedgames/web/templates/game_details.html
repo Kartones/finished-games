@@ -56,10 +56,12 @@
             <a class="nes-btn is-primary" href="{{ url }}" target="_blank">{{ display_name }}</a>
         </li>
     {% endfor %}
+    {% for display_name, url in EXTRA_GAME_INFO_BUTTONS %}
         <li>
-            <a class="nes-btn is-primary" href="https://howlongtobeat.com/?q={{ game.name_for_search|urlencode }}#search"
-                target="_blank">HowLogToBeat</a>
+            <a class="nes-btn is-primary" href="{{ url }}"
+                target="_blank">{{ display_name }}</a>
         </li>
+    {% endfor  %}
     </ul>
 </p>
 

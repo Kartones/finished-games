@@ -135,3 +135,10 @@ COVERS_IMPORT_PATH = os.path.join(os.path.join(BASE_DIR, "catalogsources"), "imp
 
 # destination path
 COVERS_PATH = os.path.join(os.path.join(STATICFILES_DIRS[0], "img"), "covers")
+
+# Generic external sources of game info to render as buttons at game details page.
+# Format is always (display_name, full_url_containing_placeholder_for_game_name). List order == button order
+EXTRA_GAME_INFO_BUTTONS = [
+    ("HowLongToBeat", "https://howlongtobeat.com/?q={}#search"),
+    ("GameFAQs", "https://gamefaqs.gamespot.com/search?game={}"),
+]

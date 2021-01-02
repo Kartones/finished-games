@@ -1,5 +1,6 @@
 import string
 from typing import Any
+from urllib.parse import quote_plus
 
 from core.models import Game, Platform
 from django.conf import settings
@@ -24,6 +25,10 @@ class GameDetailsView(View):
             "game": game,
             "authenticated_user_catalog": kwargs["authenticated_user_catalog"],
             "covers_path": settings.COVERS_URL_PATH,
+            "EXTRA_GAME_INFO_BUTTONS": [
+                (display_name, url.format(quote_plus(game.name_for_search)))
+                for display_name, url in settings.EXTRA_GAME_INFO_BUTTONS
+            ],
         }
         return render(request, "game_details.html", context)
 
