@@ -117,10 +117,10 @@ class GameFormTests(TestCase):
         game_form = GameForm(game_data)
         self.assertFalse(game_form.is_valid())
         self.assertTrue("platforms" in game_form.errors.keys())
-        self.assertTrue("subset or all of parent game platforms" in game_form.errors["platforms"][0])
+        self.assertTrue("subset/all of parent game platforms" in game_form.errors["platforms"][0])
 
         game_data["platforms"] = [platform_3]
         game_form = GameForm(game_data)
         self.assertFalse(game_form.is_valid())
         self.assertTrue("platforms" in game_form.errors.keys())
-        self.assertTrue("subset or all of parent game platforms" in game_form.errors["platforms"][0])
+        self.assertTrue("subset/all of parent game platforms" in game_form.errors["platforms"][0])

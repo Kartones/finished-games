@@ -12,8 +12,7 @@ class GameAutocompleteView(autocomplete.Select2QuerySetView):
         if not self.q:
             return None
 
-        queryset = Game.objects.all()
-        queryset = queryset.filter(name_for_search__contains=Game.clean_name_for_search(self.q))
+        queryset = Game.objects.filter(name_for_search__contains=Game.clean_name_for_search(self.q))
         queryset = queryset.order_by(Length("name"), Lower("name"))
 
         return queryset
@@ -33,7 +32,9 @@ class PlatformAutocompleteView(autocomplete.Select2QuerySetView):
             return None
 
         # Not a Game, but not worth duplicating or abstracting logic just for this cleaning
-        queryset = Platform.objects.all().filter(shortname__contains=Game.clean_name_for_search(self.q))
+        query = Game.clean_name_for_search(self.q)
+
+        queryset = Platform.objects.filter(shortname__contains=query) | Platform.objects.filter(name__contains=query)
 
         # comes from PlatformFilterform
         filter_type = self.forwarded.get("filter_type", "")
