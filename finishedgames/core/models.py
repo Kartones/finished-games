@@ -73,11 +73,12 @@ class Game(BaseGame):
         )
 
     def save(self, *args: Any, **kwargs: Any) -> None:
-        self.name_for_search = "".join(
-            [char for char in self.name.lower() if any([char.isalnum(), char in ["-", ".", " "]])]
-        )
-
+        self.name_for_search = self.clean_name_for_search(self.name)
         super().save(*args, **kwargs)
+
+    @staticmethod
+    def clean_name_for_search(name: str) -> str:
+        return "".join([char for char in name.strip().lower() if any([char.isalnum(), char in ["-", ".", " "]])])
 
     def __str__(self) -> str:
         dlc_fragment = " [DLC/Expansion]" if self.dlc_or_expansion else ""

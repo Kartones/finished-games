@@ -1,4 +1,3 @@
-import re
 from typing import Any, Optional
 
 from core.models import Game, Platform, UserGame, WishlistedUserGame
@@ -8,18 +7,13 @@ from django.db.models.query import QuerySet
 from web import constants
 
 
-# see core.models.Game.save() for details
-def simplify_query(query: str) -> str:
-    return re.sub(r"[^\w\-. ]", "", query.strip()).lower()
-
-
 class GameAutocompleteView(autocomplete.Select2QuerySetView):
     def get_queryset(self) -> Optional[QuerySet]:
         if not self.q:
             return None
 
         queryset = Game.objects.all()
-        queryset = queryset.filter(name_for_search__contains=simplify_query(self.q))
+        queryset = queryset.filter(name_for_search__contains=Game.clean_name_for_search(self.q))
         queryset = queryset.order_by(Length("name"), Lower("name"))
 
         return queryset
@@ -38,7 +32,8 @@ class PlatformAutocompleteView(autocomplete.Select2QuerySetView):
         if not self.q or not username:
             return None
 
-        queryset = Platform.objects.all().filter(shortname__contains=simplify_query(self.q))
+        # Not a Game, but not worth duplicating or abstracting logic just for this cleaning
+        queryset = Platform.objects.all().filter(shortname__contains=Game.clean_name_for_search(self.q))
 
         # comes from PlatformFilterform
         filter_type = self.forwarded.get("filter_type", "")
