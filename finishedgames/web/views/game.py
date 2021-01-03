@@ -21,13 +21,19 @@ class GameDetailsView(View):
     def get(self, request: HttpRequest, game_id: int, *args: Any, **kwargs: Any) -> HttpResponse:
         game = get_object_or_404(Game.objects.select_related("parent_game"), pk=game_id)
 
+        # If needed, could do support multiple platforms and check intersection deltas, for now only filtering for PC so
+        # simplified
         context = {
             "game": game,
             "authenticated_user_catalog": kwargs["authenticated_user_catalog"],
             "covers_path": settings.COVERS_URL_PATH,
             "EXTRA_GAME_INFO_BUTTONS": [
                 (display_name, url.format(quote_plus(game.name_for_search)))
-                for display_name, url in settings.EXTRA_GAME_INFO_BUTTONS
+                for display_name, url, platform_filter in settings.EXTRA_GAME_INFO_BUTTONS
+                if (
+                    platform_filter is None
+                    or {platform_filter} - set(game.platforms.values_list("id", flat=True)) == set()
+                )
             ],
         }
         return render(request, "game_details.html", context)

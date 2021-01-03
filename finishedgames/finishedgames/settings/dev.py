@@ -39,3 +39,7 @@ STATICFILES_DIRS = [
     # but for example cover images from 'statics'
     os.path.join(BASE_DIR, "statics"),  # NOQA: F405
 ]
+
+EXTRA_GAME_INFO_BUTTONS += [  # NOQA: F405
+    ("PCGamingWiki", "https://www.pcgamingwiki.com/w/index.php?search={}&title=Special%3ASearch", 10),
+]
