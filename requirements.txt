@@ -1,5 +1,5 @@
 django==2.2.17
-requests==2.25.0
+requests==2.25.1
 # Note: 3.5.1 is stable, 3.8.1 broke the games search. Test before upgrading
 django-autocomplete-light==3.5.1
 Pillow==7.2.0

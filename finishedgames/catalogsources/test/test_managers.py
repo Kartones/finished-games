@@ -3,7 +3,7 @@ from unittest.mock import MagicMock, patch
 from catalogsources.managers import ImportManager
 from catalogsources.models import FetchedGame
 from core.models import Game
-from core.test.helpers import create_game, create_platform, create_user
+from core.test.tests_helpers import create_game, create_platform, create_user
 from django.test import TestCase
 
 AN_IRRELEVANT_YEAR = 2000

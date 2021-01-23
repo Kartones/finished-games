@@ -19,14 +19,14 @@ def source_class_from_id(source_id: str) -> Type[BaseAdapter]:
 
 
 class TimeProfiler:
-    def __init__(self, use_performance_counter=False):
+    def __init__(self, use_performance_counter: bool = False) -> None:
         self.use_performance_counter = use_performance_counter
         self.duration = 0.0
 
-    def __enter__(self):
+    def __enter__(self) -> "TimeProfiler":
         self.start = time.perf_counter() if self.use_performance_counter else time.time()
         return self
 
-    def __exit__(self, *args):
+    def __exit__(self, *args: str) -> None:
         self.end = time.perf_counter() if self.use_performance_counter else time.time()
         self.duration = self.end - self.start

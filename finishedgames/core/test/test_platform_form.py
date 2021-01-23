@@ -1,21 +1,22 @@
 from datetime import datetime
+from typing import Any, Dict
 
 from core.forms import PlatformForm
-from core.test.helpers import create_platform
+from core.test.tests_helpers import create_platform
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 
 
 class PlatformFormTests(TestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         self.platform_1 = create_platform()
 
-    def test_platform_names_are_unique(self):
+    def test_platform_names_are_unique(self) -> None:
         platform_data = {
             "name": "a unique name",
             "shortname": "a unique shortname",
             "publish_date": datetime.now().year,
-        }
+        }  # type: Dict[str, Any]
         create_platform(name=platform_data["name"], shortname=platform_data["shortname"])
 
         platform_form = PlatformForm(platform_data)
@@ -25,12 +26,12 @@ class PlatformFormTests(TestCase):
         self.assertTrue("shortname" in platform_form.errors.keys())
         self.assertTrue("already exists" in platform_form.errors["shortname"][0])
 
-    def test_platform_name_uniqueness_is_case_insensitive(self):
+    def test_platform_name_uniqueness_is_case_insensitive(self) -> None:
         platform_data = {
             "name": "A Case Sensitive Unique Name",
             "shortname": "A Case Sensitive Unique Shortname",
             "publish_date": datetime.now().year,
-        }
+        }  # type: Dict[str, Any]
         create_platform(name=platform_data["name"], shortname=platform_data["shortname"])
 
         platform_2_data = platform_data.copy()

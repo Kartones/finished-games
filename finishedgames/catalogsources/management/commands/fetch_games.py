@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Tuple, cast
+from typing import Dict, List, Tuple, cast
 
 from catalogsources.helpers import clean_string_field
 from catalogsources.management.helpers import TimeProfiler, source_class_from_id, wait_if_needed
@@ -15,7 +15,7 @@ class Command(BaseCommand):
         parser.add_argument("offset", type=int)
         parser.add_argument("platforms", nargs="+", type=int)
 
-    def handle(self, *args: Any, **options: Dict) -> None:
+    def handle(self, *args: str, **options: Dict) -> None:
         self._display_legend()
         self._fetch_source(
             source_id=cast(str, options["source"]),
@@ -23,7 +23,7 @@ class Command(BaseCommand):
             initial_offset=cast(int, options["offset"]),
         )
 
-    def _fetch_source(self, source_id: str, platforms: List[int], initial_offset=0) -> None:
+    def _fetch_source(self, source_id: str, platforms: List[int], initial_offset: int = 0) -> None:
         had_errors = False
         self.stdout.write(
             self.style.WARNING(
@@ -134,7 +134,7 @@ class Command(BaseCommand):
 
     @staticmethod
     def _source_has_plaforms(source_id: str) -> bool:
-        return FetchedPlatform.objects.filter(source_id=source_id).count() > 0
+        return cast(bool, FetchedPlatform.objects.filter(source_id=source_id).count() > 0)
 
     def _display_legend(self) -> None:
         self.stdout.write(self.style.WARNING("Legend: "))

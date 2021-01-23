@@ -1,5 +1,5 @@
-from typing import Dict  # NOQA: F401
+# type: ignore
 
 from .base import *  # NOQA: F401, F403
 
-DATABASES = {}  # type: Dict
+DATABASES = {}

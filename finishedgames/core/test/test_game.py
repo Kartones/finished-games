@@ -3,7 +3,7 @@ from django.test import TestCase
 
 
 class GameTests(TestCase):
-    def test_can_add_new_url_to_empty_urls_list(self):
+    def test_can_add_new_url_to_empty_urls_list(self) -> None:
         a_display_name = "an irrelevant name"
         a_url = "an irrelevant url"
 
@@ -13,7 +13,7 @@ class GameTests(TestCase):
         game.upsert_url(display_name=a_display_name, url=a_url)
         self.assertEqual(game.urls_dict, {a_display_name: a_url})
 
-    def test_can_add_new_url_to_existing_urls_list(self):
+    def test_can_add_new_url_to_existing_urls_list(self) -> None:
         a_display_name = "an irrelevant name"
         another_display_name = "another irrelevant name"
         a_url = "an irrelevant url"
@@ -26,7 +26,7 @@ class GameTests(TestCase):
         game.upsert_url(display_name=another_display_name, url=another_url)
         self.assertEqual(game.urls_dict, {a_display_name: a_url, another_display_name: another_url})
 
-    def test_updates_existing_url_with_new_data(self):
+    def test_updates_existing_url_with_new_data(self) -> None:
         a_display_name = "an irrelevant name"
         another_display_name = "another irrelevant name"
         a_url = "an irrelevant url"
@@ -40,7 +40,7 @@ class GameTests(TestCase):
         game.upsert_url(display_name=a_display_name, url=a_new_url)
         self.assertEqual(game.urls_dict, {a_display_name: a_new_url, another_display_name: another_url})
 
-    def test_stores_searchable_name_on_creation(self):
+    def test_stores_searchable_name_on_creation(self) -> None:
         name = "F.E.A.R.: Perseus Mandate"
         expected_searchable_name = "f.e.a.r. perseus mandate"
 
@@ -48,7 +48,7 @@ class GameTests(TestCase):
         game.save()
         self.assertEqual(game.name_for_search, expected_searchable_name)
 
-    def test_updates_searchable_name_on_modification(self):
+    def test_updates_searchable_name_on_modification(self) -> None:
         initial_name = "F.E.A.R.: Perseus Mandate"
         updated_name = "F.E.A.R.: First Encounter Assault Recon"
         expected_searchable_name = "f.e.a.r. first encounter assault recon"

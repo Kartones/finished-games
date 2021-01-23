@@ -1,6 +1,6 @@
 import uuid
 from datetime import datetime
-from typing import List, Optional, Union
+from typing import List, Optional, Union, cast
 
 from core.forms import GameForm, PlatformForm
 from core.models import Game, Platform
@@ -16,7 +16,7 @@ def create_platform(name: Optional[str] = None, shortname: Optional[str] = None)
             "publish_date": datetime.now().year,
         }
     )
-    return platform_form.save()
+    return cast(Platform, platform_form.save())
 
 
 def create_game(
@@ -34,7 +34,7 @@ def create_game(
             "parent_game": parent_game,
         }
     )
-    return game_form.save()
+    return cast(Game, game_form.save())
 
 
 def create_user(username: Optional[str] = None, username_slug: Optional[str] = None) -> settings.AUTH_USER_MODEL:
