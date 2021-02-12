@@ -93,6 +93,30 @@ Or, once you have fetched platforms from a given source, fetch games of one or m
 python3 manage.py fetch_games <source_id> <platform_id_1> [<platform_id_2> ...]
 ```
 
+Now you will contain `Fetched Platforms` and `Fetched Games`, which you need to add to the main catalog (so they appear on the website), or hide them if you do not wish to import. This allows to make changes, handle conflicts, and the like without editing live data.
+
+When using the Admin site to browse fetched items, there are custom convenience *Actions* available, like marking as hidden or importing to the main catalog.
+
+There's also a handy and self-descriptive command:
+```
+# import up to 500 new games; exclude_unreleased skips those with date `1970` (unknown or, typically, not yet released)
+python3 manage.py import_fetched_games_without_fg_game 500 --exclude_unreleased
+```
+
+Then, when a game becomes updated, either from a fetch (e.g. gets released on new platforms) or from a manual edit in the admin interface, its `sync` state will be `false`. You can filter to see only un-synced games, and sync them from the web, but again there's a command that will do smart sync:
+```
+# sync up to 500 games out of sync
+python3 manage.py sync_games 500
+```
+The command will sync:
+- Game cover
+- Publish date (if greater than imported game's publish date)
+- New platforms (platforms not already present in the imported game). Note that it won't remove platforms.
+
+
+----
+
+
 Sample screenshot of a games fetch command execution:
 ![Games fetch command execution](finishedgames/doc/fetch_games_command.png)
 
@@ -102,12 +126,6 @@ There are customized django views to manage all the fetched data:
 ![Fetched game import admin view](finishedgames/doc/fetched_game_import.png)
 
 ![Fetched platform import admin view](finishedgames/doc/fetched_platform_import.png)
-
-And you can import both `Fetched Platforms` and `Fetched Games` to the main catalog (so they appear on the website), or hide them if you do not wish to import them.
-
-No detailed instructions are provided on how to work with fetched items, but don't worry about your existing catalog, fetched data always goes to different tables and must be manually imported into the catalog to avoid overriding things by mistake.
-
-When using the Admin site to browse fetched items, there are custom convenience *Actions* available, like marking as hidden or importing to the main catalog.
 
 ### Fetch and import flow
 
