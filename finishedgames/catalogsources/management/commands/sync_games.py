@@ -5,6 +5,7 @@ from catalogsources.models import FetchedGame
 from django.conf import settings
 from django.core.management.base import BaseCommand, CommandParser
 from django.db.models import F
+
 from finishedgames import constants
 
 
@@ -43,11 +44,16 @@ class Command(BaseCommand):
 
             self.stdout.write("{} ({}) ".format(fetched_game.name, fetched_game.id), ending="")
 
-            available_platforms = []  # type: List[int]
-            # TODO: Only if specified
-            # for platform in fetched_game.platforms.all():
-            #     if platform.fg_platform:
-            #        available_platforms.append(platform.fg_platform.id)
+            available_platforms = [platform.id for platform in fetched_game.fg_game.platforms.all()]  # type: List[int]
+
+            for platform in fetched_game.platforms.all():
+                if platform.fg_platform and (platform.fg_platform.id not in available_platforms):
+                    available_platforms.append(platform.fg_platform.id)
+
+            if fetched_game.publish_date > fetched_game.fg_game.publish_date:
+                publish_date = fetched_game.publish_date
+            else:
+                publish_date = fetched_game.fg_game.publish_date
 
             try:
                 error_message = ""
@@ -57,12 +63,12 @@ class Command(BaseCommand):
                     source_display_name=source_display_names[fetched_game.source_id],
                     source_url=fetched_game.source_url,
                     # name=fetched_game.name,
-                    # publish_date_string=fetched_game.publish_date,
+                    publish_date_string=publish_date,
                     # dlc_or_expansion=fetched_game.dlc_or_expansion,
                     platforms=available_platforms,
                     # parent_game_id=None,
                     cover=fetched_game.cover,
-                    update_fields_filter=["cover"],
+                    update_fields_filter=["cover", "publish_date", "platforms"],
                 )
             except GameImportSaveError as error:
                 error_message = str(error)
