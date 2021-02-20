@@ -1,7 +1,7 @@
-coverage==5.3.1
+coverage==5.4
 django-debug-toolbar==3.2
-mypy==0.800
-pre-commit==2.10.0
+mypy==0.812
+pre-commit==2.10.1
 pytest==6.2.2
 pytest-cov==2.11.1
 pytest-django==4.1.0
