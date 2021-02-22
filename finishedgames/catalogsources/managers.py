@@ -7,6 +7,7 @@ from catalogsources.helpers import clean_string_field
 from catalogsources.models import FetchedGame, FetchedPlatform
 from core.models import UNKNOWN_PUBLISH_DATE, Game, Platform
 from django.conf import settings
+
 from finishedgames import constants
 
 
@@ -268,7 +269,7 @@ class ImportManager:
         return errors
 
     @classmethod
-    def sync_fetched_games_base_fields(cls, fetched_game_ids: List[int]) -> Tuple[int, int]:
+    def sync_fetched_games(cls, fetched_game_ids: List[int], force_sync: bool = False) -> Tuple[int, int]:
         source_display_names = {
             key: settings.CATALOG_SOURCES_ADAPTERS[key][constants.ADAPTER_DISPLAY_NAME]
             for key in settings.CATALOG_SOURCES_ADAPTERS.keys()
@@ -279,20 +280,26 @@ class ImportManager:
         for fetched_game_id in fetched_game_ids:
             fetched_game = FetchedGame.objects.filter(id=fetched_game_id).get()
 
-            if not fetched_game.can_sync or fetched_game.is_sync:
+            if not fetched_game.can_sync or (fetched_game.is_sync and not force_sync):
                 count_skipped += 1
                 continue
 
-            available_platform_ids = []  # List[int]
+            available_platforms = [platform.id for platform in fetched_game.fg_game.platforms.all()]  # type: List[int]
+
             for platform in fetched_game.platforms.all():
-                if platform.fg_platform:
-                    available_platform_ids.append(platform.fg_platform.id)
+                if platform.fg_platform and (platform.fg_platform.id not in available_platforms):
+                    available_platforms.append(platform.fg_platform.id)
+
+            if fetched_game.publish_date > fetched_game.fg_game.publish_date:
+                publish_date = fetched_game.publish_date
+            else:
+                publish_date = fetched_game.fg_game.publish_date
 
             source_display_name = source_display_names[fetched_game.source_id]
 
             cls.import_fetched_game(
-                publish_date_string=str(fetched_game.publish_date),
-                platforms=available_platform_ids,
+                publish_date_string=publish_date,
+                platforms=available_platforms,
                 cover=fetched_game.cover,
                 game_id=fetched_game.fg_game.id,
                 fetched_game_id=fetched_game_id,

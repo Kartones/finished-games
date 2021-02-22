@@ -11,6 +11,9 @@ cov_html/*
 pytest_cache/*
 .project
 .pydevproject
+
+finishedgames/*.json
+finishedgames/static/img/covers/*
 .settings
 .settings/*
 *.db.sqlite3

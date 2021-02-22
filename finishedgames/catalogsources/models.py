@@ -52,6 +52,7 @@ class FetchedGame(BaseGame):
 
     def save(self, *args: Any, **kwargs: Any) -> None:
         new_changes_hash = self._get_changes_hash()
+
         if new_changes_hash != self.change_hash:
             self.change_hash = new_changes_hash
             self.last_modified_date = timezone.now()

@@ -8,6 +8,7 @@ from django.contrib import admin, messages
 from django.db.models import F
 from django.db.models.query import QuerySet
 from django.http import HttpRequest, HttpResponseRedirect
+
 from finishedgames import constants
 
 
@@ -104,7 +105,7 @@ def sync_fetched_games_base_fields(modeladmin: admin.ModelAdmin, request: HttpRe
         messages.error(request, error)
         return
 
-    count_synced, count_skipped = ImportManager.sync_fetched_games_base_fields(game_ids)
+    count_synced, count_skipped = ImportManager.sync_fetched_games(game_ids)
 
     if count_skipped:
         messages.warning(
