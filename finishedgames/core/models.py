@@ -5,6 +5,7 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
+from django.db.models.functions import Lower
 
 URLS_KEY_VALUE_GLUE = "||"
 URLS_ITEMS_GLUE = "@@"
@@ -32,7 +33,8 @@ class Platform(BasePlatform):
 class BaseGame(models.Model):
     name = models.CharField("Name", max_length=200, unique=True, db_index=True)
     publish_date = models.IntegerField(
-        "Year first published", validators=[MinValueValidator(UNKNOWN_PUBLISH_DATE), MaxValueValidator(3000)],
+        "Year first published",
+        validators=[MinValueValidator(UNKNOWN_PUBLISH_DATE), MaxValueValidator(3000)],
     )
     dlc_or_expansion = models.BooleanField("DLC/Expansion", default=False)
     platforms = models.ManyToManyField(Platform)
@@ -51,7 +53,7 @@ class Game(BaseGame):
 
     @property
     def platforms_list(self) -> str:
-        return ", ".join((platform.shortname for platform in self.platforms.all()))
+        return ", ".join((platform.shortname for platform in self.platforms.order_by(Lower("shortname"))))
 
     @property
     def urls_dict(self) -> Dict[str, str]:

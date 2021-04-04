@@ -5,6 +5,22 @@
 
 {% block title %}{{ game.name }} - {{ block.super }}{% endblock title %}
 
+{% block microformats %}
+    <meta property="og:locale" content="en" />
+    <meta property="og:site_name" content="Finished Games" />
+    <meta itemprop="name" content="{{ game.name }}" />
+    <meta property="og:title" content="{{ game.name }}" />
+    <meta property="og:type" content="article" />
+    <meta property="og:description" content="First published: {{ game.publish_date }}. Platforms: {{ game.platforms_list }}" />
+    <meta property="article:author" content="" />
+    <meta property="og:url" content="{% url 'game_details' game.id %}" />
+    {% if game.cover %}
+        <meta itemprop="image" content="{% get_static_prefix %}{{ covers_path }}{{ game.cover }}.png" />
+        <meta property="og:image" content="{% get_static_prefix %}{{ covers_path }}{{ game.cover }}.png" />
+        <link href="{% get_static_prefix %}{{ covers_path }}{{ game.cover }}.png" rel="image_src" />
+    {% endif %}
+{% endblock microformats %}
+
 {% block content %}
 
     {% if game.cover %}
