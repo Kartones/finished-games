@@ -1,4 +1,4 @@
-django==2.2.21
+django==2.2.24
 requests==2.25.1
 # Note: 3.5.1 is stable, 3.8.1 broke the games search. Test before upgrading
 django-autocomplete-light==3.5.1
