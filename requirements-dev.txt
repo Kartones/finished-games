@@ -1,6 +1,8 @@
 coverage==5.5
 django-debug-toolbar==3.2.1
-mypy==0.812
+mypy==0.901
+# type hints for requests package
+types-requests
 pre-commit==2.13.0
 pytest==6.2.4
 pytest-cov==2.12.1
