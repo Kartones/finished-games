@@ -34,10 +34,6 @@ Django admin views to manage `Games` and `Platforms`:
 
 ![Platform edit admin view](finishedgames/doc/platform_edit.png)
 
-You can see a live demo of the project at [https://finishedgames.kartones.net](https://finishedgames.kartones.net) (user accounts restricted to only friends, not for public use, sorry!).
-
-Also, [navigating to the help](https://finishedgames.kartones.net/help/) quickly explains the meaning of the action buttons.
-
 ### Notes
 
 Javascript uses features from ES2015 and assumes a modern browser, which means: not outdated Firefox, Chrome, Safari or Edge. Internet Explorer and other older browsers are not supported.
