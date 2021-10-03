@@ -10,8 +10,9 @@ from catalogsources.models import FetchedGame, FetchedPlatform
 from django.conf import settings
 from django.core.management.base import OutputWrapper
 from django.core.management.color import Style
-from finishedgames import constants
 from PIL import Image
+
+from finishedgames import constants
 
 
 # Decorator
@@ -262,7 +263,7 @@ class GiantBombAdapter(BaseAdapter):
 
             game = FetchedGame(**data)
 
-            if result["image"] and result["image"]["thumb_url"]:
+            if result["image"] and result["image"]["thumb_url"] and settings.USE_COVERS:
                 cover_filename = self._fetch_cover(result["image"]["thumb_url"], game.name_for_cover())
                 if cover_filename is not None:
                     game.cover = cover_filename
@@ -274,7 +275,12 @@ class GiantBombAdapter(BaseAdapter):
                 if fetched_platform:
                     platforms.append(fetched_platform)
 
-            entities.append((game, platforms,))
+            entities.append(
+                (
+                    game,
+                    platforms,
+                )
+            )
 
         return entities
 
