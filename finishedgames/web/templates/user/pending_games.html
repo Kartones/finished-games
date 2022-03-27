@@ -7,7 +7,7 @@
 
 {% block content %}
 
-<h2><i class="nes-icon trophy is-empty" title="Finished"></i> {{ viewed_user.get_username.capitalize }} Pending games list</h2>
+<h2><i class="nes-icon trophy is-empty" title="Pending"></i> {{ viewed_user.get_username.capitalize }} Pending games list</h2>
 
 <p>
     <form id="platform_filter" action="{% url 'user_games_platform_filter' viewed_user.get_username %}" method="get">
