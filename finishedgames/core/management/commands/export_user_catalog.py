@@ -57,8 +57,7 @@ class Command(BaseCommand):
                     "platform_id": user_game.platform.id,
                     "currently_playing": user_game.currently_playing,
                     "finished": user_game.finished,
-                    "year_finished": user_game.year_finished,
-                    # Not exporting the `no_longer_owned` field on purpose
+                    # Not exporting: `no_longer_owned`, `year_finished`
                     "abandoned": user_game.abandoned,
                 }
             )
