@@ -18,7 +18,8 @@ RUN getent passwd $uid || useradd -m -u $uid -g $gid finished-games
 RUN chown -R $uid:$gid /usr/local
 
 # To upgrade pip below
-RUN apt-get update
+RUN apt-get update -y \
+  && rm -rf /var/lib/apt/lists/*
 
 USER $uid
 
