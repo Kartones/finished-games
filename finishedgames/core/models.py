@@ -80,7 +80,14 @@ class Game(BaseGame):
 
     @staticmethod
     def clean_name_for_search(name: str) -> str:
-        return "".join([char for char in name.strip().lower() if any([char.isalnum(), char in ["-", ".", " "]])])
+        name_without_date_suffix = name.split(" (")[0]
+        return "".join(
+            [
+                char
+                for char in name_without_date_suffix.strip().lower()
+                if any([char.isalnum(), char in ["-", ".", " "]])
+            ]
+        )
 
     def __str__(self) -> str:
         dlc_fragment = " [DLC/Expansion]" if self.dlc_or_expansion else ""

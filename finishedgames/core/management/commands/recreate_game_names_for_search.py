@@ -21,7 +21,6 @@ class Command(BaseCommand):
         for game in games:
             game.save()
             counter += 1
-            self.stdout.write(".", ending="")
             if counter % 50 == 0:
                 self.stdout.write(" {:.3f}%".format(counter * 100 / games_count))
 
