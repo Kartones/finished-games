@@ -38,9 +38,8 @@ jobs:
           paths:
             - ./cache
           key: v1-dependencies-dev-{{ checksum "requirements-dev.txt" }}
-
       - run:
-          command: pytest
+          command: python -m pytest
           shell: /bin/bash
           working_directory: ~/project/finishedgames
           environment:
