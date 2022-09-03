@@ -137,21 +137,6 @@
                         </div>
                     </div>
                     <div class="form-row">
-                        <div>
-                            {{ fetched_game_form.fetched_cover.label_tag }}
-                            <div class="with-copy-btn">
-                                <div class="readonly" id="id_{{ fetched_game_form.fetched_cover.html_name }}">
-                                    <span>{{fetched_game_form.fetched_cover.value}}</span>
-                                </div>
-                                <input id="{{ fetched_game_form.fetched_cover.html_name }}"
-                                    data-source="id_{{ fetched_game_form.fetched_cover.html_name }}"
-                                    data-destination="id_{{ game_form.cover.html_name }}"
-                                    onclick="copyField(this)" type="button" value="➤" class="btn-operation"
-                                    title="Copy value">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="form-row">
                         <label for="parent_game">
                             {{ fetched_game_form.fetched_parent_game_name.label }}:<br/><br/>
                             Must be mapped to a catalog game
@@ -283,15 +268,6 @@
                                 {{ game_form.dlc_or_expansion }}
                                 <input data-target="id_{{ game_form.dlc_or_expansion.html_name }}"
                                     data-original="{{ game_form.dlc_or_expansion.value }}" onclick="revertField(this)"
-                                    type="button" value="↺" class="btn-operation" title="Reset to original value">
-                            </div>
-                        </div>
-                        <div class="form-row">
-                            <div class="checkbox-row">
-                                {{ game_form.cover.label_tag }}
-                                {{ game_form.cover }}
-                                <input data-target="id_{{ game_form.cover.html_name }}"
-                                    data-original="{{ game_form.cover.value }}" onclick="revertField(this)"
                                     type="button" value="↺" class="btn-operation" title="Reset to original value">
                             </div>
                         </div>

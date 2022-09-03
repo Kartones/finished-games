@@ -25,9 +25,7 @@ class GameDetailsView(View):
         # simplified
         context = {
             "game": game,
-            "use_covers": settings.USE_COVERS,
             "authenticated_user_catalog": kwargs["authenticated_user_catalog"],
-            "covers_path": settings.COVERS_URL_PATH,
             "EXTRA_GAME_INFO_BUTTONS": [
                 (display_name, url.format(quote_plus(game.name_for_search)))
                 for display_name, url, platform_filter in settings.EXTRA_GAME_INFO_BUTTONS

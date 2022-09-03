@@ -9,8 +9,6 @@ from typing import Dict  # NOQA: F401
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-USE_COVERS = True
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
 
@@ -122,20 +120,6 @@ CATALOG_SOURCES_ADAPTERS = {}  # type: Dict
 CATALOG_SOURCES_ADAPTER_USER_AGENT = None
 
 PAGINATION_ITEMS_PER_PAGE = 100
-
-# before visual rescaling (in pixelated mode)
-COVER_IMAGE_HEIGHT = 80
-# for those covers in landscape mode
-COVER_IMAGE_WIDTH = 80
-
-# subpath relative to statics path
-COVERS_URL_PATH = "img/covers/"
-
-# source path
-COVERS_IMPORT_PATH = os.path.join(os.path.join(BASE_DIR, "catalogsources"), "import")
-
-# destination path
-COVERS_PATH = os.path.join(os.path.join(STATICFILES_DIRS[0], "img"), "covers")
 
 # Generic external sources of game info to render as buttons at game details page.
 # Format: (display_name, full_url_containing_placeholder_for_game_name, optional_platform_id_filter)

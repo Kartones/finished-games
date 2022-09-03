@@ -32,14 +32,4 @@
             <a href="?{% query_update request exclude=None sort_by=constants.SORT_BY_ABANDONED %}"><i class="nes-icon skull" title="Abandoned"></i></a>
         {% endif %}
     {% endif %}
-
-    {% if constants.KEY_GAMES_NO_LONGER_OWNED in enabled_statuses %}
-        {% if sort_by == constants.SORT_BY_NO_LONGER_OWNED %}
-            <a href="?{% query_update request sort_by=constants.SORT_BY_NO_LONGER_OWNED_DESC exclude=exclude %}"><i class="nes-icon snes-pad is-disabled" title="No longer owned"></i>&#8595;</a>
-        {% elif sort_by == constants.SORT_BY_NO_LONGER_OWNED_DESC %}
-            <a href="?{% query_update request sort_by=constants.SORT_BY_NO_LONGER_OWNED exclude=exclude %}"><i class="nes-icon snes-pad is-disabled" title="No longer owned"></i>&#8593;</a>
-        {% else %}
-            <a href="?{% query_update request sort_by=constants.SORT_BY_NO_LONGER_OWNED exclude=exclude %}"><i class="nes-icon snes-pad is-disabled" title="No longer owned"></i></a>
-        {% endif %}
-    {% endif %}
 </th>

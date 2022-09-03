@@ -52,7 +52,6 @@ def authenticated_user_games(wrapped_function: Callable) -> Any:
             constants.KEY_GAMES_WISHLISTED: wishlisted_games,
             constants.KEY_GAMES_CURRENTLY_PLAYING: currently_playing_games,
             constants.KEY_GAMES_FINISHED: finished_games,
-            constants.KEY_GAMES_NO_LONGER_OWNED: no_longer_owned_games,
             constants.KEY_GAMES_ABANDONED: abandoned_games,
         }
         return wrapped_function(request, *args, **kwargs)

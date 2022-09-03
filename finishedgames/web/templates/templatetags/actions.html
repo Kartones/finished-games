@@ -110,33 +110,6 @@
         </button>
     </form>
 
-    <form action="{% url 'user_no_longer_owned_games' user.get_username %}"
-            onsubmit="{% send_action_data constants.FORM_ACTION_REMOVE_NOT_OWNED item_generic_id %}"
-            id="{{ constants.FORM_ACTION_REMOVE_NOT_OWNED }}{{ item_generic_id }}"
-            style="{% if item_generic_id not in authenticated_user_catalog.games or item_generic_id not in authenticated_user_catalog.not_owned %}display:none{% endif %}">
-            {% csrf_token %}
-        <input type="hidden" name="_method" value="{{ constants.FORM_METHOD_DELETE }}" />
-        <input type="hidden" name="user" value="{{ user.id }}" />
-        <input type="hidden" name="game" value="{{ game_id }}" />
-        <input type="hidden" name="platform" value="{{ platform_id }}" />
-        <button class="nes-btn is-primary" type="submit" title="Remove no longer owned mark">
-            <i class="nes-icon snes-pad is-disabled" title="Remove no longer owned mark"></i>
-        </button>
-    </form>
-
-    <form action="{% url 'user_no_longer_owned_games' user.get_username %}"
-            onsubmit="{% send_action_data constants.FORM_ACTION_NOT_OWNED item_generic_id %}"
-            id="{{ constants.FORM_ACTION_NOT_OWNED }}{{ item_generic_id }}"
-            style="{% if item_generic_id not in authenticated_user_catalog.games or item_generic_id in authenticated_user_catalog.not_owned %}display:none{% endif %}">
-        {% csrf_token %}
-        <input type="hidden" name="user" value="{{ user.id }}" />
-        <input type="hidden" name="game" value="{{ game_id }}" />
-        <input type="hidden" name="platform" value="{{ platform_id }}" />
-        <button class="nes-btn" type="submit" title="Mark as no longer owned">
-            <i class="nes-icon snes-pad is-disabled" title="Mark as no longer owned"></i>
-        </button>
-    </form>
-
     <form action="{% url 'user_games' user.get_username %}"
           onsubmit="{% send_action_data constants.FORM_ACTION_REMOVE_FROM_CATALOG item_generic_id %}"
           id="{{ constants.FORM_ACTION_REMOVE_FROM_CATALOG }}{{ item_generic_id }}"

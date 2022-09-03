@@ -60,7 +60,6 @@ class Command(BaseCommand):
                     dlc_or_expansion=fetched_game.dlc_or_expansion,
                     platforms=available_platforms,
                     fetched_game_id=fetched_game.id,
-                    cover=fetched_game.cover,
                     game_id=None,
                     parent_game_id=None,
                     source_display_name=source_display_names[fetched_game.source_id],
