@@ -80,7 +80,7 @@ class FetchedGame(BaseGame):
             fg_game_id=self.fg_game if self.fg_game else "",
             source_game_id=self.source_game_id,
             source_url=self.source_url,
-            cover=self.cover if self.cover else "",
+            cover="",
         )
 
     def __str__(self) -> str:

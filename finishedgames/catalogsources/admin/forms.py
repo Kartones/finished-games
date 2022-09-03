@@ -71,7 +71,6 @@ class SingleFetchedGameImportForm(forms.Form):
     fg_platform_ids = forms.CharField(label="Fetched Platform Ids", disabled=True)
     fg_platforms = forms.CharField(label="Fetched Platforms", disabled=True)
     fetched_dlc_or_expansion = forms.BooleanField(label="DLC/Expansion", disabled=True)
-    fetched_cover = forms.CharField(label="Cover filename", disabled=True)
     source_id = forms.CharField(label="Source identifier", max_length=50, disabled=True)
     source_game_id = forms.CharField(label="Source game identifier", max_length=50, disabled=True)
     source_url = forms.CharField(label="Resource source URI", max_length=255, disabled=True)
@@ -97,13 +96,6 @@ class SingleGameImportForm(forms.Form):
     )
     platforms = forms.ModelMultipleChoiceField(queryset=Platform.objects.order_by(Lower("name")))
     dlc_or_expansion = forms.BooleanField(label="DLC/Expansion", initial=False, required=False)
-    cover = forms.CharField(
-        label="Cover filename",
-        max_length=100,
-        initial="",
-        required=False,
-        widget=forms.TextInput(attrs={"size": "60", "class": "vTextField"}),
-    )
     parent_game = forms.ModelChoiceField(
         label="Parent game",
         queryset=Game.objects.order_by(Lower("name")),
@@ -129,7 +121,6 @@ class GamesImportForm(forms.Form):
     names = SimpleArrayField(forms.CharField(max_length=200))
     publish_date_strings = SimpleArrayField(forms.CharField(max_length=4))
     dlcs_or_expansions = SimpleArrayField(forms.BooleanField(required=False))
-    covers = SimpleArrayField(forms.CharField(max_length=100, required=False))
     platforms_lists = SimpleArrayField(forms.CharField(max_length=500))
     parent_game_ids = SimpleArrayField(forms.IntegerField())
     source_display_names = SimpleArrayField(forms.CharField(max_length=255))

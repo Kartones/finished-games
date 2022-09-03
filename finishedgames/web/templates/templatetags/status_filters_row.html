@@ -22,12 +22,4 @@
             <i class="nes-icon skull is-empty is-half-transparent" title="Pending"></i>
         {% endif %}
     {% endif %}
-
-    {% if constants.KEY_GAMES_NO_LONGER_OWNED in enabled_statuses %}
-        {% if user_game.no_longer_owned %}
-            <i class="nes-icon snes-pad is-disabled" title="No longer owned"></i>
-        {% else %}
-            <i class="nes-icon snes-pad is-empty is-half-transparent" title="Owned"></i>
-        {% endif %}
-    {% endif %}
 </td>

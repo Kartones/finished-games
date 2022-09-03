@@ -14,20 +14,9 @@
     <meta property="og:description" content="First published: {{ game.publish_date }}. Platforms: {{ game.platforms_list }}" />
     <meta property="article:author" content="" />
     <meta property="og:url" content="{% url 'game_details' game.id %}" />
-    {% if use_covers and game.cover %}
-        <meta itemprop="image" content="{% get_static_prefix %}{{ covers_path }}{{ game.cover }}.png" />
-        <meta property="og:image" content="{% get_static_prefix %}{{ covers_path }}{{ game.cover }}.png" />
-        <link href="{% get_static_prefix %}{{ covers_path }}{{ game.cover }}.png" rel="image_src" />
-    {% endif %}
 {% endblock microformats %}
 
 {% block content %}
-
-    {% if use_covers and game.cover %}
-    <div style="min-height: 200px;">
-        <img class="game-cover" src="{% get_static_prefix %}{{ covers_path }}{{ game.cover }}.png" height="160" />
-    {% endif %}
-
     <h2>{{ game.name }}</h2>
 
     {% if game.dlc_or_expansion %}
@@ -35,10 +24,6 @@
     {% endif %}
 
     <p><strong>Year first published</strong>: {{ game.publish_date }}</p>
-
-{% if game.cover %}
-    </div>
-{% endif %}
 
 <p><strong>Available on</strong>:</p>
 <table class="nes-table is-bordered">

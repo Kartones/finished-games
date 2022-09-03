@@ -7,7 +7,7 @@ from django.db.models import F
 
 
 class Command(BaseCommand):
-    help = "Syncs already imported, not hidden, Fetched Games cover"
+    help = "Syncs already imported, not hidden, Fetched Games"
 
     def add_arguments(self, parser: CommandParser) -> None:
         parser.add_argument("max_items", type=int)
