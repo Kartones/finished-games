@@ -31,5 +31,6 @@
         "breaking"
       ]
     }
-  ]
+  ],
+  "ignoreDeps": ["django-autocomplete-light"]
 }
