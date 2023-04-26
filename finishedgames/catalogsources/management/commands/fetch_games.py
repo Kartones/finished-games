@@ -58,10 +58,9 @@ class Command(BaseCommand):
                 for platform_id in platforms:
                     # For now at least, if fails gathering a platform, try with next one
                     while adapter.has_more_items() and not had_errors:
+                        total = "-"
                         if adapter.total_results != adapter.UNKOWN_TOTAL_RESULTS_VALUE:
-                            total = adapter.total_results
-                        else:
-                            total = "-"
+                            total = str(adapter.total_results)
                         self.stdout.write(
                             "\n> Fetch call (platform_id {id}): {current}/{total}".format(
                                 id=platform_id, current=adapter.next_offset, total=total

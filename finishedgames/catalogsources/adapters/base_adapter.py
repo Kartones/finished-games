@@ -17,7 +17,8 @@ class BaseAdapter(ABC):
 
     @abstractmethod
     def __init__(self, stdout: OutputWrapper, stdout_color_style: Style) -> None:
-        pass
+        self.total_results = 0
+        self.next_offset = 0
 
     @abstractmethod
     def __enter__(self) -> "BaseAdapter":

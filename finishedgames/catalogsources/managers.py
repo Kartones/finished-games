@@ -93,7 +93,7 @@ class ImportManager:
         shortname: str,
         publish_date_string: str,
         fetched_platform_id: int,
-        platform_id: int = None,
+        platform_id: Optional[int] = None,
         update_fields_filter: Optional[List[str]] = None,
     ) -> None:
         if platform_id:
