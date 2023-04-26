@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Any, Callable, Dict, List, Optional, Tuple  # NOQA: F401
+from typing import Any, Dict, List, Optional, Tuple  # NOQA: F401
 
 from core.managers import CatalogManager
 from core.models import Platform, UserGame, WishlistedUserGame
@@ -267,7 +267,6 @@ class GamesView(View):
                 constants.KEY_GAMES_CURRENTLY_PLAYING,
                 constants.KEY_GAMES_FINISHED,
                 constants.KEY_GAMES_ABANDONED,
-                constants.KEY_GAMES_NO_LONGER_OWNED,
             ],
             "enabled_fields": [constants.KEY_FIELD_PLATFORM],
             "authenticated_user_catalog": kwargs["authenticated_user_catalog"],
@@ -340,7 +339,6 @@ class GamesByPlatformView(View):
                 constants.KEY_GAMES_CURRENTLY_PLAYING,
                 constants.KEY_GAMES_FINISHED,
                 constants.KEY_GAMES_ABANDONED,
-                constants.KEY_GAMES_NO_LONGER_OWNED,
             ],
             "enabled_fields": [],
             "authenticated_user_catalog": kwargs["authenticated_user_catalog"],
@@ -452,7 +450,7 @@ class GamesFinishedView(View):
             "finished_games_count": paginator.count,
             "constants": constants,
             "sort_by": sort_by,
-            "enabled_statuses": [constants.KEY_GAMES_CURRENTLY_PLAYING, constants.KEY_GAMES_NO_LONGER_OWNED],
+            "enabled_statuses": [constants.KEY_GAMES_CURRENTLY_PLAYING],
             "authenticated_user_catalog": kwargs["authenticated_user_catalog"],
             "enabled_fields": [constants.KEY_FIELD_PLATFORM, constants.KEY_FIELD_YEAR],
             "platform_filter_form": platform_filter_form,

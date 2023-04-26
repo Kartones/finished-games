@@ -32,5 +32,8 @@
       ]
     }
   ],
+  "pip_requirements": {
+    "fileMatch": ["(^|/)([\\w-]*)requirements([\\w-]*)\\.txt$"]
+  },
   "ignoreDeps": ["django-autocomplete-light"]
 }

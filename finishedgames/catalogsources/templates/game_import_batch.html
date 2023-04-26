@@ -39,7 +39,6 @@
             <input type="checkbox" name="fields" value="publish_date" checked>Publish Date<br />
             <input type="checkbox" name="fields" value="platforms" checked>Platforms<br />
             <input type="checkbox" name="fields" value="dlc_or_expansion">DLC/Expansion<br />
-            <input type="checkbox" name="fields" value="cover">Cover<br />
             <input type="checkbox" name="fields" value="parent_game">Parent Game<br />
         </p>
 
@@ -81,8 +80,6 @@
                         value="{{ fetched_game.publish_date }}">
                     <input type="hidden" name="{{games_form.dlcs_or_expansions.html_name}}"
                         value="{% if fetched_game.dlc_or_expansion %}true{% else %}false{% endif %}">
-                    <input type="hidden" name="{{games_form.covers.html_name}}"
-                        value="{{ fetched_game.cover }}">
                     <input type="hidden" name="{{games_form.platforms_lists.html_name}}"
                         value="{{ platforms }}">
                     {% if fetched_game.parent_game and fetched_game.parent_game.fg_game %}
