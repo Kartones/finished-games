@@ -4,8 +4,8 @@ django-debug-toolbar==3.2.4
 mypy==1.5.1
 # type hints for requests package
 types-requests
-pre-commit==3.3.3
-pytest==7.4.0
+pre-commit==3.4.0
+pytest==7.4.1
 pytest-cov==4.1.0
 pytest-django==4.5.2
 pytest-randomly==3.15.0
