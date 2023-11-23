@@ -1,7 +1,7 @@
 coverage==7.3.2
 # 3.3.0 no longer supports django < 3.2
 django-debug-toolbar==3.2.4
-mypy==1.7.0
+mypy==1.7.1
 # type hints for requests package
 types-requests
 pre-commit==3.5.0
