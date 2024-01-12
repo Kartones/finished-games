@@ -230,7 +230,7 @@ Also remember that you need to [setup the statics](https://docs.djangoproject.co
 
 #### Django features
 
-- Django >= 2.2
+- Django >= 2.2 , < 3
 - Extensive ORM usage, including `select_related()` and `prefetch_related()`, query optimizations (`only()`, `values_list()`, ...)
 - custom model managers
 - `Paginator` component for pagination
