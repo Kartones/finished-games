@@ -83,8 +83,8 @@ def query_update(request: HttpRequest, **kwargs: Any) -> str:
 
 @lru_cache(maxsize=12)
 def _build_action_data(action_id: str) -> str:
-    display_div_ids = constants.ACTIONS_BUTTONS_MAPPING[action_id]["show"]  # type: ignore
-    hide_div_ids = constants.ACTIONS_BUTTONS_MAPPING[action_id]["hide"]  # type: ignore
+    display_div_ids = constants.ACTIONS_BUTTONS_MAPPING[action_id]["show"]
+    hide_div_ids = constants.ACTIONS_BUTTONS_MAPPING[action_id]["hide"]
     # Small hack to overcome lack of partial string format substitution, using a partial function makes it more messy
     item_template = "'{div_id}{{item_generic_id}}'"
 
