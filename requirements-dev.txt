@@ -1,4 +1,4 @@
-coverage==7.5.4
+coverage==7.6.0
 # 3.3.0 no longer supports django < 3.2
 django-debug-toolbar==3.2.4
 mypy==1.10.1
