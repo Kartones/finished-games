@@ -1,6 +1,6 @@
 # Beginning with python 3.12, needed for distutils
 setuptools==75.1.0
-django==2.2.28
+django==4.2.16
 requests==2.32.3
 # Note: 3.5.1 is stable, 3.8.1 broke the games search. Test before upgrading
 django-autocomplete-light==3.5.1
