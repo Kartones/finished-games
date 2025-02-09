@@ -86,7 +86,7 @@ def calculate_progress_counters(unfiltered_user_games: QuerySet) -> Tuple[int, i
     # counters use unfiltered list
     unfiltered_games_count = unfiltered_user_games.count()
     currently_playing_games_count = unfiltered_user_games.filter(currently_playing=True).count()
-    finished_games_count = unfiltered_user_games.exclude(year_finished__isnull=True).count()
+    finished_games_count = unfiltered_user_games.exclude(year_finished__isnull=True).exclude(abandoned=True).count()
     abandoned_games_count = unfiltered_user_games.filter(abandoned=True).count()
     completed_games_count = finished_games_count + abandoned_games_count
     pending_games_count = unfiltered_games_count - completed_games_count
@@ -134,7 +134,7 @@ def catalog(request: HttpRequest, username: str) -> HttpResponse:
     user_platforms_count = Platform.objects.filter(id__in=user_platform_ids).count()
 
     currently_playing_games_count = all_user_games.filter(currently_playing=True).count()
-    finished_games_count = all_user_games.exclude(year_finished__isnull=True).count()
+    finished_games_count = all_user_games.exclude(year_finished__isnull=True).exclude(abandoned=True).count()
     abandoned_games_count = all_user_games.filter(abandoned=True).count()
     completed_games_count = finished_games_count + abandoned_games_count
     pending_games_count = user_games_count - completed_games_count
@@ -539,7 +539,10 @@ class GamesAbandonedView(View):
             )
         else:
             CatalogManager.mark_as_abandoned(
-                user=request.user, game_id=int(request.POST["game"]), platform_id=int(request.POST["platform"])
+                user=request.user,
+                game_id=int(request.POST["game"]),
+                platform_id=int(request.POST["platform"]),
+                year_finished=datetime.now().year,
             )
 
         return HttpResponse(status=204)

@@ -174,22 +174,26 @@ class UserGameTests(TestCase):
         UserGame.objects.get(user=another_user.id, game_id=another_game.id, platform_id=self.platform.id)
 
     def test_mark_as_abandoned_sets_and_unsets_proper_fields(self) -> None:
-        an_irrelevant_year = 2000
+        an_irrelevant_finished_year = 2000
+        an_irrelevant_abandoned_year = 2020
         self.user_game.currently_playing = True
-        self.user_game.year_finished = an_irrelevant_year
+        self.user_game.year_finished = an_irrelevant_finished_year
         self.user_game.save()
 
-        CatalogManager.mark_as_abandoned(self.user, self.game.id, self.platform.id)
+        CatalogManager.mark_as_abandoned(self.user, self.game.id, self.platform.id, an_irrelevant_abandoned_year)
 
         self.user_game.refresh_from_db()
         self.assertTrue(self.user_game.abandoned)
         self.assertFalse(self.user_game.currently_playing)
         self.assertFalse(self.user_game.finished)
+        self.assertEqual(self.user_game.year_finished, an_irrelevant_abandoned_year)
 
     def test_unmark_as_abandoned_sets_proper_field(self) -> None:
-        CatalogManager.mark_as_abandoned(self.user, self.game.id, self.platform.id)
+        an_irrelevant_abandoned_year = 2020
+        CatalogManager.mark_as_abandoned(self.user, self.game.id, self.platform.id, an_irrelevant_abandoned_year)
 
         CatalogManager.unmark_as_abandoned(self.user, self.game.id, self.platform.id)
 
         self.user_game.refresh_from_db()
         self.assertFalse(self.user_game.abandoned)
+        self.assertEqual(self.user_game.year_finished, None)

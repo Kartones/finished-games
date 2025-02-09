@@ -13,6 +13,6 @@ services:
       - ../..:/code
       - ../..:/opt/finished-games
       - ~/.bash_history.finished-games:/home/finished-games/.bash_history
-    command: "bash -c 'exec python manage.py runserver 0.0.0.0:5000'"
+    command: "bash -c 'exec python manage.py runserver 0.0.0.0:5001'"
     ports:
-        - "0.0.0.0:5000:5000"
+        - "0.0.0.0:5001:5001"

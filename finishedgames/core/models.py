@@ -123,7 +123,7 @@ class UserGame(BaseUserGame):
 
     @property
     def finished(self) -> bool:
-        return self.year_finished is not None
+        return self.year_finished is not None and not self.abandoned
 
     def __str__(self) -> str:
         return "{}: {} ({})".format(self.user.get_username(), self.game.name, self.platform.shortname)
