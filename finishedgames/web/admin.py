@@ -53,8 +53,8 @@ class CustomUserAdmin(auth.admin.UserAdmin):
 
 
 class UserGameAdmin(FGModelAdmin):
-    list_display = ["game", "user", "platform", "currently_playing", "year_finished", "no_longer_owned", "abandoned"]
-    list_filter = ["user__username", "platform", "currently_playing", "year_finished", "no_longer_owned", "abandoned"]
+    list_display = ["game", "user", "platform", "currently_playing", "year_finished", "abandoned"]
+    list_filter = ["user__username", "platform", "currently_playing", "year_finished", "abandoned"]
     search_fields = ["game__name"]
     autocomplete_fields = ["user", "game"]
 
@@ -93,7 +93,7 @@ class GameAdmin(FGModelAdmin):
         ("DLCs & Expansions", {"fields": ["dlc_or_expansion", "parent_game"]}),
         ("Advanced", {"fields": ["urls_list", "urls"]}),
     ]
-    list_display = ["name", "platforms_list", "dlc_or_expansion", "parent_game"]
+    list_display = ["name", "publish_date", "platforms_list", "dlc_or_expansion", "parent_game"]
     list_filter = ["dlc_or_expansion", "platforms"]
     search_fields = ["name"]
     autocomplete_fields = ["parent_game"]
