@@ -75,7 +75,7 @@ Admin site is accessible from [http://0.0.0.0:5000/admin/](http://0.0.0.0:5000/a
 
 ## Fetching and importing from external sources
 
-You can manually add `Games` and `Platforms` to your catalog, but this can become a titanic task. The included `catalogsources` django app provides an extensible adapter-based system to fetch data from external sources that provide APIs. This repo includes connectors for [GiantBomb](https://www.giantbomb.com/api/) and [MobyGames](https://www.mobygames.com/info/api), but **you must always request your own API keys and setup them** (see `finishedgames/finishedgames/settings/prod.py.sample` for expected configuration format).
+You can manually add `Games` and `Platforms` to your catalog, but this can become a titanic task. The included `catalogsources` django app provides an extensible adapter-based system to fetch data from external sources that provide APIs. This repo includes a connector for [GiantBomb](https://www.giantbomb.com/api/), but **you must always request your own API keys and setup them** (see `finishedgames/finishedgames/settings/prod.py.sample` for expected configuration format).
 
 Once you have added your key(s) to the settings, you can invoke fetching of platforms using a Django command:
 ```
