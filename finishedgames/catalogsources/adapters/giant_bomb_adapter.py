@@ -98,6 +98,10 @@ class GiantBombAdapter(BaseAdapter):
     def batch_size(self) -> int:
         return self._batch_size
 
+    def rate_limited(self) -> None:
+        self.token_bucket = 0
+        self.last_check_timestamp = time.time()
+
     @rate_limit
     def fetch_platforms_block(self) -> List[FetchedPlatform]:
         self.offset = self.next_offset
@@ -115,6 +119,9 @@ class GiantBombAdapter(BaseAdapter):
             except json.decoder.JSONDecodeError:
                 self.stdout.write(self.stdout_style.ERROR("Unable to decode content as JSON"))
                 self.errored = True
+        elif request.status_code == 429:
+            self.rate_limited()
+            return []
         else:
             self.errored = True
             self.stdout.write(
@@ -162,6 +169,9 @@ class GiantBombAdapter(BaseAdapter):
             except json.decoder.JSONDecodeError:
                 self.stdout.write(self.stdout_style.ERROR("Unable to decode content as JSON"))
                 self.errored = True
+        elif request.status_code == 429:
+            self.rate_limited()
+            return []
         else:
             self.errored = True
             self.stdout.write(
