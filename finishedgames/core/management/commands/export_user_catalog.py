@@ -6,7 +6,7 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.management.base import BaseCommand, CommandParser
 
-COUNTER_NEWLINE_AFTER_AMOUNT = 200
+COUNTER_NEWLINE_AFTER_AMOUNT = 250
 
 
 class Command(BaseCommand):
@@ -63,9 +63,8 @@ class Command(BaseCommand):
                 }
             )
 
-            self.stdout.write(".", ending="")
             if counter % COUNTER_NEWLINE_AFTER_AMOUNT == 0:
-                self.stdout.write(" {}".format(counter))
+                self.stdout.write("{}".format(counter))
 
         print("\nRead {} User Games".format(counter))
 
@@ -87,9 +86,8 @@ class Command(BaseCommand):
                 }
             )
 
-            self.stdout.write(".", ending="")
             if counter % COUNTER_NEWLINE_AFTER_AMOUNT == 0:
-                self.stdout.write(" {}".format(counter))
+                self.stdout.write("{}".format(counter))
 
         print("\nRead {} User Wishlisted Games".format(counter))
 
@@ -141,9 +139,8 @@ class Command(BaseCommand):
                 }
             )
 
-            self.stdout.write(".", ending="")
             if counter % 50 == 0:
-                self.stdout.write(" {}".format(counter))
+                self.stdout.write("{}".format(counter))
 
         print("\nRead {} Platforms".format(counter))
 
@@ -169,9 +166,8 @@ class Command(BaseCommand):
         if game.parent_game:
             parent_game_ids.add(game.parent_game.id)
 
-        self.stdout.write(".", ending="")
         if counter % COUNTER_NEWLINE_AFTER_AMOUNT == 0:
-            self.stdout.write(" {}".format(counter))
+            self.stdout.write("{}".format(counter))
 
         return counter
 

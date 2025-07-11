@@ -30,7 +30,7 @@
     </div>
 
     <footer>
-        Made with <i class="nes-icon heart is-small" title="love"></i> by <a href="https://kartones.net" target="_blank">Kartones</a> | Fork it on <a href="https://github.com/Kartones/finished-games" target="_blank">Github</a>
+        Made with <i class="nes-icon heart is-small" title="love"></i> by <a href="https://kartones.net" target="_blank">Kartones</a> | Fork it on <a href="https://github.com/Kartones/finished-games" target="_blank">Github</a>{% if user.is_authenticated and user.is_staff %} | <a href="/fg-admin/" target="_blank">Admin</a>{% endif %}
     </footer>
     {% block footer %}{% endblock footer %}
 </body>
