@@ -79,7 +79,7 @@ class Command(BaseCommand):
 
     def handle(self, *args: Any, **options: Dict) -> None:
         gog_user_id = str(options["gog_user_id"])
-        fg_user_id = options["fg_user_id"]
+        fg_user_id = cast(int, options["fg_user_id"])
 
         game_data = self._fetch_data(gog_user_id)
         for data in game_data:
