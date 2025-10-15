@@ -205,11 +205,23 @@ class GameTimeView(View):
 
         try:
             minutes_played = int(request.POST["minutes_played"])
+        except (ValueError, TypeError, KeyError):
+            return HttpResponse(status=400)
+
+        user_game_id_str = request.POST.get("user_game_id")
+        try:
+            user_game_id = int(user_game_id_str)
         except (ValueError, TypeError):
             return HttpResponse(status=400)
 
+        # Ensure the user_game_id belongs to the authenticated user
+        try:
+            user_game = UserGame.objects.get(id=user_game_id, user=request.user)
+        except UserGame.DoesNotExist:
+            return HttpResponse(status=400)
+
         CatalogManager.update_minutes_played(
-            user=request.user, user_game_id=int(request.POST["user_game_id"]), minutes_played=minutes_played
+            user=request.user, user_game_id=user_game_id, minutes_played=minutes_played
         )
 
         return HttpResponse(status=204)
