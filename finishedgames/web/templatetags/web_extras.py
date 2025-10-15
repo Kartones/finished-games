@@ -13,6 +13,12 @@ register = template.Library()
 
 
 @register.filter
+def get_item(dictionary: Dict, key: Any) -> Any:
+    """Access dictionary item by key in templates."""
+    return dictionary.get(key)
+
+
+@register.filter
 def generic_id(game_id: int, platform_id: int) -> str:
     return generic_id_helper(game_id, platform_id)
 

@@ -1,8 +1,8 @@
 import string
-from typing import Any
+from typing import Any, Dict
 from urllib.parse import quote_plus
 
-from core.models import Game, Platform
+from core.models import Game, Platform, UserGame
 from django.conf import settings
 from django.core.paginator import Paginator
 from django.db.models.functions import Lower
@@ -21,11 +21,17 @@ class GameDetailsView(View):
     def get(self, request: HttpRequest, game_id: int, *args: Any, **kwargs: Any) -> HttpResponse:
         game = get_object_or_404(Game.objects.select_related("parent_game"), pk=game_id)
 
+        user_games_by_platform: Dict[int, UserGame] = {}
+        if request.user.is_authenticated:
+            user_games = UserGame.objects.filter(user=request.user, game_id=game_id).select_related("platform")
+            user_games_by_platform = {ug.platform.id: ug for ug in user_games}
+
         # If needed, could do support multiple platforms and check intersection deltas, for now only filtering for PC so
         # simplified
         context = {
             "game": game,
             "authenticated_user_catalog": kwargs["authenticated_user_catalog"],
+            "user_games_by_platform": user_games_by_platform,
             "EXTRA_GAME_INFO_BUTTONS": [
                 (display_name, url.format(quote_plus(game.name_for_search)))
                 for display_name, url, platform_filter in settings.EXTRA_GAME_INFO_BUTTONS
