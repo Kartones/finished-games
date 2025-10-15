@@ -221,54 +221,53 @@ class Command(BaseCommand):
         return user_game
 
     def _fetch_data(self, gog_user_id: str) -> List[GameTimeData]:
-        connection = sqlite3.connect(GOG_DB_MACOS_PATH)
-        cursor = connection.cursor()
+        with sqlite3.connect(GOG_DB_MACOS_PATH) as connection:
+            cursor = connection.cursor()
 
-        cursor.execute(
-            f"""
-            SELECT releaseKey, value
-            FROM {GAME_PIECES_TABLE}
-            WHERE gamePieceTypeId = ? AND userId = ?
-            """,
-            (GAME_PIECE_TYPE_TITLE, gog_user_id),
-        )
-        game_titles_data = cursor.fetchall()
-        titles_map = {}
-        for release_key, value_json in game_titles_data:
-            try:
-                value_dict = json.loads(value_json)
-                title = value_dict.get("title")
-                if title:
-                    cleaned_title = cast(str, clean_string_field(title))
-                    if cleaned_title in IGNORED_TITLES:
-                        continue
-                    mapped_title = TITLE_MAPPINGS.get(cleaned_title, cleaned_title)
-                    titles_map[release_key] = mapped_title
-            except (json.JSONDecodeError, KeyError):
-                continue
+            cursor.execute(
+                f"""
+                SELECT releaseKey, value
+                FROM {GAME_PIECES_TABLE}
+                WHERE gamePieceTypeId = ? AND userId = ?
+                """,
+                (GAME_PIECE_TYPE_TITLE, gog_user_id),
+            )
+            game_titles_data = cursor.fetchall()
+            titles_map = {}
+            for release_key, value_json in game_titles_data:
+                try:
+                    value_dict = json.loads(value_json)
+                    title = value_dict.get("title")
+                    if title:
+                        cleaned_title = cast(str, clean_string_field(title))
+                        if cleaned_title in IGNORED_TITLES:
+                            continue
+                        mapped_title = TITLE_MAPPINGS.get(cleaned_title, cleaned_title)
+                        titles_map[release_key] = mapped_title
+                except (json.JSONDecodeError, KeyError):
+                    continue
 
-        cursor.execute(
-            f"""
-            SELECT releaseKey, minutesInGame
-            FROM {GAME_TIME_TABLE}
-            WHERE userId = ?
-            """,
-            (gog_user_id,),
-        )
-        play_times_data = cursor.fetchall()
+            cursor.execute(
+                f"""
+                SELECT releaseKey, minutesInGame
+                FROM {GAME_TIME_TABLE}
+                WHERE userId = ?
+                """,
+                (gog_user_id,),
+            )
+            play_times_data = cursor.fetchall()
 
-        connection.close()
 
-        result = []
-        for release_key, minutes_in_game in play_times_data:
-            if release_key in titles_map:
-                result.append(
-                    GameTimeData(
-                        title=titles_map[release_key],
-                        platform_id=PLATFORM_PC,
-                        minutes_played=minutes_in_game,
+            result = []
+            for release_key, minutes_in_game in play_times_data:
+                if release_key in titles_map:
+                    result.append(
+                        GameTimeData(
+                            title=titles_map[release_key],
+                            platform_id=PLATFORM_PC,
+                            minutes_played=minutes_in_game,
+                        )
                     )
-                )
 
         return sorted(result, key=lambda x: x.title)
 
