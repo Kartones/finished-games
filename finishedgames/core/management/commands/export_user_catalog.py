@@ -60,6 +60,7 @@ class Command(BaseCommand):
                     # Not exporting: `no_longer_owned`
                     "year_finished": user_game.year_finished,
                     "abandoned": user_game.abandoned,
+                    "minutes_played": user_game.minutes_played,
                 }
             )
 

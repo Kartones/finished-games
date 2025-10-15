@@ -6,4 +6,5 @@ def clean_string_field(field: Optional[str]) -> Optional[str]:
     if field is None:
         return None
     else:
-        return unicodedata.normalize("NFC", field.strip(" _!-:"))
+        cleaned = field.replace("®", "").replace("™", "")
+        return unicodedata.normalize("NFC", cleaned.strip(" _!-:"))

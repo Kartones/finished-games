@@ -121,6 +121,9 @@ def catalog(request: HttpRequest, username: str) -> HttpResponse:
         completed_games_progress = 0
     wishlisted_games_count = WishlistedUserGame.objects.filter(user=viewed_user).count()
 
+    total_minutes_played = sum(user_game.minutes_played for user_game in all_user_games)
+    total_hours_played = total_minutes_played / 60.0
+
     if request.user.is_authenticated and request.user == viewed_user:
         options_auto_exclude = request.COOKIES.get(constants.USER_OPTIONS_EXCLUDE_COOKIE_NAME, None) is not None
     else:
@@ -138,6 +141,7 @@ def catalog(request: HttpRequest, username: str) -> HttpResponse:
         "abandoned_games_count": abandoned_games_count,
         "progress_class": progress_bar_class(completed_games_progress),
         "wishlisted_games_count": wishlisted_games_count,
+        "total_hours_played": total_hours_played,
         "options_auto_exclude": options_auto_exclude,
     }
 
