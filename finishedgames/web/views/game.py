@@ -54,6 +54,7 @@ class GamesByPlatformView(View):
             "games": games,
             "games_count": paginator.count,
             "authenticated_user_catalog": kwargs["authenticated_user_catalog"],
+            "enabled_fields": [constants.KEY_FIELD_GAME_TIME],
         }
 
         return render(request, "games_by_platform.html", context)

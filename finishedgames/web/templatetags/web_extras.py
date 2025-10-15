@@ -31,6 +31,15 @@ def render_actions(
     }
 
 
+@register.inclusion_tag("templatetags/game_time.html")
+def render_game_time(user: settings.AUTH_USER_MODEL, user_game_id: int, game_time: int) -> Dict:
+    return {
+        "user": user,
+        "user_game_id": user_game_id,
+        "game_time": game_time,
+        "constants": constants,
+    }
+
 @register.inclusion_tag("templatetags/field_filters_headers.html")
 def field_filters_headers(request: HttpRequest, sort_by: str, exclude: str, enabled_fields: List[str]) -> Dict:
     # NOTE: Name column is implicitly enabled
