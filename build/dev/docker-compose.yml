@@ -13,6 +13,7 @@ services:
       - ../..:/code
       - ../..:/opt/finished-games
       - ~/.bash_history.finished-games:/home/finished-games/.bash_history
+      - /Users/Shared/GOG.com/Galaxy/Storage:/Users/Shared/GOG.com/Galaxy/Storage
     command: "bash -c 'exec python manage.py runserver 0.0.0.0:5001'"
     ports:
         - "0.0.0.0:5001:5001"
