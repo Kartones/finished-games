@@ -1,3 +1,14 @@
 <td class="is-centered">
-    {{ game_time }} mins
+    <form action="{% url 'user_game_time' user.get_username %}" method="post" style="display: inline;">
+        {% csrf_token %}
+        <input type="hidden" name="user_game_id" value="{{ user_game_id }}" />
+        <input
+            type="number"
+            name="minutes_played"
+            value="{{ game_time }}"
+            min="0"
+            style="width: 80px; text-align: center;"
+            onchange="this.form.submit()"
+        /> mins
+    </form>
 </td>

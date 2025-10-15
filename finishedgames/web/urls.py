@@ -49,6 +49,7 @@ urlpatterns = [
         user.NoLongerOwnedGamesView.as_view(),
         name="user_no_longer_owned_games",
     ),
+    path("users/<slug:username>/game-time/", user.GameTimeView.as_view(), name="user_game_time"),
     path("users/<slug:username>/options/", user.Options.as_view(), name="user_options"),
     re_path(r"^google.*\.html$", TemplateView.as_view(template_name="google-validation.html")),
 ]

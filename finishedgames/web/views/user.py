@@ -198,6 +198,22 @@ class NoLongerOwnedGamesView(View):
         return HttpResponse(status=204)
 
 
+class GameTimeView(View):
+    def post(self, request: HttpRequest, username: str, *args: Any, **kwargs: Any) -> HttpResponse:
+        if username != request.user.get_username() or request.method != "POST":
+            raise Http404("Invalid URL")
+
+        minutes_played = int(request.POST["minutes_played"])
+        if minutes_played < 0:
+            return HttpResponse(status=400)
+
+        CatalogManager.update_minutes_played(
+            user=request.user, user_game_id=int(request.POST["user_game_id"]), minutes_played=minutes_played
+        )
+
+        return HttpResponse(status=204)
+
+
 class GamesView(View):
     @method_decorator(viewed_user)
     @method_decorator(authenticated_user_games)
