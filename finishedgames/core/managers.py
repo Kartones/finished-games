@@ -93,6 +93,6 @@ class CatalogManager:
 
     @staticmethod
     def update_minutes_played(user: settings.AUTH_USER_MODEL, user_game_id: int, minutes_played: int) -> None:
-        user_game = UserGame.objects.filter(user=user, id=user_game_id).get()
+        user_game = UserGame.objects.get(user=user, id=user_game_id)
         user_game.minutes_played = minutes_played
         user_game.save(update_fields=["minutes_played"])
