@@ -203,8 +203,9 @@ class GameTimeView(View):
         if username != request.user.get_username() or request.method != "POST":
             raise Http404("Invalid URL")
 
-        minutes_played = int(request.POST["minutes_played"])
-        if minutes_played < 0:
+        try:
+            minutes_played = int(request.POST["minutes_played"])
+        except (ValueError, TypeError):
             return HttpResponse(status=400)
 
         CatalogManager.update_minutes_played(
