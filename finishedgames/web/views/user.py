@@ -59,29 +59,6 @@ def filter_and_exclude_games(user_games: QuerySet, request: HttpRequest) -> Tupl
         return usergames_queryset, usergames_queryset, sort_by, ""
 
 
-def _filter_and_exclude_games(user_games: QuerySet, request: HttpRequest) -> Tuple[QuerySet, QuerySet, str, str]:
-    sort_by = request.GET.get("sort_by", constants.SORT_BY_GAME_NAME)
-    try:
-        order_by = constants.SORT_FIELDS_MAPPING[sort_by]
-    except KeyError:
-        order_by = constants.SORT_FIELDS_MAPPING[constants.SORT_BY_GAME_NAME]
-
-    # Querystring takes precedence to allow explicit sorting/showing back even if cookie is set
-    exclude = request.GET.get("exclude", None) or request.COOKIES.get(constants.USER_OPTIONS_EXCLUDE_COOKIE_NAME, None)
-    exclude_kwargs = None  # type: Any
-    try:
-        exclude_kwargs = constants.EXCLUDE_FIELDS_MAPPING[exclude]
-    except KeyError:
-        exclude = None
-
-    usergames_queryset = user_games.order_by(*order_by)
-
-    if exclude:
-        return user_games.exclude(**exclude_kwargs).order_by(*order_by), usergames_queryset, sort_by, exclude
-    else:
-        return usergames_queryset, usergames_queryset, sort_by, ""
-
-
 def calculate_progress_counters(unfiltered_user_games: QuerySet) -> Tuple[int, int, int, int, int, int, int]:
     # counters use unfiltered list
     unfiltered_games_count = unfiltered_user_games.count()
@@ -268,7 +245,7 @@ class GamesView(View):
                 constants.KEY_GAMES_FINISHED,
                 constants.KEY_GAMES_ABANDONED,
             ],
-            "enabled_fields": [constants.KEY_FIELD_PLATFORM],
+            "enabled_fields": [constants.KEY_FIELD_PLATFORM, constants.KEY_FIELD_GAME_TIME],
             "authenticated_user_catalog": kwargs["authenticated_user_catalog"],
         }
 
@@ -340,7 +317,7 @@ class GamesByPlatformView(View):
                 constants.KEY_GAMES_FINISHED,
                 constants.KEY_GAMES_ABANDONED,
             ],
-            "enabled_fields": [],
+            "enabled_fields": [constants.KEY_FIELD_GAME_TIME],
             "authenticated_user_catalog": kwargs["authenticated_user_catalog"],
         }
 
@@ -397,7 +374,7 @@ class GamesPendingView(View):
             "constants": constants,
             "sort_by": sort_by,
             "enabled_statuses": [constants.KEY_GAMES_CURRENTLY_PLAYING],
-            "enabled_fields": [constants.KEY_FIELD_PLATFORM],
+            "enabled_fields": [constants.KEY_FIELD_PLATFORM, constants.KEY_FIELD_GAME_TIME],
             "authenticated_user_catalog": kwargs["authenticated_user_catalog"],
             "platform_filter_form": platform_filter_form,
         }
@@ -452,7 +429,7 @@ class GamesFinishedView(View):
             "sort_by": sort_by,
             "enabled_statuses": [constants.KEY_GAMES_CURRENTLY_PLAYING],
             "authenticated_user_catalog": kwargs["authenticated_user_catalog"],
-            "enabled_fields": [constants.KEY_FIELD_PLATFORM, constants.KEY_FIELD_YEAR],
+            "enabled_fields": [constants.KEY_FIELD_PLATFORM, constants.KEY_FIELD_YEAR, constants.KEY_FIELD_GAME_TIME],
             "platform_filter_form": platform_filter_form,
         }
 
@@ -522,7 +499,7 @@ class GamesAbandonedView(View):
             "abandoned_games_count": paginator.count,
             "constants": constants,
             "sort_by": sort_by,
-            "enabled_fields": [constants.KEY_FIELD_PLATFORM],
+            "enabled_fields": [constants.KEY_FIELD_PLATFORM, constants.KEY_FIELD_GAME_TIME],
             "authenticated_user_catalog": kwargs["authenticated_user_catalog"],
             "platform_filter_form": platform_filter_form,
         }
@@ -595,7 +572,7 @@ class GamesCurrentlyPlayingView(View):
             "sort_by": sort_by,
             "authenticated_user_catalog": kwargs["authenticated_user_catalog"],
             "enabled_statuses": [constants.KEY_GAMES_FINISHED],
-            "enabled_fields": [constants.KEY_FIELD_PLATFORM],
+            "enabled_fields": [constants.KEY_FIELD_PLATFORM, constants.KEY_FIELD_GAME_TIME],
             "platform_filter_form": platform_filter_form,
         }
 

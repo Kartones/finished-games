@@ -17,6 +17,11 @@
 
             {% if user.is_authenticated %}
                 <th>Actions</th>
+                {% if constants.KEY_FIELD_GAME_TIME in enabled_fields %}
+                    <th class="is-centered">
+                        Game Time
+                    </th>
+                {% endif %}
             {% endif %}
         </tr>
     </thead>
@@ -31,6 +36,9 @@
 
                 {% if user.is_authenticated %}
                     {% render_actions user item.game.id platform.id authenticated_user_catalog %}
+                    {% if constants.KEY_FIELD_GAME_TIME in enabled_fields %}
+                        {% render_game_time item.id item.minutes_played %}
+                    {% endif %}
                 {% endif %}
             </tr>
         {% endfor %}
