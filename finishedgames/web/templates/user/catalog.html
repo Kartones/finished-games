@@ -25,6 +25,9 @@
              <i class="nes-icon skull is-small"></i> <a href="{% url 'user_abandoned_games' viewed_user.get_username %}"><strong>{{ abandoned_games_count }}</strong> abandoned game{{ abandoned_games_count|pluralize }}</a>
         </p>
         <p>
+            Total game time: <strong>{{ total_hours_played|floatformat:1 }}</strong> hours
+        </p>
+        <p>
             {% if user.is_authenticated and user == viewed_user %}
                 You've completed {{ completed_games_progress }}% of your catalog
             {% else %}
