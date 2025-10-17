@@ -25,9 +25,6 @@ class Command(BaseCommand):
             queryset = queryset.filter(abandoned=True)
         elif status == "finished":
             queryset = queryset.filter(year_finished__isnull=False, abandoned=False)
-        else:
-            self.stderr.write(f"Unknown status: {status}")
-            return
 
         queryset = queryset.select_related("game", "platform").order_by("game__name")
 
