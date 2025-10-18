@@ -12,16 +12,18 @@ class Command(BaseCommand):
         parser.add_argument("names_file", type=str, help="File with game names (one per line)")
         parser.add_argument("times_file", type=str, help="File with playtimes in hours (one per line)")
         parser.add_argument("user_id", type=int, help="Finished Games user ID")
+        parser.add_argument("--additive", action="store_true", default=False, help="Add playtime (in minutes) to existing value instead of replacing")
 
     def handle(self, *args: Any, **options: Dict) -> None:
         names_file = cast(str, options["names_file"])
         times_file = cast(str, options["times_file"])
         user_id = cast(int, options["user_id"])
+        additive = cast(bool, options["additive"])
 
-        playtime_dict = self._load_playtime_data(names_file, times_file)
-        self._update_user_games(user_id, playtime_dict)
+        playtime_dict = self._load_playtime_data(names_file, times_file, additive)
+        self._update_user_games(user_id, playtime_dict, additive)
 
-    def _load_playtime_data(self, names_file: str, times_file: str) -> Dict[str, int]:
+    def _load_playtime_data(self, names_file: str, times_file: str, additive: bool = False) -> Dict[str, int]:
         """Load game names and playtimes from files and return a dictionary."""
         game_names = []
         playtimes = []
@@ -49,27 +51,37 @@ class Command(BaseCommand):
                 continue
 
             try:
-                hours = float(time_str)
-                # we want minutes
-                playtime_dict[name] = int(hours * 60)
+                value = float(time_str)
+                if additive:
+                    # directly comes in minutes
+                    playtime_dict[name] = int(value)
+                else:
+                    # comes in hours and we want minutes
+                    playtime_dict[name] = int(value * 60)
             except ValueError:
                 self.stdout.write(self.style.WARNING(f"{name} : invalid playtime value '{time_str}', skipping"))
 
         return playtime_dict
 
-    def _update_user_games(self, user_id: int, playtime_dict: Dict[str, int]) -> None:
+    def _update_user_games(self, user_id: int, playtime_dict: Dict[str, int], additive: bool = False) -> None:
         """Update UserGame records with playtime data."""
         for game_name, minutes in playtime_dict.items():
-            user_game = UserGame.objects.filter(user_id=user_id, game__name=game_name).first()
+            user_game = UserGame.objects.filter(user_id=user_id, game__name__iexact=game_name).first()
 
             if not user_game:
                 self.stdout.write(self.style.WARNING(f"{game_name} : game not found for user"))
                 continue
 
-            if user_game.minutes_played >= minutes:
-                self.stdout.write(f"{game_name} : existing playtime ({user_game.minutes_played}) is greater or equal, skipping update to {minutes}")
-                continue
+            if additive:
+                new_minutes = user_game.minutes_played + minutes
+                user_game.minutes_played = new_minutes
+                user_game.save()
+                self.stdout.write(self.style.SUCCESS(f"{game_name} : minutes updated from {user_game.minutes_played - minutes} to {new_minutes}"))
+            else:
+                if user_game.minutes_played >= minutes:
+                    self.stdout.write(f"{game_name} : existing playtime ({user_game.minutes_played}) is greater or equal than {minutes}, skipped")
+                    continue
 
-            user_game.minutes_played = minutes
-            user_game.save()
-            self.stdout.write(self.style.SUCCESS(f"{game_name} : minutes updated to {minutes}"))
+                user_game.minutes_played = minutes
+                user_game.save()
+                self.stdout.write(self.style.SUCCESS(f"{game_name} : minutes updated to {minutes}"))
