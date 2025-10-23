@@ -12,7 +12,6 @@ from django.core.management.base import BaseCommand, CommandParser
 GOG_DB_MACOS_PATH = "/Users/Shared/GOG.com/Galaxy/Storage/galaxy-2.0.db"
 
 # reverse-engineered from GOG Galaxy 2.0
-GAME_PIECE_TYPE_TITLE = 557
 GAME_PIECES_TABLE = "GamePieces"
 GAME_TIME_TABLE = "GameTimes"
 
@@ -199,12 +198,20 @@ class Command(BaseCommand):
             required=True,
             help="Finished Games user ID",
         )
+        parser.add_argument(
+            "--title-game-piece-id",
+            type=int,
+            help="GOG Galaxy game piece type ID for titles. If you don't know the GamePieces.gamePieceTypeId containing the title, you must manually open the SQLite database at {GOG_DB_MACOS_PATH} and search for it.",  # noqa: E501
+        )
 
     def handle(self, *args: Any, **options: Dict) -> None:
         gog_user_id = str(options["gog_user_id"])
         fg_user_id = cast(int, options["fg_user_id"])
 
-        game_data = self._fetch_data(gog_user_id)
+        print(f"Going to import GOG game times from {GOG_DB_MACOS_PATH}")
+
+        title_game_piece_id = cast(int, options["title_game_piece_id"])
+        game_data = self._fetch_data(gog_user_id, title_game_piece_id)
         for data in game_data:
             self.process_game_time(data.title, data.platform_id, data.minutes_played, fg_user_id)
 
@@ -220,7 +227,7 @@ class Command(BaseCommand):
         user_game = UserGame.objects.filter(user=fg_user_id, game=game, platform_id=platform_id).first()
         return user_game
 
-    def _fetch_data(self, gog_user_id: str) -> List[GameTimeData]:
+    def _fetch_data(self, gog_user_id: str, title_game_piece_id: int) -> List[GameTimeData]:
         with sqlite3.connect(GOG_DB_MACOS_PATH) as connection:
             cursor = connection.cursor()
 
@@ -230,7 +237,7 @@ class Command(BaseCommand):
                 FROM {GAME_PIECES_TABLE}
                 WHERE gamePieceTypeId = ? AND userId = ?
                 """,
-                (GAME_PIECE_TYPE_TITLE, gog_user_id),
+                (title_game_piece_id, gog_user_id),
             )
             game_titles_data = cursor.fetchall()
             titles_map = {}
