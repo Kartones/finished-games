@@ -38,8 +38,14 @@ IGNORED_TITLES: List[str] = [
     "Train Simulator",
 ]
 
+# Mappings to apply before cleaning the title, when searching in the catalog/DB
+CATALOG_TITLE_MAPPINGS: Dict[str, str] = {
+    "Resident Evil HD REMASTER": "Resident Evil (2002)",
+    "The Elder Scrolls III: Morrowind GOTY Edition": "The Elder Scrolls III: Morrowind",
+}
+
 # Mappings to apply after cleaning the title
-TITLE_MAPPINGS: Dict[str, str] = {
+CLEANED_TITLE_MAPPINGS: Dict[str, str] = {
     "RUINER": "Ruiner",
     "1701 A.D.: Gold Edition": "1701 A.D.",
     "20 Minutes Till Dawn": "20 Minutes Until Dawn",
@@ -216,7 +222,8 @@ class Command(BaseCommand):
             self.process_game_time(data.title, data.platform_id, data.minutes_played, fg_user_id)
 
     def _get_game(self, game_name: str, platform_id: int) -> Any:
-        return Game.objects.filter(name__iexact=game_name, platforms__in=[platform_id]).first()
+        mapped_name = CATALOG_TITLE_MAPPINGS.get(game_name, game_name)
+        return Game.objects.filter(name__iexact=mapped_name, platforms__in=[platform_id]).first()
 
     def _game_exists(self, game_name: str, platform_id: int) -> bool:
         game = self._get_game(game_name, platform_id)
@@ -249,7 +256,7 @@ class Command(BaseCommand):
                         cleaned_title = cast(str, clean_string_field(title))
                         if cleaned_title in IGNORED_TITLES:
                             continue
-                        mapped_title = TITLE_MAPPINGS.get(cleaned_title, cleaned_title)
+                        mapped_title = CLEANED_TITLE_MAPPINGS.get(cleaned_title, cleaned_title)
                         titles_map[release_key] = mapped_title
                 except (json.JSONDecodeError, KeyError):
                     continue
@@ -283,7 +290,7 @@ class Command(BaseCommand):
             return
 
         if not self._game_exists(game_name, platform_id):
-            self.stdout.write(self.style.WARNING(f"{game_name} : Game title not found"))
+            self.stdout.write(self.style.WARNING(f"{game_name} : Game title not found for platform ID {platform_id}"))
             return
 
         user_game = self._get_user_game(game_name, platform_id, fg_user_id)
