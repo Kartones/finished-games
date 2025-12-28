@@ -7,7 +7,9 @@
         <div>
             <a class="nes-btn" href="{% url 'games' %}" title="Games">Games</a>
             <a class="nes-btn" href="{% url 'platforms' %}" title="Platforms">Platforms</a>
-            <a class="nes-btn" href="{% url 'users' %}" title="Users">Users</a>
+            {% if not HIDE_USERS_BUTTON %}
+                <a class="nes-btn" href="{% url 'users' %}" title="Users">Users</a>
+            {% endif %}
             {% if user.is_authenticated %}
                 <a class="nes-btn is-right" href="{% url 'logout' %}" title="Logout">Logout</a>
                 <a class="nes-btn is-right" href="{% url 'help' %}" title="Help">Help</a>

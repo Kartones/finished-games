@@ -66,6 +66,7 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
+                "web.context_processors.app_settings",
             ],
         },
     },
@@ -129,3 +130,6 @@ EXTRA_GAME_INFO_BUTTONS = [
     ("HowLongToBeat", "https://howlongtobeat.com/?q={}#search", None),
     ("GameFAQs", "https://gamefaqs.gamespot.com/search?game={}", None),
 ]
+
+# If True, hides the button at the header that shows the list of users
+HIDE_USERS_BUTTON = False
