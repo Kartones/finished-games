@@ -68,7 +68,7 @@ class FetchedGameAdmin(FetchedGameAdminViewsMixin, FGModelAdmin):
         import_fetched_games_link_automatically_if_name_and_year_matches,
         sync_fetched_games_base_fields,
     ]
-    autocomplete_fields = [
+    raw_id_fields = [
         "fg_game",
         "parent_game",
     ]

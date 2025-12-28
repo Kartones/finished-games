@@ -2,6 +2,4 @@
 setuptools==75.1.0
 django==2.2.28
 requests==2.32.3
-# Note: 3.5.1 is stable, 3.8.1 broke the games search
-django-autocomplete-light==3.5.1
 Pillow==10.4.0

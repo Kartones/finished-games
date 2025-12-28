@@ -1,6 +1,5 @@
 from catalogsources.admin.form_fields import SimpleArrayField
 from core.models import UNKNOWN_PUBLISH_DATE, Game, Platform
-from dal import autocomplete
 from django import forms
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db.models.functions import Lower
@@ -99,7 +98,6 @@ class SingleGameImportForm(forms.Form):
     parent_game = forms.ModelChoiceField(
         label="Parent game",
         queryset=Game.objects.order_by(Lower("name")),
-        widget=autocomplete.ModelSelect2(url="game_autocomplete", attrs={"data-minimum-input-length": 2},),
         required=False,
     )
     source_display_name = forms.CharField(

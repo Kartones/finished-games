@@ -56,7 +56,7 @@ class UserGameAdmin(FGModelAdmin):
     list_display = ["game", "user", "platform", "currently_playing", "year_finished", "minutes_played", "abandoned"]
     list_filter = ["user__username", "platform", "currently_playing", "year_finished", "minutes_played", "abandoned"]
     search_fields = ["game__name"]
-    autocomplete_fields = ["user", "game"]
+    raw_id_fields = ["user", "game"]
 
     def get_ordering(self, request: HttpRequest) -> List[str]:
         return [Lower("user__username"), "-id"]
@@ -96,7 +96,7 @@ class GameAdmin(FGModelAdmin):
     list_display = ["name", "publish_date", "platforms_list", "dlc_or_expansion", "parent_game"]
     list_filter = ["dlc_or_expansion", "platforms"]
     search_fields = ["name"]
-    autocomplete_fields = ["parent_game"]
+    raw_id_fields = ["parent_game"]
 
     readonly_fields = ["urls_list", "game_url"]
 
@@ -130,7 +130,7 @@ class WishlistedUserGameAdmin(FGModelAdmin):
     list_display = ("game", "user", "platform")
     list_filter = ["user__username", "platform"]
     search_fields = ["game__name"]
-    autocomplete_fields = ["user", "game"]
+    raw_id_fields = ["user", "game"]
 
     def get_ordering(self, request: HttpRequest) -> List[str]:
         return [Lower("user__username"), "-id"]
