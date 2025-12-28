@@ -42,6 +42,8 @@ IGNORED_TITLES: List[str] = [
 CATALOG_TITLE_MAPPINGS: Dict[str, str] = {
     "Resident Evil HD REMASTER": "Resident Evil (2002)",
     "The Elder Scrolls III: Morrowind GOTY Edition": "The Elder Scrolls III: Morrowind",
+    "Immortals Fenyx Rising": "Immortals: Fenyx Rising",
+    "Need for Speed Hot Pursuit Remastered": "Need for Speed: Hot Pursuit Remastered",
 }
 
 # Mappings to apply after cleaning the title
