@@ -121,15 +121,16 @@ def datalist_autocomplete(
     placeholder: str = "",
 ) -> Dict:
     """
-    Render an HTML5 datalist-based autocomplete component.
+    HTML5 datalist-based autocomplete component
 
     Args:
         entity_type: Either 'game' or 'platform'
-        action_url: The form action URL (where to submit)
+        action_url: Destination URL
         input_id: Unique ID for the input element
-        username: Optional username for filtering
-        filter_type: Optional filter type
+        username: Optional username for filtering (for platforms)
+        filter_type: Optional filter type (for platforms)
         placeholder: Placeholder text for the input field
+        size: Optional size attribute for the input element
     """
     options = []
 
