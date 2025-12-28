@@ -18,6 +18,9 @@ SECRET_KEY = "[8x6?[zLKSKjp?HVU=WVlOjj$B.6n6JljFtG*nS #Ugu=Wh[?1@vmkMcL8nt#t61*G
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+# Django 3.2+ primary key field type
+DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
+
 # Enable at dev settings
 DJANGO_DEBUG_TOOLBAR_ENABLED = False
 

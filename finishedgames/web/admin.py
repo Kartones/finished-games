@@ -12,8 +12,7 @@ from django.utils.safestring import mark_safe
 
 
 class FGModelAdmin(admin.ModelAdmin):
-    class Media:
-        css = {"all": ("css/admin.css",)}
+    pass
 
 
 class CustomUserAdmin(auth.admin.UserAdmin):
@@ -147,3 +146,6 @@ admin.site.register(Game, GameAdmin)
 admin.site.register(Platform, PlatformAdmin)
 admin.site.register(UserGame, UserGameAdmin)
 admin.site.register(WishlistedUserGame, WishlistedUserGameAdmin)
+# Remove the Django 3.1+ sidebar
+admin.site.enable_nav_sidebar = False
+admin.site.site_header = "Finished Games Admin"
