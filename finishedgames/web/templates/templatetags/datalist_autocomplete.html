@@ -25,11 +25,11 @@
                 const entityId = options[i].getAttribute("data-id");
 
                 {% if entity_type == "platform" %}
-                const currentUrl = new URL("{{ action_url }}", window.location.origin);
+                const currentUrl = new URL("{{ action_url|escapejs }}", window.location.origin);
                 currentUrl.searchParams.set("platform", entityId);
                 window.location.href = currentUrl.toString();
                 {% else %}
-                window.location.href =  "{{ action_url }}".replace("0", entityId);
+                window.location.href =  "{{ action_url|escapejs }}".replace("0", entityId);
                 {% endif %}
                 break;
             }
