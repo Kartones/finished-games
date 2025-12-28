@@ -102,8 +102,8 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "static"),
 ]
 
-# Directory from which you’d serve statics in production
-# STATIC_ROOT = "/code/finishedgames/statics/"
+# Directory from which you’d serve statics. In production, but now always required to be defined.
+STATIC_ROOT = "/code/statics/"
 
 # Disable default maximum of GET/POST fields allowed, else massive imports will fail
 DATA_UPLOAD_MAX_NUMBER_FIELDS = None

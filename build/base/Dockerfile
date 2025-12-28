@@ -1,5 +1,4 @@
-# 3.12 is the last compatible with django 2.x
-FROM python:3.12.9-slim-bookworm
+FROM python:3.14-slim-bookworm
 
 LABEL title "Finished-Games"
 LABEL maintainer "Diego / Kartones"

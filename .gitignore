@@ -26,3 +26,4 @@ finishedgames/web/templates/google-validation.html
 finishedgames/finishedgames/settings/prod.py
 finishedgames/finishedgames/settings/local.py
 requirements-prod.txt
+/statics
