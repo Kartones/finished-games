@@ -1,17 +1,13 @@
 {% extends "base_with_menu.html" %}
 
 {% load static %}
+{% load web_extras %}
 
 {% block title %}Games - {{ block.super }}{% endblock title %}
 
 {% block content %}
 <p>
-    <h3>{{ game_search_form.game.label_tag }}</h3>
-</p>
-<p>
-    <form id="game_search" action="{% url 'game_search' %}" method="get">
-        {{ game_search_form.game }}
-    </form>
+    {% datalist_autocomplete entity_type='game' action_url=game_details_url_pattern input_id='game_datalist_search' placeholder='Input game name' size='50' %}
 </p>
 
 <p>
@@ -29,20 +25,5 @@
     {% endfor %}
     <a href="{% url 'games_filtered_by_starting_character' non_alphanumeric_constant %}">#</a>
 </p>
-
-{{ game_search_form.media }}
-
-{# absence of a returnValue property on the beforeunload event will guarantee the browser unload happens #}
-{# https://developer.mozilla.org/en-US/docs/Web/API/WindowEventHandlers/onbeforeunload #}
-{# purpose of the cleanup is to avoid back button leaving last search typed in in the form #}
-<script type="text/javascript">
-    window.addEventListener("beforeunload", function (e) {
-        delete e["returnValue"];
-        $("#id_{{ game_search_form.game.html_name }}").val(null);
-    });
-    $("#id_{{ game_search_form.game.html_name }}").on("select2:select", function (e) {
-        document.forms["game_search"].submit();
-    });
-</script>
 
 {% endblock content %}

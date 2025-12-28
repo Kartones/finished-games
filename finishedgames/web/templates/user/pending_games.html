@@ -10,12 +10,7 @@
 <h2><i class="nes-icon trophy is-empty" title="Pending"></i> {{ viewed_user.get_username.capitalize }} Pending games list</h2>
 
 <p>
-    <form id="platform_filter" action="{% url 'user_games_platform_filter' viewed_user.get_username %}" method="get">
-        {{ platform_filter_form.platform.label_tag }}
-        {{ platform_filter_form.platform }}
-        {{ platform_filter_form.username }}
-        {{ platform_filter_form.filter_type }}
-    </form>
+    {% datalist_autocomplete entity_type='platform' action_url=current_page_url input_id='platform_filter' placeholder='Filter by platform' username=viewed_user.get_username filter_type='pending' %}
 </p>
 
 <table class="nes-table is-bordered">
@@ -94,17 +89,5 @@
         </p>
     </div>
 </section>
-
-{{ platform_filter_form.media }}
-
-<script type="text/javascript">
-    let platformFilter = $("#id_{{ platform_filter_form.platform.html_name }}");
-    platformFilter.on("select2:select", function (e) {
-        document.forms["platform_filter"].submit();
-    });
-    platformFilter.on("select2:clearing", function (e) {
-        document.forms["platform_filter"].submit();
-    });
-</script>
 
 {% endblock content %}

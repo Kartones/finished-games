@@ -225,7 +225,7 @@ Also remember that you need to [setup the statics](https://docs.djangoproject.co
 - `mypy` mandatory linter test (any broken rule fails tests run)
 - `isort` & `black` auto-formatters upon commit (automatically reformat files)
 - configuration hierarchy (`base -> dev/prod/test -> local`), including different default SQLite DB
-- Tiny Javascript footprint: djando admin uses some vanilla JS and jQuery, website uses so far only vanilla JS.
+- Tiny Javascript footprint: Django admin uses some vanilla JS and jQuery, website uses only vanilla JS.
 
 
 #### Django features
@@ -239,7 +239,6 @@ Also remember that you need to [setup the statics](https://docs.djangoproject.co
 - admin custom ordering, filters, fieldsets, readonly fields, search fields...
 - custom admin actions, decorators, filters, forms, form fields (a handy non-pg dependant `SimpleArrayField`) and views
 - `django-debug-toolbar`: Disabled on production for security
-- `django-autocomplete-light`: `Select2` based configurable autofill both for the admin and for normal views
 
 
 ## License
