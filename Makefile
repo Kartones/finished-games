@@ -1,4 +1,4 @@
-.PHONY: default deps base build stop shell test coverage run statics
+.PHONY: default deps base build stop shell test coverage run statics migrate
 
 export SERVICE_NAME := finished-games
 
@@ -58,3 +58,6 @@ coverage: build
 
 statics: build
 	$(COMPOSE_CMD) python3 manage.py collectstatic ${collectargs}
+
+migrate: build
+	$(COMPOSE_CMD) python3 manage.py migrate

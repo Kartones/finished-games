@@ -10,7 +10,7 @@ Finished games is a small personal project whose purposes are:
 
 **1) To provide an easy to use videogames catalog tracking, both for your owned titles (and videogame platforms), which ones have you finished or are currently playing, and to keep a wishlist of interesting games you desire.** I'm going to use it frequently and wanted to build it my way.
 
-**2) To practice fully developing a website with Django 2.x.** On my daily work I don't get to touch all the pieces that the framework provides, so this project is a good way to fix that.
+**2) To practice fully developing a website with Django**. On my daily work I don't get to touch all the pieces that the framework provides, so this project is a good way to fix that.
 
 Near the end of this README you will find detailed lists of libraries and django features used.
 
@@ -42,9 +42,7 @@ The Docker Python image is already compatible with variable type hints (>= 3.6),
 
 ## Setup
 
-This project requires `Docker` and `Docker Compose` to be built (only Python to run). Python required version is minimum `3.5`, but the Docker container is built with `3.7`. Django version is `2.2` so anyway you need Python >= 3.5.
-
-This project is almost on maintenance mode, so a Django `3+` migration is highly unlikely.
+This project requires `Docker` and `Docker Compose` to be built (only Python to run).
 
 Python package requirements are specified in the corresponding `requirements.txt` and `requirements-dev.txt` files. These packages are installed inside the containers in development and testing.
 
@@ -230,7 +228,6 @@ Also remember that you need to [setup the statics](https://docs.djangoproject.co
 
 #### Django features
 
-- Django >= 2.2 , < 3
 - Extensive ORM usage, including `select_related()` and `prefetch_related()`, query optimizations (`only()`, `values_list()`, ...)
 - custom model managers
 - `Paginator` component for pagination
