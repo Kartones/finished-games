@@ -235,7 +235,6 @@ Also remember that you need to [setup the statics](https://docs.djangoproject.co
 - custom template tags (with and without rendering templates) and filters
 - admin custom ordering, filters, fieldsets, readonly fields, search fields...
 - custom admin actions, decorators, filters, forms, form fields (a handy non-pg dependant `SimpleArrayField`) and views
-- `django-debug-toolbar`: Disabled on production for security
 
 
 ## License

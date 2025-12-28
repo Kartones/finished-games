@@ -1,6 +1,4 @@
-# Beginning with python 3.12, needed for distutils
 setuptools==80.9.0
-django==3.2.25
+django==4.1.13
 requests==2.32.5
-# latest: 12.0.0
-Pillow==10.4.0
+Pillow==12.0.0

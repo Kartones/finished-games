@@ -21,9 +21,6 @@ DEBUG = True
 # Django 3.2+ primary key field type
 DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 
-# Enable at dev settings
-DJANGO_DEBUG_TOOLBAR_ENABLED = False
-
 ALLOWED_HOSTS = [
     "0.0.0.0",  # nosec
     "127.0.0.1",  # nosec
