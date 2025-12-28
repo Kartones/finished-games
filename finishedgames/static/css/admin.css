@@ -1,0 +1,11 @@
+.theme-toggle {
+    display: none !important;
+}
+
+.skip-to-content-link {
+    display: none !important;
+}
+
+.submit-row a.deletelink {
+  display: initial;
+}
