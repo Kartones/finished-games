@@ -225,7 +225,7 @@ Also remember that you need to [setup the statics](https://docs.djangoproject.co
 - `mypy` mandatory linter test (any broken rule fails tests run)
 - `isort` & `black` auto-formatters upon commit (automatically reformat files)
 - configuration hierarchy (`base -> dev/prod/test -> local`), including different default SQLite DB
-- Tiny Javascript footprint: djando admin uses some vanilla JS and jQuery, website uses only vanilla JS.
+- Tiny Javascript footprint: Django admin uses some vanilla JS and jQuery, website uses only vanilla JS.
 
 
 #### Django features
