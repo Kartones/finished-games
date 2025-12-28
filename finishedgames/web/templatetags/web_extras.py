@@ -5,7 +5,7 @@ from core.helpers import generic_id as generic_id_helper
 from core.models import Game, Platform, UserGame, WishlistedUserGame
 from django import template
 from django.conf import settings
-from django.db.models.functions import Length, Lower
+from django.db.models.functions import Lower
 from django.http import HttpRequest
 from django.utils.safestring import mark_safe
 from web import constants
