@@ -1,0 +1,45 @@
+<input type="text"
+       id="{{ input_id }}"
+       name="{{ entity_type }}_name"
+       list="{{ datalist_id }}"
+       placeholder="{{ placeholder }}"
+       autocomplete="off"
+       size="{{ size|default:'20' }}"
+       />
+<datalist id="{{ datalist_id }}">
+    {% for option in options %}
+    <option value="{{ option.value }}" data-id="{{ option.id }}"></option>
+    {% endfor %}
+</datalist>
+
+<script type="text/javascript">
+(function() {
+    const input = document.getElementById("{{ input_id }}");
+    const datalist = document.getElementById("{{ datalist_id }}");
+
+    input.addEventListener("input", function() {
+        const value = this.value;
+        const options = datalist.querySelectorAll("option");
+        for (let i = 0; i < options.length; i++) {
+            if (options[i].value === value) {
+                const entityId = options[i].getAttribute("data-id");
+
+                {% if entity_type == "platform" %}
+                const currentUrl = new URL("{{ action_url }}", window.location.origin);
+                currentUrl.searchParams.set("platform", entityId);
+                window.location.href = currentUrl.toString();
+                {% else %}
+                window.location.href =  "{{ action_url }}".replace("0", entityId);
+                {% endif %}
+                break;
+            }
+        }
+    });
+
+    // Avoid back button issues
+    window.addEventListener("beforeunload", function(e) {
+        delete e["returnValue"];
+        input.value = "";
+    });
+})();
+</script>

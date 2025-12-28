@@ -1,10 +1,11 @@
 from functools import lru_cache
-from typing import Any, Dict, List, cast
+from typing import Any, Dict, List, Optional, cast
 
 from core.helpers import generic_id as generic_id_helper
-from core.models import UserGame
+from core.models import Game, Platform, UserGame, WishlistedUserGame
 from django import template
 from django.conf import settings
+from django.db.models.functions import Length, Lower
 from django.http import HttpRequest
 from django.utils.safestring import mark_safe
 from web import constants
@@ -107,3 +108,82 @@ def _build_action_data(action_id: str) -> str:
         display_div_ids=",".join([item_template.format(div_id=div_id) for div_id in display_div_ids]),
         hide_div_ids=",".join([item_template.format(div_id=div_id) for div_id in hide_div_ids]),
     )
+
+
+@register.inclusion_tag("templatetags/datalist_autocomplete.html")
+def datalist_autocomplete(
+    entity_type: str,
+    action_url: str,
+    input_id: str,
+    username: Optional[str] = None,
+    filter_type: Optional[str] = None,
+    size: Optional[str] = None,
+    placeholder: str = "",
+) -> Dict:
+    """
+    Render an HTML5 datalist-based autocomplete component.
+
+    Args:
+        entity_type: Either 'game' or 'platform'
+        action_url: The form action URL (where to submit)
+        input_id: Unique ID for the input element
+        username: Optional username for filtering
+        filter_type: Optional filter type
+        placeholder: Placeholder text for the input field
+    """
+    options = []
+
+    if entity_type == "game":
+        queryset = Game.objects.order_by(Lower("name"))
+        options = [{"value": game.name, "id": game.id} for game in queryset]
+    elif entity_type == "platform":
+        queryset = Platform.objects.order_by(Lower("shortname"))
+
+        if username and filter_type:
+            if filter_type == constants.PLATFORM_FILTER_WISHLISTED:
+                queryset = queryset.filter(
+                    id__in=WishlistedUserGame.objects.filter(user__username=username)
+                    .values_list("platform__id", flat=True)
+                    .distinct()
+                )
+            elif filter_type == constants.PLATFORM_FILTER_FINISHED:
+                queryset = queryset.filter(
+                    id__in=UserGame.objects.filter(user__username=username, year_finished__isnull=False)
+                    .values_list("platform__id", flat=True)
+                    .distinct()
+                )
+            elif filter_type == constants.PLATFORM_FILTER_PENDING:
+                queryset = queryset.filter(
+                    id__in=UserGame.objects.filter(user__username=username)
+                    .exclude(year_finished__isnull=False)
+                    .exclude(abandoned=True)
+                    .values_list("platform__id", flat=True)
+                    .distinct()
+                )
+            elif filter_type == constants.PLATFORM_FILTER_ABANDONED:
+                queryset = queryset.filter(
+                    id__in=UserGame.objects.filter(user__username=username, abandoned=True)
+                    .values_list("platform__id", flat=True)
+                    .distinct()
+                )
+            elif filter_type == constants.PLATFORM_FILTER_CURRENTLY_PLAYING:
+                queryset = queryset.filter(
+                    id__in=UserGame.objects.filter(user__username=username, currently_playing=True)
+                    .values_list("platform__id", flat=True)
+                    .distinct()
+                )
+
+        queryset = queryset.only("id", "shortname")
+        options = [{"value": platform.shortname, "id": platform.id} for platform in queryset]
+
+    datalist_id = f"{input_id}_list"
+
+    return {
+        "input_id": input_id,
+        "datalist_id": datalist_id,
+        "action_url": action_url,
+        "options": options,
+        "placeholder": placeholder,
+        "entity_type": entity_type,
+        "size": size,
+    }

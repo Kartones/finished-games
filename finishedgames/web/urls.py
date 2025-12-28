@@ -15,7 +15,6 @@ urlpatterns = [
         game.GamesStartingWithCharacterView.as_view(),
         name="games_filtered_by_starting_character",
     ),
-    path("games/search/", game.GameSearch.as_view(), name="game_search"),
     path("platforms/", platform.platforms, name="platforms"),
     path("platforms/<int:platform_id>/", platform.platform_details, name="platform_details"),
     path("platforms/<int:platform_id>/games/", game.GamesByPlatformView.as_view(), name="games_by_platform"),
@@ -34,11 +33,6 @@ urlpatterns = [
     path("users/<slug:username>/games/pending/", user.GamesPendingView.as_view(), name="user_pending_games"),
     path("users/<slug:username>/games/abandoned/", user.GamesAbandonedView.as_view(), name="user_abandoned_games"),
     path("users/<slug:username>/games/wishlisted/", user.GamesWishlistedView.as_view(), name="user_wishlisted_games"),
-    path(
-        "users/<slug:username>/platforms/search/",
-        user.PlatformFilterSearch.as_view(),
-        name="user_games_platform_filter",
-    ),
     path(
         "users/<slug:username>/platforms/<int:platform_id>/games/",
         user.GamesByPlatformView.as_view(),
