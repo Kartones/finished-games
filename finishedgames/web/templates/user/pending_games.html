@@ -23,9 +23,19 @@
             {% if user.is_authenticated %}
                 <th>Actions</th>
                 {% if constants.KEY_FIELD_GAME_TIME in enabled_fields %}
-                    <th class="is-centered">
-                        Game Time
-                    </th>
+                    {% if sort_by == constants.SORT_BY_GAME_TIME %}
+                        <th class="is-centered">
+                            <a href="?{% query_update request sort_by=constants.SORT_BY_GAME_TIME_DESC exclude=exclude %}">Game Time &#8595;</a>
+                        </th>
+                    {% elif sort_by == constants.SORT_BY_GAME_TIME_DESC %}
+                        <th class="is-centered">
+                            <a href="?{% query_update request sort_by=constants.SORT_BY_GAME_TIME exclude=exclude %}">Game Time &#8593;</a>
+                        </th>
+                    {% else %}
+                        <th class="is-centered">
+                            <a href="?{% query_update request sort_by=constants.SORT_BY_GAME_TIME exclude=exclude %}">Game Time</a>
+                        </th>
+                    {% endif %}
                 {% endif %}
             {% endif %}
         </tr>

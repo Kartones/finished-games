@@ -12,6 +12,8 @@ SORT_BY_CURRENTLY_PLAYING = "playing"
 SORT_BY_CURRENTLY_PLAYING_DESC = "-playing"
 SORT_BY_NO_LONGER_OWNED = "notowned"
 SORT_BY_NO_LONGER_OWNED_DESC = "-notowned"
+SORT_BY_GAME_TIME = "gametime"
+SORT_BY_GAME_TIME_DESC = "-gametime"
 
 SORT_FIELDS_MAPPING = {
     SORT_BY_GAME_NAME: ["game__name"],
@@ -28,6 +30,8 @@ SORT_FIELDS_MAPPING = {
     SORT_BY_CURRENTLY_PLAYING_DESC: ["currently_playing", "game__name"],
     SORT_BY_NO_LONGER_OWNED: ["-no_longer_owned", "game__name"],
     SORT_BY_NO_LONGER_OWNED_DESC: ["no_longer_owned", "game__name"],
+    SORT_BY_GAME_TIME: ["-minutes_played", "game__name"],
+    SORT_BY_GAME_TIME_DESC: ["minutes_played", "game__name"],
 }
 
 PLATFORM_FILTER_ABANDONED = "abandoned"
