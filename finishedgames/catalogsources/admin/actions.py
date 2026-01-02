@@ -115,7 +115,7 @@ def import_fetched_games_link_only_if_exact_match(
         messages.warning(
             request,
             "{} Fetched Games linked, but some could not be linked: {}".format(successful_links, ", ".join(warnings))
-         )
+        )
     else:
         messages.success(request, "{} Fetched Games linked successfully".format(successful_links))
 

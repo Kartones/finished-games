@@ -138,12 +138,12 @@ class ImportManager:
             key: settings.CATALOG_SOURCES_ADAPTERS[key][constants.ADAPTER_DISPLAY_NAME]
             for key in settings.CATALOG_SOURCES_ADAPTERS.keys()
         }
-        errors = []  # type: List[str]
+        errors: List[str] = []
 
         for fetched_game_id in fetched_game_ids:
             fetched_game = FetchedGame.objects.filter(id=fetched_game_id).get()
 
-            available_platform_ids = []  # List[int]
+            available_platform_ids: List[int] = []
             for platform in fetched_game.platforms.all():
                 if platform.fg_platform:
                     available_platform_ids.append(platform.fg_platform.id)
@@ -179,12 +179,12 @@ class ImportManager:
             for key in settings.CATALOG_SOURCES_ADAPTERS.keys()
         }
 
-        errors = []  # type: List[str]
+        errors: List[str] = []
 
         for fetched_game_id in fetched_game_ids:
             fetched_game = FetchedGame.objects.filter(id=fetched_game_id).get()
 
-            available_platform_ids = []  # List[int]
+            available_platform_ids: List[int] = []
             first_available_platform_shortname = None
             for platform in fetched_game.platforms.all():
                 if platform.fg_platform:
@@ -222,13 +222,13 @@ class ImportManager:
             key: settings.CATALOG_SOURCES_ADAPTERS[key][constants.ADAPTER_DISPLAY_NAME]
             for key in settings.CATALOG_SOURCES_ADAPTERS.keys()
         }
-        errors = []  # type: List[str]
+        errors: List[str] = []
 
         for fetched_game_id in fetched_game_ids:
             fetched_game = FetchedGame.objects.filter(id=fetched_game_id).get()
 
-            game_id = None  # Optional[int]
-            available_platform_ids = []  # List[int]
+            game_id: Optional[int] = None
+            available_platform_ids: List[int] = []
             for platform in fetched_game.platforms.all():
                 if platform.fg_platform:
                     available_platform_ids.append(platform.fg_platform.id)
@@ -268,7 +268,7 @@ class ImportManager:
             key: settings.CATALOG_SOURCES_ADAPTERS[key][constants.ADAPTER_DISPLAY_NAME]
             for key in settings.CATALOG_SOURCES_ADAPTERS.keys()
         }
-        warnings = []  # type: List[str]
+        warnings: List[str] = []
 
         for fetched_game_id in fetched_game_ids:
             fetched_game = FetchedGame.objects.filter(id=fetched_game_id).get()
@@ -277,7 +277,7 @@ class ImportManager:
             if fetched_game.fg_game:
                 continue
 
-            available_platform_ids = []  # List[int]
+            available_platform_ids: List[int] = []
             for platform in fetched_game.platforms.all():
                 if platform.fg_platform:
                     available_platform_ids.append(platform.fg_platform.id)
@@ -288,7 +288,7 @@ class ImportManager:
                 warnings.append("Skipped '{}': unknown publish date".format(fetched_game.name))
                 continue
 
-            existing_game_id = None # Optional[int]
+            existing_game_id: Optional[int] = None
 
             try:
                 existing_game = Game.objects.filter(
@@ -297,9 +297,10 @@ class ImportManager:
                 ).get()
                 existing_game_id = existing_game.id
             except Game.DoesNotExist:
+                # Don't add warning yet, fallback will do it if needed
                 pass
             except Game.MultipleObjectsReturned:
-                warnings.append("Multiple matching game (name+date)s found for '{}' ({})".format(
+                warnings.append("Multiple games found matching name and date for '{}' ({})".format(
                     fetched_game.name,
                     fetched_game.publish_date
                 ))
@@ -358,7 +359,9 @@ class ImportManager:
                 count_skipped += 1
                 continue
 
-            available_platforms = [platform.id for platform in fetched_game.fg_game.platforms.all()]  # type: List[int]
+            available_platforms: List[int] = [
+                platform.id for platform in fetched_game.fg_game.platforms.all()
+            ]
 
             for platform in fetched_game.platforms.all():
                 if platform.fg_platform and (platform.fg_platform.id not in available_platforms):

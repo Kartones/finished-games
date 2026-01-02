@@ -1,6 +1,5 @@
 from datetime import datetime
 import json
-import os
 from pathlib import Path
 import time
 from typing import Any, Callable, cast, List, Optional, Tuple
@@ -80,23 +79,24 @@ class SteamAdapter(BaseAdapter):
         self.api_key = settings.CATALOG_SOURCES_ADAPTERS[self.SOURCE_ID][constants.ADAPTER_API_KEY]
         self.user_id = settings.CATALOG_SOURCES_ADAPTERS[self.SOURCE_ID][constants.ADAPTER_USER_ID]
 
-       # Steam in theory allows 100k requests per day, which would be ~4166 per hour,
-       # but internet mentions around 200 in 5-minute buckets, and I've hit it myself with less than 500 requests, so this adapter works in 5-minute windows.
-       # Seems that the rate limit also resets around every 5 minutes.
+        # Steam in theory allows 100k requests per day, which would be ~4166 per hour,
+        # but internet mentions around 200 in 5-minute buckets,
+        # and I've hit it myself with less than 500 requests, so this adapter works in 5-minute windows.
+        # Seems that the rate limit also resets around every 5 minutes.
 
         self.max_requests_per_time_window = settings.CATALOG_SOURCES_ADAPTERS[self.SOURCE_ID][
             constants.ADAPTER_REQUESTS_PER_HOUR
-        ]  / 12  # per 5 minutes
+        ]  // 12  # per 5 minutes
         self.wait_seconds_when_rate_limited = settings.CATALOG_SOURCES_ADAPTERS[self.SOURCE_ID][
             constants.ADAPTER_WAIT_SECONDS_WHEN_RATE_LIMITED
-        ] / 12  # per 5 minutes
+        ] // 12  # per 5 minutes
         self.time_window = 300  # X requests allowed in 5 minutes
         self.token_bucket = float(self.max_requests_per_time_window)  # Start with bucket full
         self.last_check_timestamp = 0.0
 
         self.offset = 0
         self.next_offset = 0
-        self.total_results = SteamAdapter.UNKOWN_TOTAL_RESULTS_VALUE
+        self.total_results = SteamAdapter.UNKNOWN_TOTAL_RESULTS_VALUE
         self.errored = False
         self.fetching = False
         self.pc_platform_cache = None  # type: Optional[FetchedPlatform]
@@ -115,7 +115,7 @@ class SteamAdapter(BaseAdapter):
     def reset(self) -> None:
         self.offset = 0
         self.next_offset = 0
-        self.total_results = SteamAdapter.UNKOWN_TOTAL_RESULTS_VALUE
+        self.total_results = SteamAdapter.UNKNOWN_TOTAL_RESULTS_VALUE
         self.errored = False
 
     @staticmethod
@@ -205,7 +205,7 @@ class SteamAdapter(BaseAdapter):
             return False
         if self.errored:
             return False
-        if self.total_results == SteamAdapter.UNKOWN_TOTAL_RESULTS_VALUE:
+        if self.total_results == SteamAdapter.UNKNOWN_TOTAL_RESULTS_VALUE:
             return True
         elif self.next_offset < self.total_results:
             return True
@@ -243,7 +243,7 @@ class SteamAdapter(BaseAdapter):
             if "release_date" in game_details and "date" in game_details["release_date"]:
                 release_date_str = game_details["release_date"]["date"]
                 try:
-                    # Observeed format: "27 Oct, 2017"
+                    # Observed format: "27 Oct, 2017"
                     if "," in release_date_str:
                         parsed_date = datetime.strptime(release_date_str, "%d %b, %Y")
                         data["publish_date"] = parsed_date.year
@@ -383,6 +383,6 @@ class SteamAdapter(BaseAdapter):
 
         self.stdout.write(".", ending="")
         if self.counter % NEWLINE_AFTER_N_GAMES == 0:
-                self.stdout.write("\n", ending="")
+            self.stdout.write("\n", ending="")
 
         return result

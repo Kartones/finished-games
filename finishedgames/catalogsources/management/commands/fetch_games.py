@@ -59,7 +59,7 @@ class Command(BaseCommand):
                     # For now at least, if fails gathering a platform, try with next one
                     while adapter.has_more_items() and not had_errors:
                         total = "-"
-                        if adapter.total_results != adapter.UNKOWN_TOTAL_RESULTS_VALUE:
+                        if adapter.total_results != adapter.UNKNOWN_TOTAL_RESULTS_VALUE:
                             total = str(adapter.total_results)
                         self.stdout.write(
                             "\n> Fetch call (platform_id {id}): {current}/{total}".format(
