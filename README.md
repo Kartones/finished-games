@@ -108,6 +108,8 @@ The command will sync:
 - New platforms (platforms not already present in the imported game). Note that it won't remove platforms.
 
 
+When adding a new catalog source, you need to implement an adapter (see `BaseAdapter` for the interface), and then register its id at `catalogsources/management/helpers.py`
+
 ----
 
 

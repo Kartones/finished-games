@@ -5,6 +5,7 @@ from typing import List
 
 from catalogsources.managers import ImportManager
 from django.contrib import admin, messages
+from django.contrib.admin.helpers import ACTION_CHECKBOX_NAME
 from django.db.models import F
 from django.db.models.query import QuerySet
 from django.http import HttpRequest, HttpResponseRedirect
@@ -25,7 +26,7 @@ def import_fetched_items(
     if request.POST["select_across"] == "1":
         ids = constants.ALL_IDS
     else:
-        ids = ",".join(request.POST.getlist(admin.ACTION_CHECKBOX_NAME))
+        ids = ",".join(request.POST.getlist(ACTION_CHECKBOX_NAME))
     return HttpResponseRedirect("import_setup/?ids={}&hidden={}".format(ids, request.GET.get("hidden", "False")))
 
 
@@ -98,6 +99,32 @@ import_fetched_games_link_automatically_if_name_and_year_matches.short_descripti
 )
 
 
+def import_fetched_games_link_only_if_exact_match(
+    modeladmin: admin.ModelAdmin, request: HttpRequest, queryset: QuerySet
+) -> None:
+    try:
+        game_ids = selected_fetched_game_ids(request, modeladmin)
+    except ValueError as error:
+        messages.error(request, error)
+        return
+
+    warnings = ImportManager.import_fetched_games_link_only_if_exact_match(game_ids)
+    successful_links = len(game_ids) - len(warnings)
+
+    if warnings:
+        messages.warning(
+            request,
+            "{} Fetched Games linked, but some could not be linked: {}".format(successful_links, ", ".join(warnings))
+        )
+    else:
+        messages.success(request, "{} Fetched Games linked successfully".format(successful_links))
+
+
+import_fetched_games_link_only_if_exact_match.short_description = (  # type:ignore # NOQA: E305, E501
+    "Link game(s) if exact match"
+)
+
+
 def sync_fetched_games_base_fields(modeladmin: admin.ModelAdmin, request: HttpRequest, queryset: QuerySet) -> None:
     try:
         game_ids = selected_fetched_game_ids(request, modeladmin)
@@ -152,4 +179,4 @@ def selected_fetched_game_ids(request: HttpRequest, modeladmin: admin.ModelAdmin
 
         return [game_id for game_id in queryset.values_list("id", flat=True)]
     else:
-        return [int(game_id) for game_id in request.POST.getlist(admin.ACTION_CHECKBOX_NAME)]
+        return [int(game_id) for game_id in request.POST.getlist(ACTION_CHECKBOX_NAME)]

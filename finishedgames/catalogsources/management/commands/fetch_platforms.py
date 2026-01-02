@@ -29,7 +29,7 @@ class Command(BaseCommand):
             self.stdout.write(self.style.WARNING("> Batch size:{}".format(adapter.batch_size())))
 
             while adapter.has_more_items() and not had_errors:
-                total = adapter.total_results if adapter.total_results != adapter.UNKOWN_TOTAL_RESULTS_VALUE else "-"
+                total = adapter.total_results if adapter.total_results != adapter.UNKNOWN_TOTAL_RESULTS_VALUE else "-"
                 self.stdout.write("\n> Fetch call: {current}/{total}".format(current=adapter.next_offset, total=total))
 
                 with TimeProfiler(use_performance_counter=True) as profiler:

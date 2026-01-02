@@ -67,7 +67,7 @@ class GiantBombAdapter(BaseAdapter):
 
         self.offset = 0
         self.next_offset = 0
-        self.total_results = GiantBombAdapter.UNKOWN_TOTAL_RESULTS_VALUE
+        self.total_results = GiantBombAdapter.UNKNOWN_TOTAL_RESULTS_VALUE
         self.errored = False
         self.last_request_data = {}  # type: Dict
         self.platforms_cache = {}  # type: Dict[int, Optional[FetchedPlatform]]
@@ -80,7 +80,7 @@ class GiantBombAdapter(BaseAdapter):
     def reset(self) -> None:
         self.offset = 0
         self.next_offset = 0
-        self.total_results = GiantBombAdapter.UNKOWN_TOTAL_RESULTS_VALUE
+        self.total_results = GiantBombAdapter.UNKNOWN_TOTAL_RESULTS_VALUE
         self.error = False
         self.last_request_data = {}
 
@@ -214,7 +214,7 @@ class GiantBombAdapter(BaseAdapter):
         if self.errored:
             return False
         # First fetch call
-        if self.total_results == GiantBombAdapter.UNKOWN_TOTAL_RESULTS_VALUE:
+        if self.total_results == GiantBombAdapter.UNKNOWN_TOTAL_RESULTS_VALUE:
             return True
         # >1 calls with more results
         elif self.next_offset < self.total_results:

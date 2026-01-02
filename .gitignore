@@ -27,3 +27,6 @@ finishedgames/finishedgames/settings/prod.py
 finishedgames/finishedgames/settings/local.py
 requirements-prod.txt
 /statics
+
+# CACHE_FOLDER_NAME variable at SteamAdapter
+cache_steam_game_details_v1/

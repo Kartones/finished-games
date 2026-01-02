@@ -50,7 +50,18 @@ class ImportManager:
         if include_all_fields or "publish_date" in cast(List[str], update_fields_filter):
             if not publish_date_string:
                 raise GameImportSaveError("Publish Date field missing")
-            game.publish_date = publish_date_string
+            publish_date = int(publish_date_string)
+
+            # new title
+            if not game.publish_date:
+                game.publish_date = UNKNOWN_PUBLISH_DATE
+
+            # Only update publish date if we have a better one, favouring earlier dates
+            # e.g. RDR was first published in 2010 on consoles, but on PC arrived in 2024
+            if publish_date != UNKNOWN_PUBLISH_DATE and (
+                game.publish_date == UNKNOWN_PUBLISH_DATE or publish_date <= game.publish_date
+            ):
+                game.publish_date = publish_date
         if include_all_fields or "dlc_or_expansion" in cast(List[str], update_fields_filter):
             if dlc_or_expansion is None:
                 raise GameImportSaveError("DLC field missing")
@@ -127,12 +138,12 @@ class ImportManager:
             key: settings.CATALOG_SOURCES_ADAPTERS[key][constants.ADAPTER_DISPLAY_NAME]
             for key in settings.CATALOG_SOURCES_ADAPTERS.keys()
         }
-        errors = []  # type: List[str]
+        errors: List[str] = []
 
         for fetched_game_id in fetched_game_ids:
             fetched_game = FetchedGame.objects.filter(id=fetched_game_id).get()
 
-            available_platform_ids = []  # List[int]
+            available_platform_ids: List[int] = []
             for platform in fetched_game.platforms.all():
                 if platform.fg_platform:
                     available_platform_ids.append(platform.fg_platform.id)
@@ -168,12 +179,12 @@ class ImportManager:
             for key in settings.CATALOG_SOURCES_ADAPTERS.keys()
         }
 
-        errors = []  # type: List[str]
+        errors: List[str] = []
 
         for fetched_game_id in fetched_game_ids:
             fetched_game = FetchedGame.objects.filter(id=fetched_game_id).get()
 
-            available_platform_ids = []  # List[int]
+            available_platform_ids: List[int] = []
             first_available_platform_shortname = None
             for platform in fetched_game.platforms.all():
                 if platform.fg_platform:
@@ -211,13 +222,13 @@ class ImportManager:
             key: settings.CATALOG_SOURCES_ADAPTERS[key][constants.ADAPTER_DISPLAY_NAME]
             for key in settings.CATALOG_SOURCES_ADAPTERS.keys()
         }
-        errors = []  # type: List[str]
+        errors: List[str] = []
 
         for fetched_game_id in fetched_game_ids:
             fetched_game = FetchedGame.objects.filter(id=fetched_game_id).get()
 
-            game_id = None  # Optional[int]
-            available_platform_ids = []  # List[int]
+            game_id: Optional[int] = None
+            available_platform_ids: List[int] = []
             for platform in fetched_game.platforms.all():
                 if platform.fg_platform:
                     available_platform_ids.append(platform.fg_platform.id)
@@ -252,6 +263,87 @@ class ImportManager:
         return errors
 
     @classmethod
+    def import_fetched_games_link_only_if_exact_match(cls, fetched_game_ids: List[int]) -> List[str]:
+        source_display_names = {
+            key: settings.CATALOG_SOURCES_ADAPTERS[key][constants.ADAPTER_DISPLAY_NAME]
+            for key in settings.CATALOG_SOURCES_ADAPTERS.keys()
+        }
+        warnings: List[str] = []
+
+        for fetched_game_id in fetched_game_ids:
+            fetched_game = FetchedGame.objects.filter(id=fetched_game_id).get()
+
+            # Already linked, skip
+            if fetched_game.fg_game:
+                continue
+
+            available_platform_ids: List[int] = []
+            for platform in fetched_game.platforms.all():
+                if platform.fg_platform:
+                    available_platform_ids.append(platform.fg_platform.id)
+
+            source_display_name = source_display_names[fetched_game.source_id]
+
+            if fetched_game.publish_date == UNKNOWN_PUBLISH_DATE:
+                warnings.append("Skipped '{}': unknown publish date".format(fetched_game.name))
+                continue
+
+            existing_game_id: Optional[int] = None
+
+            try:
+                existing_game = Game.objects.filter(
+                    name=fetched_game.name,
+                    publish_date=fetched_game.publish_date
+                ).get()
+                existing_game_id = existing_game.id
+            except Game.DoesNotExist:
+                # Don't add warning yet, fallback will do it if needed
+                pass
+            except Game.MultipleObjectsReturned:
+                warnings.append("Multiple games found matching name and date for '{}' ({})".format(
+                    fetched_game.name,
+                    fetched_game.publish_date
+                ))
+                # do not attempt to link in this case
+                continue
+
+            # second try, only by name
+            if not existing_game_id:
+                try:
+                    existing_game = Game.objects.filter(
+                        name=fetched_game.name,
+                    ).get()
+                    existing_game_id = existing_game.id
+                except Game.DoesNotExist:
+                    warnings.append("No matching game name found for '{}' ({})".format(
+                        fetched_game.name,
+                        fetched_game.publish_date
+                    ))
+                except Game.MultipleObjectsReturned:
+                    warnings.append("Multiple matching game names found for '{}' ({})".format(
+                        fetched_game.name,
+                        fetched_game.publish_date
+                    ))
+
+            if existing_game_id:
+                try:
+                    cls.import_fetched_game(
+                        name=fetched_game.name,
+                        publish_date_string=str(fetched_game.publish_date),
+                        dlc_or_expansion=fetched_game.dlc_or_expansion,
+                        platforms=available_platform_ids,
+                        game_id=existing_game_id,
+                        fetched_game_id=fetched_game_id,
+                        source_display_name=source_display_name,
+                        source_url=fetched_game.source_url,
+                        update_fields_filter=["publish_date", "dlc_or_expansion", "platforms"],
+                    )
+                except GameImportSaveError as error:
+                    warnings.append("Failed to link '{}': {}".format(fetched_game.name, error))
+
+        return warnings
+
+    @classmethod
     def sync_fetched_games(cls, fetched_game_ids: List[int], force_sync: bool = False) -> Tuple[int, int]:
         source_display_names = {
             key: settings.CATALOG_SOURCES_ADAPTERS[key][constants.ADAPTER_DISPLAY_NAME]
@@ -267,7 +359,9 @@ class ImportManager:
                 count_skipped += 1
                 continue
 
-            available_platforms = [platform.id for platform in fetched_game.fg_game.platforms.all()]  # type: List[int]
+            available_platforms: List[int] = [
+                platform.id for platform in fetched_game.fg_game.platforms.all()
+            ]
 
             for platform in fetched_game.platforms.all():
                 if platform.fg_platform and (platform.fg_platform.id not in available_platforms):
