@@ -5,6 +5,7 @@ from catalogsources.admin.actions import (
     import_fetched_games_fixing_duplicates_appending_platform,
     import_fetched_games_fixing_duplicates_appending_publish_date,
     import_fetched_games_link_automatically_if_name_and_year_matches,
+    import_fetched_games_link_only_if_exact_match,
     import_fetched_items,
     sync_fetched_games_base_fields,
 )
@@ -66,6 +67,7 @@ class FetchedGameAdmin(FetchedGameAdminViewsMixin, FGModelAdmin):
         import_fetched_games_fixing_duplicates_appending_platform,
         import_fetched_games_fixing_duplicates_appending_publish_date,
         import_fetched_games_link_automatically_if_name_and_year_matches,
+        import_fetched_games_link_only_if_exact_match,
         sync_fetched_games_base_fields,
     ]
     raw_id_fields = [

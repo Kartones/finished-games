@@ -16,6 +16,14 @@ from django.core.management.color import Style
 from finishedgames import constants
 
 
+"""
+References:
+- https://steamcommunity.com/dev
+- https://developer.valvesoftware.com/wiki/Steam_Web_API
+- https://steamcommunity.com/dev/apikey
+"""
+
+
 # Steam doesn't have pagination
 BATCH_SIZE = 50000
 
