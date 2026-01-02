@@ -5,6 +5,7 @@ from typing import List
 
 from catalogsources.managers import ImportManager
 from django.contrib import admin, messages
+from django.contrib.admin.helpers import ACTION_CHECKBOX_NAME
 from django.db.models import F
 from django.db.models.query import QuerySet
 from django.http import HttpRequest, HttpResponseRedirect
@@ -25,7 +26,7 @@ def import_fetched_items(
     if request.POST["select_across"] == "1":
         ids = constants.ALL_IDS
     else:
-        ids = ",".join(request.POST.getlist(admin.ACTION_CHECKBOX_NAME))
+        ids = ",".join(request.POST.getlist(ACTION_CHECKBOX_NAME))
     return HttpResponseRedirect("import_setup/?ids={}&hidden={}".format(ids, request.GET.get("hidden", "False")))
 
 
@@ -152,4 +153,4 @@ def selected_fetched_game_ids(request: HttpRequest, modeladmin: admin.ModelAdmin
 
         return [game_id for game_id in queryset.values_list("id", flat=True)]
     else:
-        return [int(game_id) for game_id in request.POST.getlist(admin.ACTION_CHECKBOX_NAME)]
+        return [int(game_id) for game_id in request.POST.getlist(ACTION_CHECKBOX_NAME)]
