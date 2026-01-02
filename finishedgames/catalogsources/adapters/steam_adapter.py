@@ -3,7 +3,7 @@ import json
 import os
 from pathlib import Path
 import time
-from typing import Any, Callable, List, Optional, Tuple
+from typing import Any, Callable, cast, List, Optional, Tuple
 
 import requests
 from catalogsources.adapters.base_adapter import BaseAdapter
@@ -290,7 +290,7 @@ class SteamAdapter(BaseAdapter):
 
         try:
             with open(cache_file, "r", encoding="utf-8") as file_handle:
-                return json.load(file_handle)
+                return cast(dict, json.load(file_handle))
         except (json.decoder.JSONDecodeError, IOError) as e:
             self.stdout.write(
                 self.stdout_style.WARNING(f"Failed to read cache for app ID {app_id}: {e}")
@@ -320,7 +320,7 @@ class SteamAdapter(BaseAdapter):
                 self.stdout.write("\n", ending="")
             return cached_data
 
-        return self._fetch_game_details(app_id)
+        return self._fetch_game_details(app_id)  # type: ignore[no-any-return]
 
     @rate_limit
     def _fetch_game_details(self, app_id: int) -> dict:
@@ -338,13 +338,13 @@ class SteamAdapter(BaseAdapter):
 
         request = requests.get(url, headers={"user-agent": settings.CATALOG_SOURCES_ADAPTER_USER_AGENT})
 
-        result = {}
+        result = dict()
         write_to_cache = False
         if request.status_code == 200:
             try:
                 response_data = request.json()
                 if str(app_id) in response_data and response_data[str(app_id)]["success"]:
-                    result = response_data[str(app_id)]["data"]
+                    result = cast(dict, response_data[str(app_id)]["data"])
                 else:
                     self.stdout.write(
                         self.stdout_style.WARNING(
@@ -354,7 +354,7 @@ class SteamAdapter(BaseAdapter):
                         )
                     )
                     # Assume there is no data, e.g. '590' is 'Left 4 Dead 2 Demo'
-                    result = {}
+                    result = dict()
                 write_to_cache = True
             except json.decoder.JSONDecodeError:
                 self.stdout.write(self.stdout_style.ERROR("Unable to decode content as JSON"))
@@ -367,7 +367,7 @@ class SteamAdapter(BaseAdapter):
                 )
             )
             time.sleep(self.wait_seconds_when_rate_limited)
-            return self._fetch_game_details(app_id)
+            return self._fetch_game_details(app_id)  # type: ignore[no-any-return]
 
         else:
             self.stdout.write(

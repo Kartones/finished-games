@@ -50,7 +50,18 @@ class ImportManager:
         if include_all_fields or "publish_date" in cast(List[str], update_fields_filter):
             if not publish_date_string:
                 raise GameImportSaveError("Publish Date field missing")
-            game.publish_date = publish_date_string
+            publish_date = int(publish_date_string)
+
+            # new title
+            if not game.publish_date:
+                game.publish_date = UNKNOWN_PUBLISH_DATE
+
+            # Only update publish date if we have a better one, favouring earlier dates
+            # e.g. RDR was first published in 2010 on consoles, but on PC arrived in 2024
+            if publish_date != UNKNOWN_PUBLISH_DATE and (
+                game.publish_date == UNKNOWN_PUBLISH_DATE or publish_date <= game.publish_date
+            ):
+                game.publish_date = publish_date
         if include_all_fields or "dlc_or_expansion" in cast(List[str], update_fields_filter):
             if dlc_or_expansion is None:
                 raise GameImportSaveError("DLC field missing")
@@ -277,20 +288,50 @@ class ImportManager:
                 warnings.append("Skipped '{}': unknown publish date".format(fetched_game.name))
                 continue
 
-            # Try to find an existing game with matching name and year
+            existing_game_id = None # Optional[int]
+
             try:
                 existing_game = Game.objects.filter(
                     name=fetched_game.name,
                     publish_date=fetched_game.publish_date
                 ).get()
+                existing_game_id = existing_game.id
+            except Game.DoesNotExist:
+                pass
+            except Game.MultipleObjectsReturned:
+                warnings.append("Multiple matching game (name+date)s found for '{}' ({})".format(
+                    fetched_game.name,
+                    fetched_game.publish_date
+                ))
+                # do not attempt to link in this case
+                continue
 
+            # second try, only by name
+            if not existing_game_id:
+                try:
+                    existing_game = Game.objects.filter(
+                        name=fetched_game.name,
+                    ).get()
+                    existing_game_id = existing_game.id
+                except Game.DoesNotExist:
+                    warnings.append("No matching game name found for '{}' ({})".format(
+                        fetched_game.name,
+                        fetched_game.publish_date
+                    ))
+                except Game.MultipleObjectsReturned:
+                    warnings.append("Multiple matching game names found for '{}' ({})".format(
+                        fetched_game.name,
+                        fetched_game.publish_date
+                    ))
+
+            if existing_game_id:
                 try:
                     cls.import_fetched_game(
                         name=fetched_game.name,
                         publish_date_string=str(fetched_game.publish_date),
                         dlc_or_expansion=fetched_game.dlc_or_expansion,
                         platforms=available_platform_ids,
-                        game_id=existing_game.id,
+                        game_id=existing_game_id,
                         fetched_game_id=fetched_game_id,
                         source_display_name=source_display_name,
                         source_url=fetched_game.source_url,
@@ -298,16 +339,6 @@ class ImportManager:
                     )
                 except GameImportSaveError as error:
                     warnings.append("Failed to link '{}': {}".format(fetched_game.name, error))
-            except Game.DoesNotExist:
-                warnings.append("No matching game found for '{}' ({})".format(
-                    fetched_game.name,
-                    fetched_game.publish_date
-                ))
-            except Game.MultipleObjectsReturned:
-                warnings.append("Multiple matching games found for '{}' ({})".format(
-                    fetched_game.name,
-                    fetched_game.publish_date
-                ))
 
         return warnings
 

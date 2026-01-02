@@ -108,11 +108,8 @@ def import_fetched_games_link_only_if_exact_match(
         messages.error(request, error)
         return
 
-    total_games = len(game_ids)
-
     warnings = ImportManager.import_fetched_games_link_only_if_exact_match(game_ids)
-
-    successful_links = total_games - len(warnings)
+    successful_links = len(game_ids) - len(warnings)
 
     if warnings:
         messages.warning(
@@ -124,7 +121,7 @@ def import_fetched_games_link_only_if_exact_match(
 
 
 import_fetched_games_link_only_if_exact_match.short_description = (  # type:ignore # NOQA: E305, E501
-    "Link game(s) if exact name & date match"
+    "Link game(s) if exact match"
 )
 
 
