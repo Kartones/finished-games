@@ -263,7 +263,7 @@ class ImportManager:
         return errors
 
     @classmethod
-    def import_fetched_games_link_only_if_exact_match(cls, fetched_game_ids: List[int]) -> List[str]:
+    def import_fetched_games_link_only_if_exact_match(cls, fetched_game_ids: List[int], fallback_to_name_match: bool) -> List[str]:
         source_display_names = {
             key: settings.CATALOG_SOURCES_ADAPTERS[key][constants.ADAPTER_DISPLAY_NAME]
             for key in settings.CATALOG_SOURCES_ADAPTERS.keys()
@@ -297,7 +297,12 @@ class ImportManager:
                 ).get()
                 existing_game_id = existing_game.id
             except Game.DoesNotExist:
-                # Don't add warning yet, fallback will do it if needed
+                if not fallback_to_name_match:
+                    warnings.append("No exact match found for '{}' ({})".format(
+                        fetched_game.name,
+                        fetched_game.publish_date
+                    ))
+                # Else don't add warning yet, fallback will do it if needed
                 pass
             except Game.MultipleObjectsReturned:
                 warnings.append("Multiple games found matching name and date for '{}' ({})".format(
@@ -308,7 +313,7 @@ class ImportManager:
                 continue
 
             # second try, only by name
-            if not existing_game_id:
+            if not existing_game_id and fallback_to_name_match:
                 try:
                     existing_game = Game.objects.filter(
                         name=fetched_game.name,

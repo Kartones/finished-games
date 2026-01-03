@@ -99,7 +99,7 @@ import_fetched_games_link_automatically_if_name_and_year_matches.short_descripti
 )
 
 
-def import_fetched_games_link_only_if_exact_match(
+def import_fetched_games_link_only_if_exact_name_and_date_match(
     modeladmin: admin.ModelAdmin, request: HttpRequest, queryset: QuerySet
 ) -> None:
     try:
@@ -108,7 +108,7 @@ def import_fetched_games_link_only_if_exact_match(
         messages.error(request, error)
         return
 
-    warnings = ImportManager.import_fetched_games_link_only_if_exact_match(game_ids)
+    warnings = ImportManager.import_fetched_games_link_only_if_exact_match(game_ids, False)
     successful_links = len(game_ids) - len(warnings)
 
     if warnings:
@@ -120,8 +120,33 @@ def import_fetched_games_link_only_if_exact_match(
         messages.success(request, "{} Fetched Games linked successfully".format(successful_links))
 
 
-import_fetched_games_link_only_if_exact_match.short_description = (  # type:ignore # NOQA: E305, E501
-    "Link game(s) if exact match"
+import_fetched_games_link_only_if_exact_name_and_date_match.short_description = (  # type:ignore # NOQA: E305, E501
+    "Link game(s) if exact name & date match"
+)
+
+def import_fetched_games_link_only_if_exact_name_match(
+    modeladmin: admin.ModelAdmin, request: HttpRequest, queryset: QuerySet
+) -> None:
+    try:
+        game_ids = selected_fetched_game_ids(request, modeladmin)
+    except ValueError as error:
+        messages.error(request, error)
+        return
+
+    warnings = ImportManager.import_fetched_games_link_only_if_exact_match(game_ids, True)
+    successful_links = len(game_ids) - len(warnings)
+
+    if warnings:
+        messages.warning(
+            request,
+            "{} Fetched Games linked, but some could not be linked: {}".format(successful_links, ", ".join(warnings))
+        )
+    else:
+        messages.success(request, "{} Fetched Games linked successfully".format(successful_links))
+
+
+import_fetched_games_link_only_if_exact_name_match.short_description = (  # type:ignore # NOQA: E305, E501
+    "Link game(s) if exact name match"
 )
 
 
