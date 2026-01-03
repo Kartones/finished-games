@@ -263,7 +263,9 @@ class ImportManager:
         return errors
 
     @classmethod
-    def import_fetched_games_link_only_if_exact_match(cls, fetched_game_ids: List[int], fallback_to_name_match: bool) -> List[str]:
+    def import_fetched_games_link_only_if_exact_match(
+        cls, fetched_game_ids: List[int], fallback_to_name_match: bool
+    ) -> List[str]:
         source_display_names = {
             key: settings.CATALOG_SOURCES_ADAPTERS[key][constants.ADAPTER_DISPLAY_NAME]
             for key in settings.CATALOG_SOURCES_ADAPTERS.keys()
@@ -292,7 +294,7 @@ class ImportManager:
 
             try:
                 existing_game = Game.objects.filter(
-                    name=fetched_game.name,
+                    name__iexact=fetched_game.name,
                     publish_date=fetched_game.publish_date
                 ).get()
                 existing_game_id = existing_game.id
@@ -316,7 +318,7 @@ class ImportManager:
             if not existing_game_id and fallback_to_name_match:
                 try:
                     existing_game = Game.objects.filter(
-                        name=fetched_game.name,
+                        name__iexact=fetched_game.name,
                     ).get()
                     existing_game_id = existing_game.id
                 except Game.DoesNotExist:
