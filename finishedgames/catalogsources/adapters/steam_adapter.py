@@ -5,13 +5,13 @@ import time
 from typing import Any, Callable, cast, List, Optional, Tuple
 
 import requests
+
 from catalogsources.adapters.base_adapter import BaseAdapter
 from catalogsources.adapters.helpers import check_rate_limit
 from catalogsources.models import FetchedGame, FetchedPlatform
 from django.conf import settings
 from django.core.management.base import OutputWrapper
 from django.core.management.color import Style
-
 from finishedgames import constants
 
 
@@ -231,7 +231,7 @@ class SteamAdapter(BaseAdapter):
                 "name": game["name"],
                 "source_game_id": str(game["appid"]),
                 "source_id": SteamAdapter.source_id(),
-                "source_url": "{}/app/{}".format(PC_PLATFORM_URL, game["appid"]),
+                "source_url": "{}app/{}".format(PC_PLATFORM_URL, game["appid"]),
                 "publish_date": SteamAdapter.DEFAULT_PUBLISH_DATE,
             }
 
