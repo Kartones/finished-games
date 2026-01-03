@@ -111,10 +111,15 @@ def import_fetched_games_link_only_if_exact_name_and_date_match(
     warnings = ImportManager.import_fetched_games_link_only_if_exact_match(game_ids, False)
     successful_links = len(game_ids) - len(warnings)
 
-    if warnings:
+    if successful_links and warnings:
         messages.warning(
             request,
             "{} Fetched Games linked, but some could not be linked: {}".format(successful_links, ", ".join(warnings))
+        )
+    elif warnings:
+        messages.warning(
+            request,
+            "No Fetched Games linked: {}".format(", ".join(warnings))
         )
     else:
         messages.success(request, "{} Fetched Games linked successfully".format(successful_links))
@@ -136,10 +141,15 @@ def import_fetched_games_link_only_if_exact_name_match(
     warnings = ImportManager.import_fetched_games_link_only_if_exact_match(game_ids, True)
     successful_links = len(game_ids) - len(warnings)
 
-    if warnings:
+    if successful_links and warnings:
         messages.warning(
             request,
             "{} Fetched Games linked, but some could not be linked: {}".format(successful_links, ", ".join(warnings))
+        )
+    elif warnings:
+        messages.warning(
+            request,
+            "No Fetched Games linked: {}".format(", ".join(warnings))
         )
     else:
         messages.success(request, "{} Fetched Games linked successfully".format(successful_links))
