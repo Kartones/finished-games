@@ -1,4 +1,5 @@
-from datetime import datetime
+import copy
+from datetime import datetime, timezone
 import json
 from pathlib import Path
 import time
@@ -28,6 +29,9 @@ BATCH_SIZE = 50000
 
 # If we change the game details to fetch more/different data
 CACHE_FOLDER_NAME = "cache_steam_game_details_v1"
+# After this value, we'll consider invalidated any cached data for unreleased games
+CACHE_UNRELEASED_DAYS_LONGEVITY = 7
+CACHE_LAST_CACHE_TS_KEY = "last_cached_timestamp"
 
 PC_PLATFORM_ID = 1
 PC_PLATFORM_NAME = "PC"
@@ -281,30 +285,55 @@ class SteamAdapter(BaseAdapter):
 
         return self.pc_platform_cache
 
-    def _cache_read(self, app_id: int) -> Optional[dict]:
+    def _cache_read(self, app_id: int) -> dict[str, Any] | None:
         cache_dir = Path(CACHE_FOLDER_NAME)
         cache_file = cache_dir / f"{app_id}.json"
 
         if not cache_file.exists():
             return None
 
+        data: dict[str, Any] | None = None
+
         try:
             with open(cache_file, "r", encoding="utf-8") as file_handle:
-                return cast(dict, json.load(file_handle))
+                data = cast(dict, json.load(file_handle))
         except (json.decoder.JSONDecodeError, IOError) as e:
             self.stdout.write(
                 self.stdout_style.WARNING(f"Failed to read cache for app ID {app_id}: {e}")
             )
-            return None
+
+        # Avoid permanentely caching unreleased games.
+        # Although if it's not released, how come you own it? preorder maybe?
+        if data and "release_date" in data and CACHE_LAST_CACHE_TS_KEY in data["release_date"]:
+            try:
+                last_cached_str = data["release_date"][CACHE_LAST_CACHE_TS_KEY]
+                last_cached_dt = datetime.fromisoformat(last_cached_str)
+                now_dt = datetime.now(timezone.utc)
+                delta_days = (now_dt - last_cached_dt).days
+                if delta_days > CACHE_UNRELEASED_DAYS_LONGEVITY:
+                    data = None
+            except ValueError:
+                # Invalid timestamp somehow, invalidate cache
+                data = None
+
+        return data
+
 
     def _cache_write(self, app_id: int, data: dict) -> None:
         cache_dir = Path(CACHE_FOLDER_NAME)
         cache_file = cache_dir / f"{app_id}.json"
 
+        is_unreleased = \
+            "release_date" in data and "coming_soon" in data["release_date"] and data["release_date"]["coming_soon"]
+
+        data_copy = copy.deepcopy(data)
+        if is_unreleased:
+            data_copy["release_date"][CACHE_LAST_CACHE_TS_KEY] = datetime.now(timezone.utc).isoformat()
+
         try:
             cache_dir.mkdir(parents=True, exist_ok=True)
             with open(cache_file, "w", encoding="utf-8") as file_handle:
-                json.dump(data, file_handle, indent=2)
+                json.dump(data_copy, file_handle, indent=2)
         except IOError as e:
             self.stdout.write(
                 self.stdout_style.WARNING(f"Failed to write cache for app ID {app_id}: {e}")
