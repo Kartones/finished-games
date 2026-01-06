@@ -18,6 +18,7 @@ STATICFILES_DIRS = [
 
 EXTRA_GAME_INFO_BUTTONS += [  # NOQA: F405
     ("PCGamingWiki", "https://www.pcgamingwiki.com/w/index.php?search={}&title=Special%3ASearch", 10),
+    ("WSFG", "https://www.wsgf.org/search/node?keys={}", 10),
 ]
 
 
