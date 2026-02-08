@@ -51,18 +51,25 @@ class Command(BaseCommand):
             required=True,
             help="Finished Games user ID",
         )
+        parser.add_argument(
+            "--verbose",
+            action="store_true",
+            default=False,
+            help="Print verbose output",
+        )
 
     def handle(self, *args: Any, **options: Dict) -> None:
         steam_user_id = settings.CATALOG_SOURCES_ADAPTERS[SOURCE_ID][constants.ADAPTER_USER_ID]
         steam_api_key = settings.CATALOG_SOURCES_ADAPTERS[SOURCE_ID][constants.ADAPTER_API_KEY]
 
         fg_user_id = cast(int, options["fg_user_id"])
+        verbose = cast(bool, options["verbose"])
 
         self.stdout.write(f"Going to import Steam game times for user ID {steam_user_id} into Finished Games user ID {fg_user_id}")
 
         game_data = self._fetch_data(steam_user_id, steam_api_key)
         for data in game_data:
-            self.process_game_time(data.title, data.platform_id, data.minutes_played, fg_user_id)
+            self.process_game_time(data.title, data.platform_id, data.minutes_played, fg_user_id, verbose)
 
     def _get_game(self, game_name: str, platform_id: int) -> Any:
         mapped_name = CATALOG_TITLE_MAPPINGS.get(game_name, game_name)
@@ -129,8 +136,12 @@ class Command(BaseCommand):
 
         return sorted(result, key=lambda x: x.title)
 
-    def process_game_time(self, game_name: str, platform_id: int, minutes_played: int, fg_user_id: int) -> None:
+    def process_game_time(
+        self, game_name: str, platform_id: int, minutes_played: int, fg_user_id: int, verbose: bool = False
+    ) -> None:
         if minutes_played == 0 or not game_name:
+            if verbose:
+                self.stdout.write(f"{game_name} : skipped (zero playtime or empty name)")
             return
 
         user_game: Optional[UserGame] = None
@@ -152,13 +163,16 @@ class Command(BaseCommand):
             return
 
         if user_game:
+            old_minutes = user_game.minutes_played
+
             if user_game.minutes_played >= minutes_played:
+                if verbose:
+                    self.stdout.write(f"{game_name} : skipped, {old_minutes} > {minutes_played}")
                 return
 
-            old_minutes = user_game.minutes_played
             user_game.minutes_played = minutes_played
             user_game.save()
-            self.stdout.write(self.style.SUCCESS(f"{game_name} : updated, {old_minutes} -> {minutes_played} minutes"))
+            self.stdout.write(self.style.SUCCESS(f"{game_name} : updated, {old_minutes} -> {minutes_played}"))
         else:
             # Do not create new entries
             self.stdout.write(self.style.WARNING(
