@@ -129,5 +129,7 @@ EXTRA_GAME_INFO_BUTTONS = [
     ("GameFAQs", "https://gamefaqs.gamespot.com/search?game={}", None),
 ]
 
-# If True, hides the button at the header that shows the list of users
+# If True, hides the buttons at the header
+HIDE_GAMES_BUTTON = False
+HIDE_PLATFORMS_BUTTON = False
 HIDE_USERS_BUTTON = False

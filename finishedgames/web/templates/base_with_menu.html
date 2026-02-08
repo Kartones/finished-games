@@ -5,18 +5,21 @@
 {% block menu %}
     <section class="nes-container menu">
         <div>
-            <a class="nes-btn" href="{% url 'games' %}" title="Games">Games</a>
-            <a class="nes-btn" href="{% url 'platforms' %}" title="Platforms">Platforms</a>
+            {% if not HIDE_GAMES_BUTTON %}
+                <a class="nes-btn" href="{% url 'games' %}" title="Games">Games</a>
+            {% endif %}
+            {% if not HIDE_PLATFORMS_BUTTON %}
+                <a class="nes-btn" href="{% url 'platforms' %}" title="Platforms">Platforms</a>
+            {% endif %}
             {% if not HIDE_USERS_BUTTON %}
                 <a class="nes-btn" href="{% url 'users' %}" title="Users">Users</a>
             {% endif %}
+                <a class="nes-btn" href="{% url 'help' %}" title="Help">Help</a>
             {% if user.is_authenticated %}
                 <a class="nes-btn is-right" href="{% url 'logout' %}" title="Logout">Logout</a>
-                <a class="nes-btn is-right" href="{% url 'help' %}" title="Help">Help</a>
                 <a class="nes-btn is-right" href="{% url 'user_catalog' user.get_username %}" title="Profile">Profile</a>
             {% else %}
                 <a class="nes-btn is-success is-right" href="{% url 'login' %}" title="Login">Login</a>
-                <a class="nes-btn is-right" href="{% url 'help' %}" title="Help">Help</a>
             {% endif %}
         </div>
     </section>
