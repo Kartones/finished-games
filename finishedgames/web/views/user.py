@@ -52,7 +52,7 @@ def filter_and_exclude_games(user_games: QuerySet, request: HttpRequest) -> Tupl
         exclude = None
         exclude_kwargs = None
 
-    if exclude:
+    if exclude and exclude_kwargs is not None:
         return user_games.exclude(**exclude_kwargs).order_by(*order_by), usergames_queryset, sort_by, exclude
     else:
         return usergames_queryset, usergames_queryset, sort_by, ""
