@@ -87,6 +87,8 @@ class CatalogManager:
     @staticmethod
     def unmark_as_abandoned(user: settings.AUTH_USER_MODEL, game_id: int, platform_id: int) -> None:
         user_game = UserGame.objects.filter(user=user, game_id=game_id, platform_id=platform_id).get()
+        if not user_game.abandoned:
+            return
         user_game.abandoned = False
         user_game.year_finished = None
         user_game.save(update_fields=["abandoned", "year_finished"])

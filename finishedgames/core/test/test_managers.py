@@ -74,6 +74,16 @@ class UserGameTests(TestCase):
         self.assertFalse(self.user_game.no_longer_owned)
         self.assertFalse(self.user_game.abandoned)
 
+    def test_mark_as_currently_playing_does_not_unmark_finished_game(self) -> None:
+        an_irrelevant_year = 2024
+        CatalogManager.mark_as_finished(self.user, self.game.id, self.platform.id, an_irrelevant_year)
+
+        CatalogManager.mark_as_currently_playing(self.user, self.game.id, self.platform.id)
+
+        self.user_game.refresh_from_db()
+        self.assertTrue(self.user_game.finished)
+        self.assertEqual(self.user_game.year_finished, an_irrelevant_year)
+
     def test_unmark_user_game_as_currently_playing_unsets_proper_field(self) -> None:
         CatalogManager.mark_as_currently_playing(self.user, self.game.id, self.platform.id)
 
