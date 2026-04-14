@@ -3,7 +3,8 @@ from typing import List, Optional, Tuple, cast
 
 from catalogsources.helpers import clean_string_field
 from catalogsources.models import FetchedGame, FetchedPlatform
-from core.models import UNKNOWN_PUBLISH_DATE, Game, Platform
+from core.constants import UNKNOWN_PUBLISH_DATE
+from core.models import Game, Platform
 from django.conf import settings
 
 from finishedgames import constants

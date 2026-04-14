@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from typing import Any, List, Tuple
 
 from catalogsources.models import FetchedGame, FetchedPlatform
-from core.models import UNKNOWN_PUBLISH_DATE
+from core.constants import UNKNOWN_PUBLISH_DATE
 from django.core.management.base import OutputWrapper
 from django.core.management.color import Style
 

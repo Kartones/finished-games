@@ -1,5 +1,6 @@
 from catalogsources.admin.form_fields import SimpleArrayField
-from core.models import UNKNOWN_PUBLISH_DATE, Game, Platform
+from core.constants import UNKNOWN_PUBLISH_DATE
+from core.models import Game, Platform
 from django import forms
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db.models.functions import Lower

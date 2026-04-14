@@ -1,3 +1,4 @@
+from core.constants import DLC_DEFAULT_MINUTES_PLAYED
 from core.managers import CatalogManager
 from core.models import UserGame, WishlistedUserGame
 from core.test.tests_helpers import create_game, create_platform, create_user
@@ -207,3 +208,38 @@ class UserGameTests(TestCase):
         self.user_game.refresh_from_db()
         self.assertFalse(self.user_game.abandoned)
         self.assertEqual(self.user_game.year_finished, None)
+
+    def test_mark_as_finished_dlc_with_zero_time_sets_default_time(self) -> None:
+        parent_game = create_game(platforms=[self.platform])
+        dlc_game = create_game(platforms=[self.platform], dlc_or_expansion=True, parent_game=parent_game)
+        dlc_user_game = UserGame(user_id=self.user.id, game_id=dlc_game.id, platform_id=self.platform.id)
+        dlc_user_game.save()
+        an_irrelevant_year = 2024
+
+        CatalogManager.mark_as_finished(self.user, dlc_game.id, self.platform.id, an_irrelevant_year)
+
+        dlc_user_game.refresh_from_db()
+        self.assertTrue(dlc_user_game.finished)
+        self.assertEqual(dlc_user_game.minutes_played, DLC_DEFAULT_MINUTES_PLAYED)
+
+    def test_mark_as_finished_dlc_with_nonzero_time_keeps_time(self) -> None:
+        parent_game = create_game(platforms=[self.platform])
+        dlc_game = create_game(platforms=[self.platform], dlc_or_expansion=True, parent_game=parent_game)
+        dlc_user_game = UserGame(user_id=self.user.id, game_id=dlc_game.id, platform_id=self.platform.id, minutes_played=5)
+        dlc_user_game.save()
+        an_irrelevant_year = 2024
+
+        CatalogManager.mark_as_finished(self.user, dlc_game.id, self.platform.id, an_irrelevant_year)
+
+        dlc_user_game.refresh_from_db()
+        self.assertTrue(dlc_user_game.finished)
+        self.assertEqual(dlc_user_game.minutes_played, 5)
+
+    def test_mark_as_finished_non_dlc_with_zero_time_stays_zero(self) -> None:
+        an_irrelevant_year = 2024
+
+        CatalogManager.mark_as_finished(self.user, self.game.id, self.platform.id, an_irrelevant_year)
+
+        self.user_game.refresh_from_db()
+        self.assertTrue(self.user_game.finished)
+        self.assertEqual(self.user_game.minutes_played, 0)

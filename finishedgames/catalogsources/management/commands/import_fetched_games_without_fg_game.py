@@ -2,7 +2,7 @@ from typing import Any, Dict, cast
 
 from catalogsources.managers import GameImportSaveError, ImportManager
 from catalogsources.models import FetchedGame
-from core.models import UNKNOWN_PUBLISH_DATE
+from core.constants import UNKNOWN_PUBLISH_DATE
 from django.conf import settings
 from django.core.management.base import BaseCommand, CommandParser
 from finishedgames import constants

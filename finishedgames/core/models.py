@@ -1,17 +1,12 @@
 from typing import Any, Dict, cast
 
+from core.constants import UNKNOWN_PUBLISH_DATE, URLS_ITEMS_GLUE, URLS_KEY_VALUE_GLUE
 from core.helpers import generic_id as generic_id_helper
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.db.models.functions import Lower
-
-URLS_KEY_VALUE_GLUE = "||"
-URLS_ITEMS_GLUE = "@@"
-
-# Games that have no date at a source catalog get the minimum accepted date (we always need a date)
-UNKNOWN_PUBLISH_DATE = 1970
 
 
 class BasePlatform(models.Model):

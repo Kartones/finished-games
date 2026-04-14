@@ -39,11 +39,12 @@ def render_actions(
 
 
 @register.inclusion_tag("templatetags/game_time.html")
-def render_game_time(user: settings.AUTH_USER_MODEL, user_game_id: int, game_time: int) -> Dict:
+def render_game_time(user: settings.AUTH_USER_MODEL, user_game_id: int, game_time: int, is_dlc: bool = False) -> Dict:
     return {
         "user": user,
         "user_game_id": user_game_id,
         "game_time": game_time,
+        "is_dlc": is_dlc,
         "constants": constants,
     }
 
