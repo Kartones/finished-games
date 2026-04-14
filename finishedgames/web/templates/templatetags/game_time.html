@@ -1,3 +1,6 @@
+{% if is_dlc %}
+<td class="is-centered">n/a (DLC)</td>
+{% else %}
 <td class="is-centered">
     <form action="{% url 'user_game_time' user.get_username %}" method="post" style="display: inline;">
         {% csrf_token %}
@@ -12,3 +15,4 @@
         /> mins
     </form>
 </td>
+{% endif %}

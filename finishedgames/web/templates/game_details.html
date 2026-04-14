@@ -46,7 +46,7 @@
                     {% render_actions user game.id platform.id authenticated_user_catalog %}
                     {% with user_game=user_games_by_platform|get_item:platform.id %}
                         {% if user_game %}
-                            {% render_game_time user user_game.id user_game.minutes_played %}
+                            {% render_game_time user user_game.id user_game.minutes_played game.dlc_or_expansion %}
                         {% else %}
                             <td> </td>
                         {% endif %}

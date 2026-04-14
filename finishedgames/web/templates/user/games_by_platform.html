@@ -47,7 +47,7 @@
                 {% if user.is_authenticated %}
                     {% render_actions user item.game.id platform.id authenticated_user_catalog %}
                     {% if constants.KEY_FIELD_GAME_TIME in enabled_fields %}
-                        {% render_game_time user item.id item.minutes_played %}
+                        {% render_game_time user item.id item.minutes_played item.game.dlc_or_expansion %}
                     {% endif %}
                 {% endif %}
             </tr>
