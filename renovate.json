@@ -21,9 +21,9 @@
       "labels": [
         "dependencies"
       ],
+      "automerge": true,
       "minimumReleaseAge": "7 days",
-      "minimumReleaseAgeBehaviour": "timestamp-optional",
-      "automerge": true
+      "minimumReleaseAgeBehaviour": "timestamp-optional"
     },
     {
       "matchPackagePatterns": [
