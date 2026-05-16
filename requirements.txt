@@ -1,4 +1,4 @@
 setuptools==80.10.2
 django==6.0.5
-requests==2.33.1
+requests==2.34.2
 Pillow==12.2.0
