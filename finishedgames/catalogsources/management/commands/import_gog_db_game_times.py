@@ -36,6 +36,7 @@ IGNORED_TITLES: List[str] = [
     "RetroArch",
     "Stones of Solace",
     "Train Simulator",
+    "RESIDENT EVIL RESISTANCE",
 ]
 
 # Mappings to apply before cleaning the title, when searching in the catalog/DB
@@ -44,6 +45,10 @@ CATALOG_TITLE_MAPPINGS: Dict[str, str] = {
     "The Elder Scrolls III: Morrowind GOTY Edition": "The Elder Scrolls III: Morrowind",
     "Immortals Fenyx Rising": "Immortals: Fenyx Rising",
     "Need for Speed Hot Pursuit Remastered": "Need for Speed: Hot Pursuit Remastered",
+    "Ghost Recon Breakpoint": "Tom Clancy's Ghost Recon Breakpoint",
+    "Heroes of Might & Magic: Olden Era": "Heroes of Might and Magic: Olden Era",
+    "Resident Evil 7: Biohazard": "Resident Evil 7 biohazard",
+    "Vampire Crawlers: The Turbo Wildcard from Vampire Survivors": "Vampire Crawlers",
 }
 
 # Mappings to apply after cleaning the title
