@@ -56,10 +56,10 @@ class Command(BaseCommand):
                     "game_id": user_game.game.id,
                     "platform_id": user_game.platform.id,
                     "currently_playing": user_game.currently_playing,
-                    "finished": user_game.finished,
+                    "finished": user_game.is_finished,
                     # Not exporting: `no_longer_owned`
                     "year_finished": user_game.year_finished,
-                    "abandoned": user_game.abandoned,
+                    "year_abandoned": user_game.year_abandoned,
                     "minutes_played": user_game.minutes_played,
                 }
             )

@@ -62,8 +62,8 @@ def calculate_progress_counters(unfiltered_user_games: QuerySet) -> Tuple[int, i
     # counters use unfiltered list
     unfiltered_games_count = unfiltered_user_games.count()
     currently_playing_games_count = unfiltered_user_games.filter(currently_playing=True).count()
-    finished_games_count = unfiltered_user_games.exclude(year_finished__isnull=True).exclude(abandoned=True).count()
-    abandoned_games_count = unfiltered_user_games.filter(abandoned=True).count()
+    finished_games_count = unfiltered_user_games.filter(year_finished__isnull=False).count()
+    abandoned_games_count = unfiltered_user_games.filter(year_abandoned__isnull=False).count()
     completed_games_count = finished_games_count + abandoned_games_count
     pending_games_count = unfiltered_games_count - completed_games_count
     if unfiltered_games_count > 0:
@@ -110,8 +110,8 @@ def catalog(request: HttpRequest, username: str) -> HttpResponse:
     user_platforms_count = Platform.objects.filter(id__in=user_platform_ids).count()
 
     currently_playing_games_count = all_user_games.filter(currently_playing=True).count()
-    finished_games_count = all_user_games.exclude(year_finished__isnull=True).exclude(abandoned=True).count()
-    abandoned_games_count = all_user_games.filter(abandoned=True).count()
+    finished_games_count = all_user_games.filter(year_finished__isnull=False).count()
+    abandoned_games_count = all_user_games.filter(year_abandoned__isnull=False).count()
     completed_games_count = finished_games_count + abandoned_games_count
     pending_games_count = user_games_count - completed_games_count
     if user_games_count > 0:
@@ -364,9 +364,7 @@ class GamesPendingView(View):
         if not viewed_user:
             raise Http404("Invalid URL")
 
-        queryset = (
-            UserGame.objects.filter(user=viewed_user).exclude(year_finished__isnull=False).exclude(abandoned=True)
-        )
+        queryset = UserGame.objects.filter(user=viewed_user, year_finished__isnull=True, year_abandoned__isnull=True)
 
         platform_filter = request.GET.get("platform")
         if platform_filter is not None:
@@ -402,7 +400,7 @@ class GamesFinishedView(View):
         if not viewed_user:
             raise Http404("Invalid URL")
 
-        queryset = UserGame.objects.filter(user=viewed_user).exclude(year_finished__isnull=True)
+        queryset = UserGame.objects.filter(user=viewed_user, year_finished__isnull=False)
 
         platform_filter = request.GET.get("platform")
         if platform_filter is not None:
@@ -456,7 +454,7 @@ class GamesAbandonedView(View):
         if not viewed_user:
             raise Http404("Invalid URL")
 
-        queryset = UserGame.objects.filter(user=viewed_user, abandoned=True)
+        queryset = UserGame.objects.filter(user=viewed_user, year_abandoned__isnull=False)
 
         platform_filter = request.GET.get("platform")
         if platform_filter is not None:
@@ -475,7 +473,11 @@ class GamesAbandonedView(View):
             "abandoned_games_count": paginator.count,
             "constants": constants,
             "sort_by": sort_by,
-            "enabled_fields": [constants.KEY_FIELD_PLATFORM, constants.KEY_FIELD_GAME_TIME],
+            "enabled_fields": [
+                constants.KEY_FIELD_PLATFORM,
+                constants.KEY_FIELD_YEAR_ABANDONED,
+                constants.KEY_FIELD_GAME_TIME,
+            ],
             "authenticated_user_catalog": kwargs["authenticated_user_catalog"],
             "current_page_url": request.path,
         }
@@ -495,7 +497,7 @@ class GamesAbandonedView(View):
                 user=request.user,
                 game_id=int(request.POST["game"]),
                 platform_id=int(request.POST["platform"]),
-                year_finished=datetime.now().year,
+                year_abandoned=datetime.now().year,
             )
 
         return HttpResponse(status=204)

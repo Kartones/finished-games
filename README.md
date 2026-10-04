@@ -145,6 +145,30 @@ There are customized django views to manage all the fetched data:
                                  +-----------------+     +----------+
 ```
 
+## Exporting data
+
+You can export all the data of a user as JSON files, written to the current directory:
+```
+python3 manage.py export_user_catalog <username>
+```
+
+Generated files:
+- `user.json`: `id` and `username`
+- `user_<id>_games.json`: the user games catalog
+- `user_<id>_wishlisted_games.json`: the wishlisted games
+- `games.json`: the games of the previous two files (plus parent games of DLCs and expansions)
+- `platforms.json`: all the platforms
+
+Each record of `user_<id>_games.json` has these keys:
+- `game_id`, `platform_id`
+- `currently_playing`: boolean
+- `finished`: boolean, `true` when `year_finished` is set
+- `year_finished`: year the game was finished, or `null`
+- `year_abandoned`: year the game was abandoned, or `null`
+- `minutes_played`
+
+A game is either finished (`year_finished` set), abandoned (`year_abandoned` set) or pending (both `null`), never finished and abandoned at the same time. There is no `abandoned` key, use `year_abandoned` to know if a game is abandoned.
+
 ## Development
 
 Running tests (including type hint checking with `mypy`):

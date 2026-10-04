@@ -156,15 +156,15 @@ def datalist_autocomplete(
                 )
             elif filter_type == constants.PLATFORM_FILTER_PENDING:
                 queryset = queryset.filter(
-                    id__in=UserGame.objects.filter(user__username=username)
-                    .exclude(year_finished__isnull=False)
-                    .exclude(abandoned=True)
+                    id__in=UserGame.objects.filter(
+                        user__username=username, year_finished__isnull=True, year_abandoned__isnull=True
+                    )
                     .values_list("platform__id", flat=True)
                     .distinct()
                 )
             elif filter_type == constants.PLATFORM_FILTER_ABANDONED:
                 queryset = queryset.filter(
-                    id__in=UserGame.objects.filter(user__username=username, abandoned=True)
+                    id__in=UserGame.objects.filter(user__username=username, year_abandoned__isnull=False)
                     .values_list("platform__id", flat=True)
                     .distinct()
                 )

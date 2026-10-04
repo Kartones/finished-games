@@ -45,3 +45,19 @@
         </th>
     {% endif %}
 {% endif %}
+
+{% if constants.KEY_FIELD_YEAR_ABANDONED in enabled_fields %}
+    {% if sort_by == constants.SORT_BY_YEAR_ABANDONED %}
+        <th>
+            <a href="?{% query_update request sort_by=constants.SORT_BY_YEAR_ABANDONED_DESC %}">Abandoned Year &#8595;</a>
+        </th>
+    {% elif sort_by == constants.SORT_BY_YEAR_ABANDONED_DESC %}
+        <th>
+            <a href="?{% query_update request sort_by=constants.SORT_BY_YEAR_ABANDONED %}">Abandoned Year &#8593;</a>
+        </th>
+    {% else %}
+        <th>
+            <a href="?{% query_update request sort_by=constants.SORT_BY_YEAR_ABANDONED %}">Abandoned Year</a>
+        </th>
+    {% endif %}
+{% endif %}

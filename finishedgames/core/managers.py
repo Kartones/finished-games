@@ -1,6 +1,7 @@
 from core.constants import DLC_DEFAULT_MINUTES_PLAYED
 from core.models import UserGame, WishlistedUserGame
 from django.conf import settings
+from django.db import transaction
 
 
 class CatalogManager:
@@ -22,16 +23,18 @@ class CatalogManager:
 
     @staticmethod
     def mark_as_finished(user: settings.AUTH_USER_MODEL, game_id: int, platform_id: int, year_finished: int) -> None:
-        CatalogManager.unmark_as_abandoned(user=user, game_id=game_id, platform_id=platform_id)
+        with transaction.atomic():
+            CatalogManager.unmark_as_abandoned(user=user, game_id=game_id, platform_id=platform_id)
 
-        user_game = UserGame.objects.select_related("game").filter(user=user, game_id=game_id, platform_id=platform_id).get()
-        user_game.year_finished = year_finished
-        update_fields = ["year_finished"]
-        if user_game.game.dlc_or_expansion and user_game.minutes_played == 0:
-            user_game.minutes_played = DLC_DEFAULT_MINUTES_PLAYED
-            update_fields.append("minutes_played")
-        user_game.save(update_fields=update_fields)
-
+            user_game = (
+                UserGame.objects.select_related("game").filter(user=user, game_id=game_id, platform_id=platform_id).get()
+            )
+            user_game.year_finished = year_finished
+            update_fields = ["year_finished"]
+            if user_game.game.dlc_or_expansion and user_game.minutes_played == 0:
+                user_game.minutes_played = DLC_DEFAULT_MINUTES_PLAYED
+                update_fields.append("minutes_played")
+            user_game.save(update_fields=update_fields)
 
     @staticmethod
     def unmark_as_finished(user: settings.AUTH_USER_MODEL, game_id: int, platform_id: int) -> None:
@@ -79,24 +82,22 @@ class CatalogManager:
         UserGame.objects.filter(user=user, game_id=game_id, platform_id=platform_id).delete()
 
     @staticmethod
-    def mark_as_abandoned(user: settings.AUTH_USER_MODEL, game_id: int, platform_id: int, year_finished: int) -> None:
+    def mark_as_abandoned(user: settings.AUTH_USER_MODEL, game_id: int, platform_id: int, year_abandoned: int) -> None:
+        with transaction.atomic():
+            CatalogManager.unmark_as_currently_playing(user=user, game_id=game_id, platform_id=platform_id)
+            CatalogManager.unmark_as_finished(user=user, game_id=game_id, platform_id=platform_id)
 
-        CatalogManager.unmark_as_currently_playing(user=user, game_id=game_id, platform_id=platform_id)
-        CatalogManager.unmark_as_finished(user=user, game_id=game_id, platform_id=platform_id)
-
-        user_game = UserGame.objects.filter(user=user, game_id=game_id, platform_id=platform_id).get()
-        user_game.abandoned = True
-        user_game.year_finished = year_finished
-        user_game.save(update_fields=["abandoned", "year_finished"])
+            user_game = UserGame.objects.filter(user=user, game_id=game_id, platform_id=platform_id).get()
+            user_game.year_abandoned = year_abandoned
+            user_game.save(update_fields=["year_abandoned"])
 
     @staticmethod
     def unmark_as_abandoned(user: settings.AUTH_USER_MODEL, game_id: int, platform_id: int) -> None:
         user_game = UserGame.objects.filter(user=user, game_id=game_id, platform_id=platform_id).get()
-        if not user_game.abandoned:
+        if not user_game.is_abandoned:
             return
-        user_game.abandoned = False
-        user_game.year_finished = None
-        user_game.save(update_fields=["abandoned", "year_finished"])
+        user_game.year_abandoned = None
+        user_game.save(update_fields=["year_abandoned"])
 
     @staticmethod
     def update_minutes_played(user: settings.AUTH_USER_MODEL, user_game_id: int, minutes_played: int) -> None:

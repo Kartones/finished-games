@@ -6,6 +6,8 @@ SORT_BY_YEAR = "year"
 SORT_BY_YEAR_DESC = "-year"
 SORT_BY_FINISHED = "finished"
 SORT_BY_FINISHED_DESC = "-finished"
+SORT_BY_YEAR_ABANDONED = "year_abandoned"
+SORT_BY_YEAR_ABANDONED_DESC = "-year_abandoned"
 SORT_BY_ABANDONED = "abandoned"
 SORT_BY_ABANDONED_DESC = "-abandoned"
 SORT_BY_CURRENTLY_PLAYING = "playing"
@@ -24,8 +26,10 @@ SORT_FIELDS_MAPPING = {
     SORT_BY_YEAR_DESC: ["-year_finished", "game__name"],
     SORT_BY_FINISHED: ["-year_finished", "game__name"],
     SORT_BY_FINISHED_DESC: ["year_finished", "game__name"],
-    SORT_BY_ABANDONED: ["-abandoned", "game__name"],
-    SORT_BY_ABANDONED_DESC: ["abandoned", "game__name"],
+    SORT_BY_YEAR_ABANDONED: ["year_abandoned", "game__name"],
+    SORT_BY_YEAR_ABANDONED_DESC: ["-year_abandoned", "game__name"],
+    SORT_BY_ABANDONED: ["-year_abandoned", "game__name"],
+    SORT_BY_ABANDONED_DESC: ["year_abandoned", "game__name"],
     SORT_BY_CURRENTLY_PLAYING: ["-currently_playing", "game__name"],
     SORT_BY_CURRENTLY_PLAYING_DESC: ["currently_playing", "game__name"],
     SORT_BY_NO_LONGER_OWNED: ["-no_longer_owned", "game__name"],
@@ -42,7 +46,7 @@ PLATFORM_FILTER_CURRENTLY_PLAYING = "playing"
 
 EXCLUDE_ABANDONED = "abandoned"
 
-EXCLUDE_FIELDS_MAPPING = {EXCLUDE_ABANDONED: {"abandoned": True}}
+EXCLUDE_FIELDS_MAPPING = {EXCLUDE_ABANDONED: {"year_abandoned__isnull": False}}
 
 # Used at actions template for the ids
 FORM_METHOD_DELETE = "DELETE"
@@ -106,6 +110,7 @@ KEY_GAMES_ABANDONED = "abandoned"
 
 KEY_FIELD_PLATFORM = "platform"
 KEY_FIELD_YEAR = "year"
+KEY_FIELD_YEAR_ABANDONED = "year_abandoned"
 KEY_FIELD_GAME_TIME = "game_time"
 
 CHARACTER_FILTER_NON_ALPHANUMERIC = "-"

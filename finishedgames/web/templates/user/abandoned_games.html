@@ -47,6 +47,9 @@
             <td class="is-centered">
                 {{ item.platform.shortname }}
             </td>
+            <td class="is-centered">
+                {{ item.year_abandoned }}
+            </td>
             {% if user.is_authenticated %}
                 {% render_actions user item.game.id item.platform.id authenticated_user_catalog %}
                 {% if constants.KEY_FIELD_GAME_TIME in enabled_fields %}

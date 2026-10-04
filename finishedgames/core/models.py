@@ -1,11 +1,12 @@
 from typing import Any, Dict, cast
 
-from core.constants import UNKNOWN_PUBLISH_DATE, URLS_ITEMS_GLUE, URLS_KEY_VALUE_GLUE
+from core.constants import MAX_VALID_YEAR, MIN_VALID_YEAR, UNKNOWN_PUBLISH_DATE, URLS_ITEMS_GLUE, URLS_KEY_VALUE_GLUE
 from core.helpers import generic_id as generic_id_helper
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
+from django.db.models import Q
 from django.db.models.functions import Lower
 
 
@@ -13,7 +14,7 @@ class BasePlatform(models.Model):
     name = models.CharField("Name", max_length=100, unique=True, db_index=True)
     shortname = models.CharField("Shortname", max_length=40, unique=True, default=None, db_index=True)
     publish_date = models.IntegerField(
-        "Year published", validators=[MinValueValidator(UNKNOWN_PUBLISH_DATE), MaxValueValidator(3000)]
+        "Year published", validators=[MinValueValidator(UNKNOWN_PUBLISH_DATE), MaxValueValidator(MAX_VALID_YEAR)]
     )
 
     class Meta:
@@ -29,7 +30,7 @@ class BaseGame(models.Model):
     name = models.CharField("Name", max_length=200, unique=True, db_index=True)
     publish_date = models.IntegerField(
         "Year first published",
-        validators=[MinValueValidator(UNKNOWN_PUBLISH_DATE), MaxValueValidator(3000)],
+        validators=[MinValueValidator(UNKNOWN_PUBLISH_DATE), MaxValueValidator(MAX_VALID_YEAR)],
     )
     dlc_or_expansion = models.BooleanField("DLC/Expansion", default=False)
     platforms = models.ManyToManyField(Platform)
@@ -110,16 +111,45 @@ class UserGame(BaseUserGame):
         null=True,
         default=None,
         blank=True,
-        validators=[MinValueValidator(UNKNOWN_PUBLISH_DATE), MaxValueValidator(3000)],
+        validators=[MinValueValidator(MIN_VALID_YEAR), MaxValueValidator(MAX_VALID_YEAR)],
         db_index=True,
     )
     no_longer_owned = models.BooleanField("No longer owned", default=False, db_index=True)
-    abandoned = models.BooleanField("Abandoned", default=False, db_index=True)
+    year_abandoned = models.IntegerField(
+        "Year abandoned",
+        null=True,
+        default=None,
+        blank=True,
+        validators=[MinValueValidator(MIN_VALID_YEAR), MaxValueValidator(MAX_VALID_YEAR)],
+        db_index=True,
+    )
     minutes_played = models.IntegerField("Minutes played", default=0, validators=[MinValueValidator(0)])
 
+    class Meta(BaseUserGame.Meta):
+        constraints = [
+            models.CheckConstraint(
+                condition=Q(year_finished__isnull=True) | Q(year_abandoned__isnull=True),
+                name="usergame_not_finished_and_abandoned",
+            ),
+            models.CheckConstraint(
+                condition=Q(year_abandoned__isnull=True)
+                | Q(year_abandoned__gte=MIN_VALID_YEAR, year_abandoned__lte=MAX_VALID_YEAR),
+                name="usergame_year_abandoned_in_range",
+            ),
+            models.CheckConstraint(
+                condition=Q(year_finished__isnull=True)
+                | Q(year_finished__gte=MIN_VALID_YEAR, year_finished__lte=MAX_VALID_YEAR),
+                name="usergame_year_finished_in_range",
+            ),
+        ]
+
     @property
-    def finished(self) -> bool:
-        return self.year_finished is not None and not self.abandoned
+    def is_finished(self) -> bool:
+        return self.year_finished is not None
+
+    @property
+    def is_abandoned(self) -> bool:
+        return self.year_abandoned is not None
 
     def __str__(self) -> str:
         return "{}: {} ({})".format(self.user.get_username(), self.game.name, self.platform.shortname)

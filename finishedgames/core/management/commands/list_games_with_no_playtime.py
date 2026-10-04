@@ -20,11 +20,11 @@ class Command(BaseCommand):
         queryset = UserGame.objects.filter(user_id=user_id, minutes_played=0)
 
         if status == "pending":
-            queryset = queryset.filter(year_finished__isnull=True, abandoned=False)
+            queryset = queryset.filter(year_finished__isnull=True, year_abandoned__isnull=True)
         elif status == "abandoned":
-            queryset = queryset.filter(abandoned=True)
+            queryset = queryset.filter(year_abandoned__isnull=False)
         elif status == "finished":
-            queryset = queryset.filter(year_finished__isnull=False, abandoned=False)
+            queryset = queryset.filter(year_finished__isnull=False)
 
         queryset = queryset.select_related("game", "platform").order_by("game__name")
 

@@ -52,8 +52,8 @@ class CustomUserAdmin(auth.admin.UserAdmin):
 
 
 class UserGameAdmin(FGModelAdmin):
-    list_display = ["game", "user", "platform", "currently_playing", "year_finished", "minutes_played", "abandoned"]
-    list_filter = ["user__username", "platform", "currently_playing", "year_finished", "minutes_played", "abandoned"]
+    list_display = ["game", "user", "platform", "currently_playing", "year_finished", "minutes_played", "year_abandoned"]
+    list_filter = ["user__username", "platform", "currently_playing", "year_finished", "year_abandoned", "minutes_played"]
     search_fields = ["game__name"]
     raw_id_fields = ["user", "game"]
 

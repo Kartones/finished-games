@@ -8,7 +8,7 @@
     {% endif %}
 
     {% if constants.KEY_GAMES_FINISHED in enabled_statuses %}
-        {% if user_game.year_finished %}
+        {% if user_game.is_finished %}
             <i class="nes-icon trophy" title="Finished"></i>
         {% else %}
             <i class="nes-icon trophy is-empty is-half-transparent" title="Not finished"></i>
@@ -16,7 +16,7 @@
     {% endif %}
 
     {% if constants.KEY_GAMES_ABANDONED in enabled_statuses %}
-        {% if user_game.abandoned %}
+        {% if user_game.is_abandoned %}
             <i class="nes-icon skull" title="Abandoned"></i>
         {% else %}
             <i class="nes-icon skull is-empty is-half-transparent" title="Pending"></i>
