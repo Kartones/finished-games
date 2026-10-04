@@ -70,10 +70,15 @@ class AbandonedListYearTests(TestCase):
         create_user_game(self.user, name="newest", year_abandoned=NEWEST_ABANDONED_YEAR)
         create_user_game(self.user, name="oldest", year_abandoned=OLDEST_ABANDONED_YEAR)
 
+    @staticmethod
+    def header_pattern(sort_by: str, arrow: str) -> str:
+        return r"sort_by={}[^>]*>Year{}</a>".format(sort_by, arrow)
+
     def test_shows_abandoned_year_column_with_each_year(self) -> None:
         response = self.client.get(reverse("user_abandoned_games", args=[self.user.username]))
 
-        self.assertContains(response, "Abandoned Year")
+        self.assertRegex(response.content.decode(), self.header_pattern(constants.SORT_BY_YEAR_ABANDONED, ""))
+        self.assertNotContains(response, "Abandoned Year")
         for year in (OLDEST_ABANDONED_YEAR, MIDDLE_ABANDONED_YEAR, NEWEST_ABANDONED_YEAR):
             self.assertRegex(response.content.decode(), r'<td class="is-centered">\s*{}\s*</td>'.format(year))
 
@@ -100,14 +105,19 @@ class AbandonedListYearTests(TestCase):
         descending = self.client.get(url, {"sort_by": constants.SORT_BY_YEAR_ABANDONED_DESC})
 
         self.assertContains(ascending, "sort_by={}".format(constants.SORT_BY_YEAR_ABANDONED_DESC))
-        self.assertContains(ascending, "Abandoned Year &#8595;")
+        self.assertRegex(
+            ascending.content.decode(), self.header_pattern(constants.SORT_BY_YEAR_ABANDONED_DESC, " &#8595;")
+        )
         self.assertContains(descending, "sort_by={}".format(constants.SORT_BY_YEAR_ABANDONED))
-        self.assertContains(descending, "Abandoned Year &#8593;")
+        self.assertRegex(
+            descending.content.decode(), self.header_pattern(constants.SORT_BY_YEAR_ABANDONED, " &#8593;")
+        )
 
     def test_other_lists_do_not_show_abandoned_year_column(self) -> None:
         response = self.client.get(reverse("user_finished_games", args=[self.user.username]))
 
         self.assertNotContains(response, "Abandoned Year")
+        self.assertNotContains(response, "sort_by={}".format(constants.SORT_BY_YEAR_ABANDONED))
 
 
 class StatusSortingTests(TestCase):
