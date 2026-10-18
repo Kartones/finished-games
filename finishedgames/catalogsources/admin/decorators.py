@@ -11,7 +11,7 @@ def hyperlink_source_url(model_instance: FGModelAdmin) -> str:
     return cast(str, format_html("<a href='{url}' target='_blank'>{url}</a>", url=model_instance.source_url))
 
 
-hyperlink_source_url.short_description = "Source URL"  # type:ignore # NOQA: E305
+hyperlink_source_url.short_description = "Source URL"  # type: ignore # NOQA: E305
 
 
 def hyperlink_fg_game(fetched_game: FetchedGame) -> str:
@@ -22,7 +22,7 @@ def hyperlink_fg_game(fetched_game: FetchedGame) -> str:
         return "-"
 
 
-hyperlink_fg_game.short_description = "FG Game"  # type:ignore # NOQA: E305
+hyperlink_fg_game.short_description = "FG Game"  # type: ignore # NOQA: E305
 
 
 def hyperlink_fg_platform(fetched_platform: FetchedPlatform) -> str:
@@ -35,4 +35,4 @@ def hyperlink_fg_platform(fetched_platform: FetchedPlatform) -> str:
         return "-"
 
 
-hyperlink_fg_platform.short_description = "FG Platform"  # type:ignore # NOQA: E305
+hyperlink_fg_platform.short_description = "FG Platform"  # type: ignore # NOQA: E305

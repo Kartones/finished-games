@@ -1,16 +1,15 @@
-from dataclasses import dataclass
 import json
-from typing import Any, cast, Dict, List, Optional
+from dataclasses import dataclass
+from typing import Any, Dict, List, Optional, cast
 
 import requests
-
-from core.models import Game, UserGame
-from catalogsources.models import FetchedGame
 from catalogsources.helpers import clean_string_field
+from catalogsources.models import FetchedGame
+from core.models import Game, UserGame
 from django.conf import settings
 from django.core.management.base import BaseCommand, CommandParser
-from finishedgames import constants
 
+from finishedgames import constants
 
 # TODO: This should also be a parameter
 PLATFORM_PC = 3
@@ -27,12 +26,11 @@ IGNORED_TITLES: List[str] = [
 ]
 
 # Mappings to apply before cleaning the title, when searching in the catalog/DB
-CATALOG_TITLE_MAPPINGS: Dict[str, str] = {
-}
+CATALOG_TITLE_MAPPINGS: Dict[str, str] = {}
 
 # Mappings to apply after cleaning the title
-CLEANED_TITLE_MAPPINGS: Dict[str, str] = {
-}
+CLEANED_TITLE_MAPPINGS: Dict[str, str] = {}
+
 
 @dataclass
 class GameTimeData:
@@ -65,7 +63,9 @@ class Command(BaseCommand):
         fg_user_id = cast(int, options["fg_user_id"])
         verbose = cast(bool, options["verbose"])
 
-        self.stdout.write(f"Going to import Steam game times for user ID {steam_user_id} into Finished Games user ID {fg_user_id}")
+        self.stdout.write(
+            f"Going to import Steam game times for user ID {steam_user_id} into Finished Games user ID {fg_user_id}"
+        )
 
         game_data = self._fetch_data(steam_user_id, steam_api_key)
         for data in game_data:
@@ -154,9 +154,9 @@ class Command(BaseCommand):
             if game:
                 user_game = self._get_user_game(game.name, platform_id, fg_user_id)
             else:
-                self.stdout.write(self.style.WARNING(
-                    f"{game_name} : Fetched game exists but linked Finished Games entry not found"
-                ))
+                self.stdout.write(
+                    self.style.WARNING(f"{game_name} : Fetched game exists but linked Finished Games entry not found")
+                )
                 return
         else:
             self.stdout.write(self.style.WARNING(f"{game_name} : Game title not found for platform ID {platform_id}"))
@@ -175,6 +175,8 @@ class Command(BaseCommand):
             self.stdout.write(self.style.SUCCESS(f"{game_name} : updated, {old_minutes} -> {minutes_played}"))
         else:
             # Do not create new entries
-            self.stdout.write(self.style.WARNING(
-                f"{game_name} : UserGame entry not found for user ID {fg_user_id} and platform ID {platform_id}"
-            ))
+            self.stdout.write(
+                self.style.WARNING(
+                    f"{game_name} : UserGame entry not found for user ID {fg_user_id} and platform ID {platform_id}"
+                )
+            )

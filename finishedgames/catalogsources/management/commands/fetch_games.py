@@ -90,7 +90,7 @@ class Command(BaseCommand):
         errors = []
         count = 0
 
-        for (game, platforms) in results:
+        for game, platforms in results:
             self.stdout.write("{}:".format(game.source_game_id), ending="")
 
             game.name = clean_string_field(game.name)

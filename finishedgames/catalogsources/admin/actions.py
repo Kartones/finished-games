@@ -1,6 +1,7 @@
 """
 Custom admin actions
 """
+
 from typing import List
 
 from catalogsources.managers import ImportManager
@@ -17,7 +18,7 @@ def hide_fetched_items(modeladmin: admin.ModelAdmin, request: HttpRequest, query
     queryset.update(hidden=True)
 
 
-hide_fetched_items.short_description = "Hide item(s)"  # type:ignore # NOQA: E305
+hide_fetched_items.short_description = "Hide item(s)"  # type: ignore # NOQA: E305
 
 
 def import_fetched_items(
@@ -30,7 +31,7 @@ def import_fetched_items(
     return HttpResponseRedirect("import_setup/?ids={}&hidden={}".format(ids, request.GET.get("hidden", "False")))
 
 
-import_fetched_items.short_description = "Import item(s) into catalog"  # type:ignore # NOQA: E305
+import_fetched_items.short_description = "Import item(s) into catalog"  # type: ignore # NOQA: E305
 
 
 def import_fetched_games_fixing_duplicates_appending_platform(
@@ -50,7 +51,7 @@ def import_fetched_games_fixing_duplicates_appending_platform(
         messages.success(request, "Fetched Games imported successfully")
 
 
-import_fetched_games_fixing_duplicates_appending_platform.short_description = (  # type:ignore # NOQA: E305, E501
+import_fetched_games_fixing_duplicates_appending_platform.short_description = (  # type: ignore # NOQA: E305, E501
     "Import game(s) - on duplicate append 1st platform"
 )
 
@@ -72,7 +73,7 @@ def import_fetched_games_fixing_duplicates_appending_publish_date(
         messages.success(request, "Fetched Games imported successfully")
 
 
-import_fetched_games_fixing_duplicates_appending_publish_date.short_description = (  # type:ignore # NOQA: E305, E501
+import_fetched_games_fixing_duplicates_appending_publish_date.short_description = (  # type: ignore # NOQA: E305, E501
     "Import game(s) - on duplicate append publish date"
 )
 
@@ -94,7 +95,7 @@ def import_fetched_games_link_automatically_if_name_and_year_matches(
         messages.success(request, "Fetched Games imported successfully")
 
 
-import_fetched_games_link_automatically_if_name_and_year_matches.short_description = (  # type:ignore # NOQA: E305, E501
+import_fetched_games_link_automatically_if_name_and_year_matches.short_description = (  # type: ignore # NOQA: E305, E501
     "Import game(s) - link if name & date match"
 )
 
@@ -114,20 +115,18 @@ def import_fetched_games_link_only_if_exact_name_and_date_match(
     if successful_links and warnings:
         messages.warning(
             request,
-            "{} Fetched Games linked, but some could not be linked: {}".format(successful_links, ", ".join(warnings))
+            "{} Fetched Games linked, but some could not be linked: {}".format(successful_links, ", ".join(warnings)),
         )
     elif warnings:
-        messages.warning(
-            request,
-            "No Fetched Games linked: {}".format(", ".join(warnings))
-        )
+        messages.warning(request, "No Fetched Games linked: {}".format(", ".join(warnings)))
     else:
         messages.success(request, "{} Fetched Games linked successfully".format(successful_links))
 
 
-import_fetched_games_link_only_if_exact_name_and_date_match.short_description = (  # type:ignore # NOQA: E305, E501
+import_fetched_games_link_only_if_exact_name_and_date_match.short_description = (  # type: ignore # NOQA: E305, E501
     "Link game(s) if exact name & date match"
 )
+
 
 def import_fetched_games_link_only_if_exact_name_match(
     modeladmin: admin.ModelAdmin, request: HttpRequest, queryset: QuerySet
@@ -144,18 +143,15 @@ def import_fetched_games_link_only_if_exact_name_match(
     if successful_links and warnings:
         messages.warning(
             request,
-            "{} Fetched Games linked, but some could not be linked: {}".format(successful_links, ", ".join(warnings))
+            "{} Fetched Games linked, but some could not be linked: {}".format(successful_links, ", ".join(warnings)),
         )
     elif warnings:
-        messages.warning(
-            request,
-            "No Fetched Games linked: {}".format(", ".join(warnings))
-        )
+        messages.warning(request, "No Fetched Games linked: {}".format(", ".join(warnings)))
     else:
         messages.success(request, "{} Fetched Games linked successfully".format(successful_links))
 
 
-import_fetched_games_link_only_if_exact_name_match.short_description = (  # type:ignore # NOQA: E305, E501
+import_fetched_games_link_only_if_exact_name_match.short_description = (  # type: ignore # NOQA: E305, E501
     "Link game(s) if exact name match"
 )
 
@@ -178,7 +174,7 @@ def sync_fetched_games_base_fields(modeladmin: admin.ModelAdmin, request: HttpRe
         messages.success(request, "Synced: {} games".format(count_synced))
 
 
-sync_fetched_games_base_fields.short_description = (  # type:ignore # NOQA: E305, E501
+sync_fetched_games_base_fields.short_description = (  # type: ignore # NOQA: E305, E501
     "Sync imported game(s) base fields"
 )
 

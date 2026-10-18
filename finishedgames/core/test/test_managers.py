@@ -228,18 +228,22 @@ class UserGameTests(TestCase):
         )
 
     def test_rejected_mark_as_abandoned_preserves_original_state(self) -> None:
-        original_states = {
+        original_states: Dict[str, Dict[str, Optional[Any]]] = {
             "finished and currently playing": dict(year_finished=2018, currently_playing=True),
             "already abandoned and currently playing": dict(year_abandoned=2019, currently_playing=True),
             "finished and no longer owned": dict(year_finished=2018, no_longer_owned=True, minutes_played=30),
             "pending": dict(),
-        }  # type: Dict[str, Dict[str, Optional[Any]]]
+        }
 
         for description, original_fields in original_states.items():
             with self.subTest(state=description):
-                fields = dict(
-                    currently_playing=False, year_finished=None, year_abandoned=None, no_longer_owned=False, minutes_played=0
-                )  # type: Dict[str, Any]
+                fields: Dict[str, Any] = dict(
+                    currently_playing=False,
+                    year_finished=None,
+                    year_abandoned=None,
+                    no_longer_owned=False,
+                    minutes_played=0,
+                )
                 fields.update(original_fields)
                 UserGame.objects.filter(id=self.user_game.id).update(**fields)
                 state_before = self._persisted_state()
@@ -328,7 +332,9 @@ class UserGameTests(TestCase):
     def test_mark_as_finished_dlc_with_nonzero_time_keeps_time(self) -> None:
         parent_game = create_game(platforms=[self.platform])
         dlc_game = create_game(platforms=[self.platform], dlc_or_expansion=True, parent_game=parent_game)
-        dlc_user_game = UserGame(user_id=self.user.id, game_id=dlc_game.id, platform_id=self.platform.id, minutes_played=5)
+        dlc_user_game = UserGame(
+            user_id=self.user.id, game_id=dlc_game.id, platform_id=self.platform.id, minutes_played=5
+        )
         dlc_user_game.save()
         an_irrelevant_year = 2024
 
@@ -355,7 +361,9 @@ class RejectedFinishTests(TransactionTestCase):
         self.platform = create_platform()
         self.game = create_game(platforms=[self.platform])
         self.user = create_user()
-        self.user_game = UserGame.objects.create(user_id=self.user.id, game_id=self.game.id, platform_id=self.platform.id)
+        self.user_game = UserGame.objects.create(
+            user_id=self.user.id, game_id=self.game.id, platform_id=self.platform.id
+        )
 
     def _assert_rejected_finish_preserves_persisted_data(
         self,
@@ -378,7 +386,11 @@ class RejectedFinishTests(TransactionTestCase):
         parent_game = create_game(platforms=[self.platform])
         dlc_game = create_game(platforms=[self.platform], dlc_or_expansion=True, parent_game=parent_game)
         user_game: UserGame = UserGame.objects.create(
-            user_id=self.user.id, game_id=dlc_game.id, platform_id=self.platform.id, minutes_played=minutes_played, **fields
+            user_id=self.user.id,
+            game_id=dlc_game.id,
+            platform_id=self.platform.id,
+            minutes_played=minutes_played,
+            **fields
         )
         return user_game
 

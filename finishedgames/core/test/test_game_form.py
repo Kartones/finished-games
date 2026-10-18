@@ -12,11 +12,11 @@ class GameFormTests(TestCase):
         self.platform_1 = create_platform()
 
     def test_game_needs_at_least_one_platform(self) -> None:
-        game_data = {
+        game_data: Dict[str, Any] = {
             "name": "a unique name",
             "platforms": [],
             "publish_date": datetime.now().year,
-        }  # type: Dict[str, Any]
+        }
 
         game_form = GameForm(game_data)
         self.assertFalse(game_form.is_valid())
@@ -26,11 +26,11 @@ class GameFormTests(TestCase):
         self.assertTrue(game_form.is_valid(), game_form.errors)
 
     def test_game_name_is_unique(self) -> None:
-        game_data = {
+        game_data: Dict[str, Any] = {
             "name": "a unique name",
             "platforms": [self.platform_1.id],
             "publish_date": datetime.now().year,
-        }  # type: Dict[str, Any]
+        }
 
         create_game(platforms=game_data["platforms"], name=game_data["name"])
 
@@ -39,11 +39,11 @@ class GameFormTests(TestCase):
         self.assertTrue("name" in game_form.errors.keys())
 
     def test_game_name_uniqueness_is_case_insensitive(self) -> None:
-        game_data = {
+        game_data: Dict[str, Any] = {
             "name": "A Case Sensitive Unique Name",
             "platforms": [self.platform_1.id],
             "publish_date": datetime.now().year,
-        }  # type: Dict[str, Any]
+        }
 
         create_game(platforms=game_data["platforms"], name=game_data["name"])
 
@@ -57,13 +57,13 @@ class GameFormTests(TestCase):
     def test_game_dlc_needs_parent_game(self) -> None:
         game_1 = create_game(platforms=[self.platform_1])
 
-        game_data = {
+        game_data: Dict[str, Any] = {
             "name": "an irrelevant name",
             "platforms": [self.platform_1.id],
             "publish_date": datetime.now().year,
             "dlc_or_expansion": True,
             "parent_game": None,
-        }  # type: Dict[str, Any]
+        }
 
         game_form = GameForm(game_data)
         self.assertFalse(game_form.is_valid())
@@ -78,13 +78,13 @@ class GameFormTests(TestCase):
         game_1 = create_game(platforms=[self.platform_1])
         game_1_dlc = create_game(platforms=[self.platform_1], dlc_or_expansion=True, parent_game=game_1.id)
 
-        game_data = {
+        game_data: Dict[str, Any] = {
             "name": "an irrelevant name",
             "platforms": [self.platform_1.id],
             "publish_date": datetime.now().year,
             "dlc_or_expansion": True,
             "parent_game": game_1_dlc.id,
-        }  # type: Dict[str, Any]
+        }
 
         game_form = GameForm(game_data)
         self.assertFalse(game_form.is_valid())
@@ -98,13 +98,13 @@ class GameFormTests(TestCase):
         game_1 = create_game(platforms=[self.platform_1, platform_2])
 
         # subset = superset
-        game_data = {
+        game_data: Dict[str, Any] = {
             "name": "an irrelevant name",
             "platforms": (platform.id for platform in game_1.platforms.all()),
             "publish_date": datetime.now().year,
             "dlc_or_expansion": True,
             "parent_game": game_1.id,
-        }  # type: Dict[str, Any]
+        }
         game_form = GameForm(game_data)
         self.assertTrue(game_form.is_valid(), game_form.errors)
 

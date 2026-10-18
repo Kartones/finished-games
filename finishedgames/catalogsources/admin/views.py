@@ -17,8 +17,9 @@ from django.forms import Form
 from django.http import Http404, HttpRequest, HttpResponseRedirect
 from django.template.response import TemplateResponse
 from django.urls import reverse
-from finishedgames import constants
 from web.admin import FGModelAdmin
+
+from finishedgames import constants
 
 
 class BaseFetchedModelAdmin(FGModelAdmin):
@@ -255,8 +256,8 @@ class FetchedGameAdminViewsMixin(BaseFetchedModelAdmin):
         return HttpResponseRedirect(reverse("admin:catalogsources_fetchedgame_changelist"))
 
     def import_batch_view(self, request: HttpRequest) -> HttpResponseRedirect:
-        imports_ok = []  # type: List[str]
-        imports_ko = []  # type: List[str]
+        imports_ok: List[str] = []
+        imports_ko: List[str] = []
 
         if request.method != "POST":
             raise Http404("Invalid URL")
@@ -327,7 +328,9 @@ class FetchedGameAdminViewsMixin(BaseFetchedModelAdmin):
                 )
             else:
                 self.message_user(
-                    request, "All Fetched Game imports failed: {}".format(",".join(imports_ko)), level="error",
+                    request,
+                    "All Fetched Game imports failed: {}".format(",".join(imports_ko)),
+                    level="error",
                 )
         else:
             self.message_user(request, "Fetched Games imported successfully: {}".format(",".join(imports_ok)))
@@ -461,8 +464,8 @@ class FetchedPlatformAdminViewsMixin(BaseFetchedModelAdmin):
         return HttpResponseRedirect(reverse("admin:catalogsources_fetchedplatform_changelist"))
 
     def import_batch_view(self, request: HttpRequest) -> HttpResponseRedirect:
-        imports_ok = []  # type: List[str]
-        imports_ko = []  # type: List[str]
+        imports_ok: List[str] = []
+        imports_ko: List[str] = []
 
         if request.method != "POST":
             raise Http404("Invalid URL")
@@ -517,7 +520,9 @@ class FetchedPlatformAdminViewsMixin(BaseFetchedModelAdmin):
                 )
             else:
                 self.message_user(
-                    request, "All Fetched Platforms failed: {}".format(",".join(imports_ko)), level="error",
+                    request,
+                    "All Fetched Platforms failed: {}".format(",".join(imports_ko)),
+                    level="error",
                 )
         else:
             self.message_user(request, "Fetched Platforms imported successfully: {}".format(",".join(imports_ok)))

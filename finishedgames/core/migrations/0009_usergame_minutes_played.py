@@ -7,13 +7,15 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('core', '0008_update_usergame_year_finished'),
+        ("core", "0008_update_usergame_year_finished"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='usergame',
-            name='minutes_played',
-            field=models.IntegerField(default=0, validators=[django.core.validators.MinValueValidator(0)], verbose_name='Minutes played'),
+            model_name="usergame",
+            name="minutes_played",
+            field=models.IntegerField(
+                default=0, validators=[django.core.validators.MinValueValidator(0)], verbose_name="Minutes played"
+            ),
         ),
     ]

@@ -69,8 +69,8 @@ class GiantBombAdapter(BaseAdapter):
         self.next_offset = 0
         self.total_results = GiantBombAdapter.UNKNOWN_TOTAL_RESULTS_VALUE
         self.errored = False
-        self.last_request_data = {}  # type: Dict
-        self.platforms_cache = {}  # type: Dict[int, Optional[FetchedPlatform]]
+        self.last_request_data: Dict = {}
+        self.platforms_cache: Dict[int, Optional[FetchedPlatform]] = {}
 
     def __enter__(self) -> "GiantBombAdapter":
         self.fetching = True
@@ -227,7 +227,7 @@ class GiantBombAdapter(BaseAdapter):
 
     @staticmethod
     def _results_to_platform_entities(results: Dict) -> List[FetchedPlatform]:
-        entities = []  # type: List[FetchedPlatform]
+        entities: List[FetchedPlatform] = []
 
         for result in results:
             data = {
@@ -248,7 +248,7 @@ class GiantBombAdapter(BaseAdapter):
         return entities
 
     def _results_to_game_entities(self, results: Dict) -> List[Tuple[FetchedGame, List[FetchedPlatform]]]:
-        entities = []  # type: List[Tuple[FetchedGame, List[FetchedPlatform]]]
+        entities: List[Tuple[FetchedGame, List[FetchedPlatform]]] = []
 
         for result in results:
             data = {
@@ -271,7 +271,7 @@ class GiantBombAdapter(BaseAdapter):
 
             game = FetchedGame(**data)
 
-            platforms = []  # type: List[FetchedPlatform]
+            platforms: List[FetchedPlatform] = []
             for platform_result in result["platforms"]:
                 # NOTE: Only platforms not hidden will be linked
                 fetched_platform = self._get_platform_cached(source_platform_id=platform_result["id"])

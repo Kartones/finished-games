@@ -24,7 +24,7 @@ class CustomUserAdmin(auth.admin.UserAdmin):
 
     def get_form(self, request: HttpRequest, obj: Any = None, **kwargs: Any) -> ModelForm:
         form = super().get_form(request, obj, **kwargs)
-        disabled_fields = set()  # type: Set[str]
+        disabled_fields: Set[str] = set()
 
         is_superuser = request.user.is_superuser
 
@@ -52,8 +52,23 @@ class CustomUserAdmin(auth.admin.UserAdmin):
 
 
 class UserGameAdmin(FGModelAdmin):
-    list_display = ["game", "user", "platform", "currently_playing", "year_finished", "minutes_played", "year_abandoned"]
-    list_filter = ["user__username", "platform", "currently_playing", "year_finished", "year_abandoned", "minutes_played"]
+    list_display = [
+        "game",
+        "user",
+        "platform",
+        "currently_playing",
+        "year_finished",
+        "minutes_played",
+        "year_abandoned",
+    ]
+    list_filter = [
+        "user__username",
+        "platform",
+        "currently_playing",
+        "year_finished",
+        "year_abandoned",
+        "minutes_played",
+    ]
     search_fields = ["game__name"]
     raw_id_fields = ["user", "game"]
 
@@ -82,7 +97,7 @@ class PlatformAdmin(FGModelAdmin):
         url = reverse("platform_details", args=[instance.id])
         return cast(str, format_html("<a href='{}' target='_blank'>{}</a>", url, url))
 
-    platform_url.short_description = "Platform Url"  # type:ignore # NOQA: E305
+    platform_url.short_description = "Platform Url"  # type: ignore # NOQA: E305
 
 
 class GameAdmin(FGModelAdmin):
@@ -107,7 +122,7 @@ class GameAdmin(FGModelAdmin):
         url = reverse("game_details", args=[instance.id])
         return cast(str, format_html("<a href='{}' target='_blank'>{}</a>", url, url))
 
-    game_url.short_description = "Game Url"  # type:ignore # NOQA: E305
+    game_url.short_description = "Game Url"  # type: ignore # NOQA: E305
 
     def urls_list(self, instance: FGModelAdmin) -> str:
         return cast(
@@ -119,7 +134,7 @@ class GameAdmin(FGModelAdmin):
             ),
         )
 
-    urls_list.short_description = "URLs list"  # type:ignore # NOQA: E305
+    urls_list.short_description = "URLs list"  # type: ignore # NOQA: E305
 
     def get_ordering(self, request: HttpRequest) -> List[str]:
         return ["-id"]

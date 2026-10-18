@@ -114,7 +114,7 @@ LATEST_VIDEOGAMES_DISPLAY_COUNT = 10
 LATEST_PLATFORMS_DISPLAY_COUNT = 5
 
 # Setup adapters at prod settings
-CATALOG_SOURCES_ADAPTERS = {}  # type: Dict
+CATALOG_SOURCES_ADAPTERS: Dict = {}
 
 # Remember to setup a user agent at prod settings
 CATALOG_SOURCES_ADAPTER_USER_AGENT = None

@@ -8,9 +8,8 @@ from django.contrib.auth import get_user_model
 from django.core.paginator import Paginator
 from django.db.models.functions import Lower
 from django.db.models.query import QuerySet
-from django.http import Http404, HttpRequest, HttpResponse, HttpResponseRedirect
+from django.http import Http404, HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, render
-from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.views import View
 from web import constants
@@ -47,7 +46,7 @@ def filter_and_exclude_games(user_games: QuerySet, request: HttpRequest) -> Tupl
     # Querystring takes precedence to allow explicit sorting/showing back even if cookie is set
     exclude = request.GET.get("exclude", None) or request.COOKIES.get(constants.USER_OPTIONS_EXCLUDE_COOKIE_NAME, None)
     try:
-        exclude_kwargs = constants.EXCLUDE_FIELDS_MAPPING[exclude]  # type: Optional[Dict]
+        exclude_kwargs: Optional[Dict] = constants.EXCLUDE_FIELDS_MAPPING[exclude]
     except KeyError:
         exclude = None
         exclude_kwargs = None
@@ -219,7 +218,7 @@ class GameTimeView(View):
 
         # Ensure the user_game_id belongs to the authenticated user
         try:
-            user_game = UserGame.objects.get(id=user_game_id, user=request.user)
+            UserGame.objects.get(id=user_game_id, user=request.user)
         except UserGame.DoesNotExist:
             return HttpResponse(status=400)
 
@@ -294,7 +293,9 @@ class GamesView(View):
         else:
             if int(request.POST["user"]) == request.user.id:
                 CatalogManager.add_to_catalog(
-                    user=request.user, game_id=int(request.POST["game"]), platform_id=int(request.POST["platform"]),
+                    user=request.user,
+                    game_id=int(request.POST["game"]),
+                    platform_id=int(request.POST["platform"]),
                 )
 
         return HttpResponse(status=204)
@@ -599,7 +600,9 @@ class GamesWishlistedView(View):
         else:
             if int(request.POST["user"]) == request.user.id:
                 CatalogManager.mark_as_wishlisted(
-                    user=request.user, game_id=int(request.POST["game"]), platform_id=int(request.POST["platform"]),
+                    user=request.user,
+                    game_id=int(request.POST["game"]),
+                    platform_id=int(request.POST["platform"]),
                 )
 
         return HttpResponse(status=204)

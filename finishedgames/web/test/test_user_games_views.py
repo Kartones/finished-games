@@ -109,9 +109,7 @@ class AbandonedListYearTests(TestCase):
             ascending.content.decode(), self.header_pattern(constants.SORT_BY_YEAR_ABANDONED_DESC, " &#8595;")
         )
         self.assertContains(descending, "sort_by={}".format(constants.SORT_BY_YEAR_ABANDONED))
-        self.assertRegex(
-            descending.content.decode(), self.header_pattern(constants.SORT_BY_YEAR_ABANDONED, " &#8593;")
-        )
+        self.assertRegex(descending.content.decode(), self.header_pattern(constants.SORT_BY_YEAR_ABANDONED, " &#8593;"))
 
     def test_other_lists_do_not_show_abandoned_year_column(self) -> None:
         response = self.client.get(reverse("user_finished_games", args=[self.user.username]))

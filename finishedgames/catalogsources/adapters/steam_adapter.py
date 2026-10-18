@@ -1,20 +1,19 @@
 import copy
-from datetime import datetime, timezone
 import json
-from pathlib import Path
 import time
-from typing import Any, Callable, cast, List, Optional, Tuple
+from datetime import datetime, timezone
+from pathlib import Path
+from typing import Any, Callable, List, Optional, Tuple, cast
 
 import requests
-
 from catalogsources.adapters.base_adapter import BaseAdapter
 from catalogsources.adapters.helpers import check_rate_limit
 from catalogsources.models import FetchedGame, FetchedPlatform
 from django.conf import settings
 from django.core.management.base import OutputWrapper
 from django.core.management.color import Style
-from finishedgames import constants
 
+from finishedgames import constants
 
 """
 References:
@@ -88,12 +87,12 @@ class SteamAdapter(BaseAdapter):
         # and I've hit it myself with less than 500 requests, so this adapter works in 5-minute windows.
         # Seems that the rate limit also resets around every 5 minutes.
 
-        self.max_requests_per_time_window = settings.CATALOG_SOURCES_ADAPTERS[self.SOURCE_ID][
-            constants.ADAPTER_REQUESTS_PER_HOUR
-        ]  // 12  # per 5 minutes
-        self.wait_seconds_when_rate_limited = settings.CATALOG_SOURCES_ADAPTERS[self.SOURCE_ID][
-            constants.ADAPTER_WAIT_SECONDS_WHEN_RATE_LIMITED
-        ] // 12  # per 5 minutes
+        self.max_requests_per_time_window = (
+            settings.CATALOG_SOURCES_ADAPTERS[self.SOURCE_ID][constants.ADAPTER_REQUESTS_PER_HOUR] // 12
+        )  # per 5 minutes
+        self.wait_seconds_when_rate_limited = (
+            settings.CATALOG_SOURCES_ADAPTERS[self.SOURCE_ID][constants.ADAPTER_WAIT_SECONDS_WHEN_RATE_LIMITED] // 12
+        )  # per 5 minutes
         self.time_window = 300  # X requests allowed in 5 minutes
         self.token_bucket = float(self.max_requests_per_time_window)  # Start with bucket full
         self.last_check_timestamp = 0.0
@@ -103,7 +102,7 @@ class SteamAdapter(BaseAdapter):
         self.total_results = SteamAdapter.UNKNOWN_TOTAL_RESULTS_VALUE
         self.errored = False
         self.fetching = False
-        self.pc_platform_cache = None  # type: Optional[FetchedPlatform]
+        self.pc_platform_cache: Optional[FetchedPlatform] = None
 
         # just a counter to show progress after each N games
         self.counter = 0
@@ -191,9 +190,7 @@ class SteamAdapter(BaseAdapter):
 
         if len(games) != game_count:
             self.stdout.write(
-                self.stdout_style.WARNING(
-                    "Game count mismatch: expected {}, got {}".format(game_count, len(games))
-                )
+                self.stdout_style.WARNING("Game count mismatch: expected {}, got {}".format(game_count, len(games)))
             )
 
         # Steam returns all games in one call (not paginated)
@@ -219,7 +216,7 @@ class SteamAdapter(BaseAdapter):
         return self.errored
 
     def _results_to_game_entities(self, games: List) -> List[Tuple[FetchedGame, List[FetchedPlatform]]]:
-        entities = []  # type: List[Tuple[FetchedGame, List[FetchedPlatform]]]
+        entities: List[Tuple[FetchedGame, List[FetchedPlatform]]] = []
 
         pc_platform = self._get_pc_platform_cached()
         if pc_platform is None:
@@ -298,9 +295,7 @@ class SteamAdapter(BaseAdapter):
             with open(cache_file, "r", encoding="utf-8") as file_handle:
                 data = cast(dict, json.load(file_handle))
         except (json.decoder.JSONDecodeError, IOError) as e:
-            self.stdout.write(
-                self.stdout_style.WARNING(f"Failed to read cache for app ID {app_id}: {e}")
-            )
+            self.stdout.write(self.stdout_style.WARNING(f"Failed to read cache for app ID {app_id}: {e}"))
 
         # Avoid permanentely caching unreleased games.
         # Although if it's not released, how come you own it? preorder maybe?
@@ -318,13 +313,13 @@ class SteamAdapter(BaseAdapter):
 
         return data
 
-
     def _cache_write(self, app_id: int, data: dict) -> None:
         cache_dir = Path(CACHE_FOLDER_NAME)
         cache_file = cache_dir / f"{app_id}.json"
 
-        is_unreleased = \
+        is_unreleased = (
             "release_date" in data and "coming_soon" in data["release_date"] and data["release_date"]["coming_soon"]
+        )
 
         data_copy = copy.deepcopy(data)
         if is_unreleased:
@@ -335,9 +330,7 @@ class SteamAdapter(BaseAdapter):
             with open(cache_file, "w", encoding="utf-8") as file_handle:
                 json.dump(data_copy, file_handle, indent=2)
         except IOError as e:
-            self.stdout.write(
-                self.stdout_style.WARNING(f"Failed to write cache for app ID {app_id}: {e}")
-            )
+            self.stdout.write(self.stdout_style.WARNING(f"Failed to write cache for app ID {app_id}: {e}"))
 
     def _get_game_details(self, app_id: int) -> dict:
         self.counter += 1
@@ -363,7 +356,9 @@ class SteamAdapter(BaseAdapter):
         {"582160":{"success":true,"data":{"release_date":{"coming_soon":false,"date":"27 Oct, 2017"}}}}
         """
 
-        url = "https://store.steampowered.com/api/appdetails?l=en&appids={app_id}&filters={filters}".format(app_id=app_id, filters=filters)
+        url = "https://store.steampowered.com/api/appdetails?l=en&appids={app_id}&filters={filters}".format(
+            app_id=app_id, filters=filters
+        )
 
         request = requests.get(url, headers={"user-agent": settings.CATALOG_SOURCES_ADAPTER_USER_AGENT})
 

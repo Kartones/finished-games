@@ -1,12 +1,11 @@
 import json
 import sqlite3
 from dataclasses import dataclass
-from typing import Any, cast, Dict, List
+from typing import Any, Dict, List, cast
 
-from core.models import Game, UserGame
 from catalogsources.helpers import clean_string_field
+from core.models import Game, UserGame
 from django.core.management.base import BaseCommand, CommandParser
-
 
 # TODO: support other OSes
 GOG_DB_MACOS_PATH = "/Users/Shared/GOG.com/Galaxy/Storage/galaxy-2.0.db"
@@ -21,7 +20,7 @@ PLATFORM_PC = 3
 # List of game titles to skip without any output
 IGNORED_TITLES: List[str] = [
     "Soulstone Survivors: Prologue",
-    "RESIDENT EVIL 2 / BIOHAZARD RE:2 \"1-Shot Demo\"",
+    'RESIDENT EVIL 2 / BIOHAZARD RE:2 "1-Shot Demo"',
     "The Planet Crafter: Prologue",
     "12 is Better than 6",
     "Call of Duty: Modern Warfare 2 Multiplayer",
@@ -188,6 +187,7 @@ CLEANED_TITLE_MAPPINGS: Dict[str, str] = {
     "World of Tanks: Blitz": "World of Tanks Blitz",
 }
 
+
 @dataclass
 class GameTimeData:
     title: str
@@ -277,7 +277,6 @@ class Command(BaseCommand):
                 (gog_user_id,),
             )
             play_times_data = cursor.fetchall()
-
 
             result = []
             for release_key, minutes_in_game in play_times_data:

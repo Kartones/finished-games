@@ -14,7 +14,6 @@ class CatalogManager:
         user_game.no_longer_owned = True
         user_game.save(update_fields=["no_longer_owned"])
 
-
     @staticmethod
     def unmark_as_no_longer_owned(user: settings.AUTH_USER_MODEL, game_id: int, platform_id: int) -> None:
         user_game = UserGame.objects.filter(user=user, game_id=game_id, platform_id=platform_id).get()
@@ -27,7 +26,9 @@ class CatalogManager:
             CatalogManager.unmark_as_abandoned(user=user, game_id=game_id, platform_id=platform_id)
 
             user_game = (
-                UserGame.objects.select_related("game").filter(user=user, game_id=game_id, platform_id=platform_id).get()
+                UserGame.objects.select_related("game")
+                .filter(user=user, game_id=game_id, platform_id=platform_id)
+                .get()
             )
             user_game.year_finished = year_finished
             update_fields = ["year_finished"]
@@ -50,7 +51,6 @@ class CatalogManager:
         user_game = UserGame.objects.filter(user=user, game_id=game_id, platform_id=platform_id).get()
         user_game.currently_playing = True
         user_game.save(update_fields=["currently_playing"])
-
 
     @staticmethod
     def unmark_as_currently_playing(user: settings.AUTH_USER_MODEL, game_id: int, platform_id: int) -> None:
@@ -75,7 +75,6 @@ class CatalogManager:
         user_game = UserGame(user_id=user.id, game_id=game_id, platform_id=platform_id)
         user_game.full_clean()
         user_game.save()
-
 
     @staticmethod
     def remove_from_catalog(user: settings.AUTH_USER_MODEL, game_id: int, platform_id: int) -> None:

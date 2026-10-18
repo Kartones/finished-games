@@ -1,5 +1,5 @@
 import os
-from typing import Any, cast, Dict
+from typing import Any, Dict, cast
 
 from core.models import UserGame
 from django.core.management.base import BaseCommand, CommandParser
@@ -12,7 +12,12 @@ class Command(BaseCommand):
         parser.add_argument("names_file", type=str, help="File with game names (one per line)")
         parser.add_argument("times_file", type=str, help="File with playtimes in hours (one per line)")
         parser.add_argument("user_id", type=int, help="Finished Games user ID")
-        parser.add_argument("--additive", action="store_true", default=False, help="Add playtime (in minutes) to existing value instead of replacing")
+        parser.add_argument(
+            "--additive",
+            action="store_true",
+            default=False,
+            help="Add playtime (in minutes) to existing value instead of replacing",
+        )
 
     def handle(self, *args: Any, **options: Dict) -> None:
         names_file = cast(str, options["names_file"])
@@ -47,7 +52,7 @@ class Command(BaseCommand):
                 self.stdout.write(f"{name} : empty playtime value, skipping")
                 continue
             if not name:
-                self.stdout.write(self.style.WARNING(f"Empty game name, skipping"))
+                self.stdout.write(self.style.WARNING("Empty game name, skipping"))
                 continue
 
             try:
@@ -76,10 +81,16 @@ class Command(BaseCommand):
                 new_minutes = user_game.minutes_played + minutes
                 user_game.minutes_played = new_minutes
                 user_game.save()
-                self.stdout.write(self.style.SUCCESS(f"{game_name} : minutes updated from {user_game.minutes_played - minutes} to {new_minutes}"))
+                self.stdout.write(
+                    self.style.SUCCESS(
+                        f"{game_name} : minutes updated from {user_game.minutes_played - minutes} to {new_minutes}"
+                    )
+                )
             else:
                 if user_game.minutes_played >= minutes:
-                    self.stdout.write(f"{game_name} : existing playtime ({user_game.minutes_played}) is greater or equal than {minutes}, skipped")
+                    self.stdout.write(
+                        f"{game_name} : existing playtime ({user_game.minutes_played}) is greater or equal than {minutes}, skipped"
+                    )
                     continue
 
                 user_game.minutes_played = minutes

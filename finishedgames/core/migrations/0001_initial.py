@@ -95,7 +95,17 @@ class Migration(migrations.Migration):
             ],
             options={"abstract": False},
         ),
-        migrations.AddField(model_name="game", name="platforms", field=models.ManyToManyField(to="core.Platform"),),
-        migrations.AlterUniqueTogether(name="wishlistedusergame", unique_together={("user", "game", "platform")},),
-        migrations.AlterUniqueTogether(name="usergame", unique_together={("user", "game", "platform")},),
+        migrations.AddField(
+            model_name="game",
+            name="platforms",
+            field=models.ManyToManyField(to="core.Platform"),
+        ),
+        migrations.AlterUniqueTogether(
+            name="wishlistedusergame",
+            unique_together={("user", "game", "platform")},
+        ),
+        migrations.AlterUniqueTogether(
+            name="usergame",
+            unique_together={("user", "game", "platform")},
+        ),
     ]

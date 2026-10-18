@@ -4,16 +4,16 @@ from django.db import migrations
 
 
 def update_usergame_year_finished(apps, _):
-    UserGame = apps.get_model('core', 'UserGame')
+    UserGame = apps.get_model("core", "UserGame")
     UserGame.objects.filter(abandoned=True).update(year_finished=2024)
 
 
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('core', '0007_auto_20201201_1950'),
+        ("core", "0007_auto_20201201_1950"),
     ]
 
     operations = [
-         migrations.RunPython(update_usergame_year_finished),
+        migrations.RunPython(update_usergame_year_finished),
     ]

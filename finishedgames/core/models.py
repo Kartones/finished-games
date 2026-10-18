@@ -53,7 +53,7 @@ class Game(BaseGame):
 
     @property
     def urls_dict(self) -> Dict[str, str]:
-        _urls_dict = {}  # type: Dict[str, str]
+        _urls_dict: Dict[str, str] = {}
 
         for urldata in self.urls.split(URLS_ITEMS_GLUE):
             fragments = urldata.split(URLS_KEY_VALUE_GLUE)

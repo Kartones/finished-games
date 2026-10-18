@@ -1,4 +1,4 @@
-from typing import Any, cast, Dict
+from typing import Any, Dict, cast
 
 from core.models import UserGame
 from django.core.management.base import BaseCommand, CommandParser

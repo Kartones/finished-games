@@ -12,11 +12,11 @@ class PlatformFormTests(TestCase):
         self.platform_1 = create_platform()
 
     def test_platform_names_are_unique(self) -> None:
-        platform_data = {
+        platform_data: Dict[str, Any] = {
             "name": "a unique name",
             "shortname": "a unique shortname",
             "publish_date": datetime.now().year,
-        }  # type: Dict[str, Any]
+        }
         create_platform(name=platform_data["name"], shortname=platform_data["shortname"])
 
         platform_form = PlatformForm(platform_data)
@@ -27,11 +27,11 @@ class PlatformFormTests(TestCase):
         self.assertTrue("already exists" in platform_form.errors["shortname"][0])
 
     def test_platform_name_uniqueness_is_case_insensitive(self) -> None:
-        platform_data = {
+        platform_data: Dict[str, Any] = {
             "name": "A Case Sensitive Unique Name",
             "shortname": "A Case Sensitive Unique Shortname",
             "publish_date": datetime.now().year,
-        }  # type: Dict[str, Any]
+        }
         create_platform(name=platform_data["name"], shortname=platform_data["shortname"])
 
         platform_2_data = platform_data.copy()

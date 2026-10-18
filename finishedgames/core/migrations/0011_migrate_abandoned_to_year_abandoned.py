@@ -25,9 +25,7 @@ def migrate_abandoned_to_year_abandoned(apps, _):
 def restore_year_finished_from_year_abandoned(apps, _):
     UserGame = apps.get_model("core", "UserGame")
 
-    UserGame.objects.filter(year_abandoned__isnull=False).update(
-        year_finished=F("year_abandoned"), year_abandoned=None
-    )
+    UserGame.objects.filter(year_abandoned__isnull=False).update(year_finished=F("year_abandoned"), year_abandoned=None)
 
 
 class Migration(migrations.Migration):

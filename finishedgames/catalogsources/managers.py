@@ -295,23 +295,22 @@ class ImportManager:
 
             try:
                 existing_game = Game.objects.filter(
-                    name__iexact=fetched_game.name,
-                    publish_date=fetched_game.publish_date
+                    name__iexact=fetched_game.name, publish_date=fetched_game.publish_date
                 ).get()
                 existing_game_id = existing_game.id
             except Game.DoesNotExist:
                 if not fallback_to_name_match:
-                    warnings.append("No exact match found for '{}' ({})".format(
-                        fetched_game.name,
-                        fetched_game.publish_date
-                    ))
+                    warnings.append(
+                        "No exact match found for '{}' ({})".format(fetched_game.name, fetched_game.publish_date)
+                    )
                 # Else don't add warning yet, fallback will do it if needed
                 pass
             except Game.MultipleObjectsReturned:
-                warnings.append("Multiple games found matching name and date for '{}' ({})".format(
-                    fetched_game.name,
-                    fetched_game.publish_date
-                ))
+                warnings.append(
+                    "Multiple games found matching name and date for '{}' ({})".format(
+                        fetched_game.name, fetched_game.publish_date
+                    )
+                )
                 # do not attempt to link in this case
                 continue
 
@@ -323,15 +322,15 @@ class ImportManager:
                     ).get()
                     existing_game_id = existing_game.id
                 except Game.DoesNotExist:
-                    warnings.append("No matching game name found for '{}' ({})".format(
-                        fetched_game.name,
-                        fetched_game.publish_date
-                    ))
+                    warnings.append(
+                        "No matching game name found for '{}' ({})".format(fetched_game.name, fetched_game.publish_date)
+                    )
                 except Game.MultipleObjectsReturned:
-                    warnings.append("Multiple matching game names found for '{}' ({})".format(
-                        fetched_game.name,
-                        fetched_game.publish_date
-                    ))
+                    warnings.append(
+                        "Multiple matching game names found for '{}' ({})".format(
+                            fetched_game.name, fetched_game.publish_date
+                        )
+                    )
 
             if existing_game_id:
                 try:
@@ -367,9 +366,7 @@ class ImportManager:
                 count_skipped += 1
                 continue
 
-            available_platforms: List[int] = [
-                platform.id for platform in fetched_game.fg_game.platforms.all()
-            ]
+            available_platforms: List[int] = [platform.id for platform in fetched_game.fg_game.platforms.all()]
 
             for platform in fetched_game.platforms.all():
                 if platform.fg_platform and (platform.fg_platform.id not in available_platforms):
