@@ -22,6 +22,6 @@ RUN apt-get update -y \
 
 USER $uid
 
-RUN pip install --upgrade pip
+RUN pip install --upgrade pip==26.2.2
 COPY requirements.txt /code/requirements.txt
 RUN pip install -r /code/requirements.txt
