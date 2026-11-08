@@ -32,7 +32,9 @@
             <th>Platform Name</th>
             {% if user.is_authenticated %}
                 <th>Actions</th>
-                <th>Game Time</th>
+                {% if not HIDE_GAME_TIME %}
+                    <th>Game Time</th>
+                {% endif %}
             {% endif %}
         </tr>
     </thead>
@@ -44,13 +46,15 @@
                 </td>
                 {% if user.is_authenticated %}
                     {% render_actions user game.id platform.id authenticated_user_catalog %}
-                    {% with user_game=user_games_by_platform|get_item:platform.id %}
-                        {% if user_game %}
-                            {% render_game_time user user_game.id user_game.minutes_played game.dlc_or_expansion %}
-                        {% else %}
-                            <td> </td>
-                        {% endif %}
-                    {% endwith %}
+                    {% if not HIDE_GAME_TIME %}
+                        {% with user_game=user_games_by_platform|get_item:platform.id %}
+                            {% if user_game %}
+                                {% render_game_time user user_game.id user_game.minutes_played game.dlc_or_expansion %}
+                            {% else %}
+                                <td> </td>
+                            {% endif %}
+                        {% endwith %}
+                    {% endif %}
                 {% endif %}
             </tr>
         {% endfor %}

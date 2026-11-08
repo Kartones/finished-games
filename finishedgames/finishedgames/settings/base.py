@@ -133,3 +133,6 @@ EXTRA_GAME_INFO_BUTTONS = [
 HIDE_GAMES_BUTTON = False
 HIDE_PLATFORMS_BUTTON = False
 HIDE_USERS_BUTTON = False
+
+# If True, hides the game time (column and input) everywhere in the web UI
+HIDE_GAME_TIME = False
