@@ -6,6 +6,7 @@ services:
         gid: ${GID}
       context: ../..
       dockerfile: build/dev/Dockerfile
+      provenance: false
     environment:
       DJANGO_SETTINGS_MODULE: finishedgames.settings.dev
     image: finished-games:dev
