@@ -6,6 +6,7 @@ from django.urls import reverse
 from web.context_processors import app_settings
 
 GAME_TIME_HEADER = "Game Time"
+TOTAL_GAME_TIME = "Total game time"
 GAME_TIME_INPUT = 'name="minutes_played"'
 
 
@@ -22,6 +23,9 @@ class HideGameTimeViewsTests(TestCase):
     def setUp(self) -> None:
         self.user = create_user()
         self.user_game = create_user_game(self.user, name="a game")
+        create_user_game(self.user, name="finished game", year_finished=2020)
+        create_user_game(self.user, name="abandoned game", year_abandoned=2021)
+        create_user_game(self.user, name="playing game", currently_playing=True)
         self.client.force_login(self.user)
 
     def get(self, url_name: str, *args: Any) -> str:
@@ -43,7 +47,10 @@ class HideGameTimeViewsTests(TestCase):
     def test_list_pages_show_game_time_by_default(self) -> None:
         for url_name, args in self.list_pages().items():
             with self.subTest(url_name):
-                self.assertIn(GAME_TIME_HEADER, self.get(url_name, *args))
+                content = self.get(url_name, *args)
+
+                self.assertIn(GAME_TIME_HEADER, content)
+                self.assertIn(GAME_TIME_INPUT, content)
 
     @override_settings(HIDE_GAME_TIME=True)
     def test_list_pages_hide_game_time_header_and_cell_when_enabled(self) -> None:
@@ -53,6 +60,13 @@ class HideGameTimeViewsTests(TestCase):
 
                 self.assertNotIn(GAME_TIME_HEADER, content)
                 self.assertNotIn(GAME_TIME_INPUT, content)
+
+    def test_catalog_shows_total_game_time_by_default(self) -> None:
+        self.assertIn(TOTAL_GAME_TIME, self.get("user_catalog", self.user.username))
+
+    @override_settings(HIDE_GAME_TIME=True)
+    def test_catalog_hides_total_game_time_when_enabled(self) -> None:
+        self.assertNotIn(TOTAL_GAME_TIME, self.get("user_catalog", self.user.username))
 
     def test_game_details_shows_game_time_by_default(self) -> None:
         content = self.get("game_details", self.user_game.game_id)
